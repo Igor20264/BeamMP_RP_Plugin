@@ -1,0 +1,30 @@
+{
+  "url":"https://discord.gg/J3nNbQ5MxC",
+  "prefix":"!",
+  "currency":"₽",
+  "TIMER":60,
+  "P4M": 0.5,
+  "BonusOnCunt": 50,
+  "PLAYERMIN":0,
+  "REQUEST_SAVE_DATABASE_TIME_SEC": 15,
+  "sec_to_repair":60,
+  "startmoney": 100000,
+  "starworkname":"Безработный",
+  "startworkmoney": 0,
+  "StopWork": 10,
+  "DeleteCarWithAFK": 30,
+  "withelist": true,
+  "drivelicence": {
+      "A" : true,
+      "B" : false,
+      "C" : false,
+      "D" : false
+  },
+  "drivelicence_cost": {
+      "A" : 0,
+      "B" : 100000,
+      "C" : 150000,
+      "D" : 150000
+  },
+  "corrector": 3
+}
