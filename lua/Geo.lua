@@ -82,7 +82,7 @@ function geo:get_random(px,py,min_dist)
 end
 
 function geo:set_random_path(player)
-    local x,y,z = GEO.getPos(MP.GetId(player))
+    local x,y,z = GEO.getPos(MP.GetId(player),0)
     local uuid = geo:get_random(x,y,300)
     geo:set_active_path(player,uuid)
     local database = self.database or gps.database

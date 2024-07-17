@@ -1,4 +1,3 @@
-
 local M = {}
 
 local function D3toD2(x,y,z) -- vec3 to vec2
