@@ -7,7 +7,6 @@ CTS = {}
 
 function SendRequestCTS()
     for id,name in pairs(MP.GetPlayers()) do
-        print(id,name)
         MP.TriggerClientEvent(id,"SendServerData",name)
     end
 

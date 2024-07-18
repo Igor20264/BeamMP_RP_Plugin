@@ -53,20 +53,35 @@ function geo:get_len()
     return l
 end
 
-function geo:get_table_by_distancse(px,py,min_dist)
+function geo:get_table_by_distancse(px,py,min_dist,work_type,pl)
+    pl=nil
+    work_type = work_type or true
     min_dist = min_dist or 10
     local temp = {}
+    local count = 0
     for uuid,data in pairs((self.database or gps.database)) do
         l1 = data.geo[1]
         l2 = data.geo[2]
-        if data.type.work == true and GEO.Rectangle(l1.x,l1.y,l2.x,l2.y,px,py) == false then
+        if work_type == true and data.type.work == true and GEO.Rectangle(l1.x,l1.y,l2.x,l2.y,px,py) == false then
             local distancse = GEO.minDistancePointRect(l1.x,l1.y,l2.x,l2.y,px,py)
             --local distancse1 = math.min(GEO.Distance(l1.x,l1.y,px,py),GEO.Distance(l2.x,l2.y,px,py))
             if distancse >= min_dist then
+                count = count + 1
                 temp[uuid] = data
                 temp[uuid].distancse = distancse
             end
+        elseif work_type ~= true and type(data.type.work) == "table" and GEO.Rectangle(l1.x,l1.y,l2.x,l2.y,px,py) == false then
+            for i,case in pairs(data.type.work) do
+                if case == work_type then
+                    count = count + 1
+                    temp[uuid] = data
+                    temp[uuid].distancse = GEO.minDistancePointRect(l1.x,l1.y,l2.x,l2.y,px,py)
+                end
+            end
         end
+    end
+    if count == 0 and pl == nil then
+        return geo:get_table_by_distancse(px,py,300,true,false)
     end
     -- sort by distancse
 
@@ -74,16 +89,18 @@ function geo:get_table_by_distancse(px,py,min_dist)
     return temp
 end
 
-function geo:get_random(px,py,min_dist)
+function geo:get_random(px,py,min_dist,work_type)
+    work_type = work_type or true
     min_dist = min_dist or 10
-    local temp = geo:get_table_by_distancse(px,py,min_dist)
+    local temp = geo:get_table_by_distancse(px,py,min_dist,work_type)
     local s = Util.RandomIntRange(#temp//2,#temp)
     return temp[s].uuid
 end
 
-function geo:set_random_path(player)
+function geo:set_random_path(player,work_type)
+    work_type = work_type or true
     local x,y,z = GEO.getPos(MP.GetId(player),0)
-    local uuid = geo:get_random(x,y,300)
+    local uuid = geo:get_random(x,y,300,work_type)
     geo:set_active_path(player,uuid)
     local database = self.database or gps.database
     return GEO.Distance(x,y,database[uuid].geo[1].x,database[uuid].geo[1].y)*1.5,uuid
@@ -91,7 +108,6 @@ end
 
 function geo:update_active_path(player,uuid)
     local database = self.database or gps.database
-    print(database[uuid])
     local x,y,z = midPoint(database[uuid].geo[1].x,database[uuid].geo[1].y,database[uuid].geo[1].z or 0,database[uuid].geo[2].x,database[uuid].geo[2].y,database[uuid].geo[2].z or 0)
     RemoutRun(player,"core_groundMarkers.setFocus(vec3("..x..","..y..","..z.."))")
 end
@@ -110,7 +126,6 @@ function geo:get_user_in_point()
     local ret = {}
     for id,name in pairs(MP.GetPlayers()) do
         local x,y,z = GEO.getPos(id,GEO.getActiveVehicle(id))
-        print(x,y,z)
         for uuid,data in pairs((self.database or gps.database)) do
             if GEO.Rectangle(data.geo[1].x,data.geo[1].y,data.geo[2].x,data.geo[2].y,x,y) then
                 ret[name] = uuid
@@ -222,7 +237,7 @@ function GEO_GET_INFO(sender_id, sender_name, message) -- name
     ret = ret.."point 1:".."x = "..data.geo[1].x.." | y = "..data.geo[1].y.." | z = "..data.geo[1].z.."\n"
     ret = ret.."point 2:".."x = "..data.geo[2].x.." | y = "..data.geo[2].y.." | z = "..data.geo[2].z.."\n"
     ret = ret.."public = "..tostring(data.type.public).."\n"
-    ret = ret.."work = "..tostring(data.type.work).."\n"
+    ret = ret.."work = "..tostring(data.type.work or data.type.work[1]).."\n"
     ret = ret.."uuid = ".. uuid
     SendMessage(sender_id, ret)
 end

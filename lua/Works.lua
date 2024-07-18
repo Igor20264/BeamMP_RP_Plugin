@@ -87,7 +87,8 @@ function Working:init()
 			block_ignore[name] = true
 			return eco.database[name]["work"]["name"], eco.database[name]["work"]["money"], false
 		else
-			local dist,uuid = gps:set_random_path(name)
+			local type_work = eco.database[name]["work"]["type"] or true
+			local dist,uuid = gps:set_random_path(name,type_work)
 			privat.neworking[name] = {lens=0,dist=dist,uuid=uuid,alltimemoney=0,last_uuid="RANDOM"}
 			if eco.database[name]["work"]["metr"] == nil then
 				eco.database[name]["work"]["metr"] = config.P4M
@@ -110,7 +111,7 @@ function Working:init()
 			end
 		end
 		gps:remove_active_path(name)
-		print(privat.neworking[name].dist*config.P4M,privat.neworking[name].lens*config.BonusOnCunt)
+		log({privat.neworking[name].dist*config.P4M,privat.neworking[name].lens*config.BonusOnCunt},3)
 		local money = (privat.neworking[name].dist*config.P4M)+(privat.neworking[name].lens*config.BonusOnCunt)
 		money = round(money,2)
 		eco:add(name,"money",money)
@@ -126,7 +127,8 @@ function Working:init()
 		end
 		privat.neworking[name].last_uuid = uuid
 		privat.neworking[name].lens = privat.neworking[name].lens + 1
-		privat.neworking[name].dist,privat.neworking[name].uuid = gps:set_random_path(name)
+		local type_work = eco.database[name]["work"]["type"] or true
+		privat.neworking[name].dist,privat.neworking[name].uuid = gps:set_random_path(name,type_work)
 		privat.neworking[name].alltimemoney = privat.neworking[name].alltimemoney + money
 	end
 
@@ -254,7 +256,6 @@ function CheckWayPoint()
 		end
 	end
 end
-
 
 function SpawnWorkCar(name, workname)
 	if work.workcars[workname] == nil then

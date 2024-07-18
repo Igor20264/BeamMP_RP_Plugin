@@ -111,7 +111,6 @@ onlyPlayer(sag, 1, "HHg", 3)
 onlyPlayer(sag, 1, "Igor20264", 3)
 onlyPlayer(sag, 1, "admin", 3)
 onlyPlayer(sag, 1, "CMD", 3)
-
 --]]
 
 -- Декоратор

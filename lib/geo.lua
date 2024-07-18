@@ -72,7 +72,10 @@ local function Circle(cx,cy,x1,y1,px,py) -- bool
 end
 
 local function getActiveVehicle(id) -- player_id -> server_car_id
-    local car_pid = CTS[MP.GetPlayerName(id)].activeVehicle
+    local car_pid = CTS[MP.GetPlayerName(id)].activeVehicle or -2
+    if car_pid == -2 then
+        return 0
+    end
     for car_id,datacar in pairs(MP.GetPlayerVehicles(id)) do
         local s = string.find(datacar,'"vid":'..car_pid)
         if s ~= nil then
