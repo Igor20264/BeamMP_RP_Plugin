@@ -72,10 +72,10 @@ local function Circle(cx,cy,x1,y1,px,py) -- bool
 end
 
 local function getActiveVehicle(id) -- player_id -> server_car_id
-    local car_pid = CTS[MP.GetPlayerName(id)].activeVehicle or -2
-    if car_pid == -2 then
-        return 0
+    if CTS[MP.GetPlayerName(id)] == nil then
+        return nil
     end
+    local car_pid = CTS[MP.GetPlayerName(id)].activeVehicle
     for car_id,datacar in pairs(MP.GetPlayerVehicles(id)) do
         local s = string.find(datacar,'"vid":'..car_pid)
         if s ~= nil then
@@ -86,7 +86,12 @@ local function getActiveVehicle(id) -- player_id -> server_car_id
 end
 
 local function getPos(id,server_car_id)
-    server_car_id = server_car_id or getActiveVehicle(id) or 0
+    local active = getActiveVehicle(id)
+    if active == nil then
+        log("User"..id.." | Car "..server_car_id.." | is not active",5)
+        return 0,0,0
+    end
+    server_car_id = server_car_id or active or 0
     data = MP.GetPositionRaw(id,server_car_id) or nil
     if data == nil then
         log("User"..id.." | Car "..server_car_id.." | is not active",5)
@@ -96,14 +101,22 @@ local function getPos(id,server_car_id)
 end
 
 local function getSpeed(id,server_car_id)
-    server_car_id = server_car_id or getActiveVehicle(id) or 0
+    local active = getActiveVehicle(id)
+    if active == nil then
+        return nil
+    end
+    server_car_id = server_car_id or active or 0
     data = MP.GetPositionRaw(id,server_car_id)["vel"]
     speed = math.sqrt(data[1]^2 + data[2]^2 + data[3]^2)*3.6
     return speed
 end
 
 local function getAngle(id,server_car_id)
-    server_car_id = server_car_id or getActiveVehicle(id) or 0
+    local active = getActiveVehicle(id)
+    if active == nil then
+        return nil
+    end
+    server_car_id = server_car_id or active or 0
     data = MP.GetPositionRaw(id,server_car_id)["rot"]
     return data[1],data[2] -- yaw, pitch
 end

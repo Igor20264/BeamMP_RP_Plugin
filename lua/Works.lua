@@ -111,7 +111,7 @@ function Working:init()
 			end
 		end
 		gps:remove_active_path(name)
-		log({privat.neworking[name].dist*config.P4M,privat.neworking[name].lens*config.BonusOnCunt},3)
+		print(privat.neworking[name].dist*config.P4M,privat.neworking[name].lens*config.BonusOnCunt)
 		local money = (privat.neworking[name].dist*config.P4M)+(privat.neworking[name].lens*config.BonusOnCunt)
 		money = round(money,2)
 		eco:add(name,"money",money)

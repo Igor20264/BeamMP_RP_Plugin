@@ -26,24 +26,33 @@ function Eco:join(id)
     if self.database[MP.GetPlayerName(id)] == nil then
         self.database[MP.GetPlayerName(id)] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence),perm = 1}
         eco.database[MP.GetPlayerName(id)]["drivelicence"]["A"] = true
+        self:save()
     end
+end
 
+function Eco:joinOnServer(id)
+    print("joinOnServer",id)
     if self.database[MP.GetPlayerName(id)]["online"] == true and self.database[MP.GetPlayerName(id)]["work"]["on_works"] == true then
         Eco:add(MP.GetPlayerName(id),"money",(self.database[MP.GetPlayerName(id)]["work"]["money"]/4))
         SendMessage(id,"Вам начислена компенсация в размере"..(self.database[MP.GetPlayerName(id)]["work"]["money"]/4).." "..config.currency)
         self.database[MP.GetPlayerName(id)]["work"]["on_works"] = false
     end
     self.database[MP.GetPlayerName(id)]["online"] = true
+    if online_player == nil then
+        online_player = {}
+    end
     online_player[id] = MP.GetPlayerName(id)
     self:save()
 end
 
 function Eco:exit(id)
     self.database[MP.GetPlayerName(id)]["online"] = false
-    local name = online_player[id]
-    work:stop(name)
-    online_player[id] = nil
-    CTS[name] = nil
+    if online_player[id] ~= nil then
+        local name = online_player[id]
+        work:stop(name)
+        online_player[id] = nil
+        CTS[name] = nil
+    end
     self:save()
 end
 
@@ -102,6 +111,10 @@ end
 -- System Commands [[
 function EXITPLAYER(player_id)
 	eco:exit(player_id)
+end
+
+function JOINPLAYER(player_id)
+    eco:joinOnServer(player_id)
 end
 
 function AddtoList(id)
@@ -238,6 +251,7 @@ M.command = {
 function M.load()
 	--M.command = RegEvent(M.command)
 	MP.RegisterEvent("onPlayerConnecting","AddtoList")
+    MP.RegisterEvent("onPlayerJoin","JOINPLAYER")
 	MP.RegisterEvent("onPlayerDisconnect","EXITPLAYER")
 end
 

@@ -6,10 +6,14 @@ block_ignore = {}
 CTS = {}
 
 function SendRequestCTS()
-    for id,name in pairs(MP.GetPlayers()) do
+    if online_player == nil then
+        print("online_player == nil")
+        return
+    end
+    for id,name in pairs(online_player) do
+        print(id,name,"SendServerData")
         MP.TriggerClientEvent(id,"SendServerData",name)
     end
-
 end
 
 function GetRequestCTS(id,data)

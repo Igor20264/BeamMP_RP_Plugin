@@ -125,10 +125,13 @@ end
 function geo:get_user_in_point()
     local ret = {}
     for id,name in pairs(MP.GetPlayers()) do
-        local x,y,z = GEO.getPos(id,GEO.getActiveVehicle(id))
-        for uuid,data in pairs((self.database or gps.database)) do
-            if GEO.Rectangle(data.geo[1].x,data.geo[1].y,data.geo[2].x,data.geo[2].y,x,y) then
-                ret[name] = uuid
+        local caruser = GEO.getActiveVehicle(id)
+        if caruser ~= nil then
+            local x,y,z = GEO.getPos(id,GEO.caruser)
+            for uuid,data in pairs((self.database or gps.database)) do
+                if GEO.Rectangle(data.geo[1].x,data.geo[1].y,data.geo[2].x,data.geo[2].y,x,y) then
+                    ret[name] = uuid
+                end
             end
         end
     end
