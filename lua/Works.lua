@@ -111,7 +111,6 @@ function Working:init()
 			end
 		end
 		gps:remove_active_path(name)
-		print(privat.neworking[name].dist*config.P4M,privat.neworking[name].lens*config.BonusOnCunt)
 		local money = (privat.neworking[name].dist*config.P4M)+(privat.neworking[name].lens*config.BonusOnCunt)
 		money = round(money,2)
 		eco:add(name,"money",money)
@@ -135,7 +134,7 @@ function Working:init()
     function obj:stop(name)
 		if privat.working[name] ~= nil then
 			local EGG = timer:get()-privat.working[name] or (timer:get()-60)
-			local pay = eco:value(name,"work","money")*round(EGG/3600)
+			local pay = eco:value(name,"work","money")*round(EGG/3600) or 0
 			eco:add(name,"money",pay)
 			eco.database[name]["work"]["is_working"] = false
 			privat.working[name] = nil
@@ -143,7 +142,7 @@ function Working:init()
 			--RemoutRun(MP.GetId(name), "extensions.vehiclesUni.removeCurrent()")
 			return pay, false
 		elseif privat.neworking[name] ~= nil then
-			local money = privat.neworking[name].alltimemoney
+			local money = privat.neworking[name].alltimemoney or 0
        	 	privat.neworking[name] = nil
 			gps:remove_active_path(name)
 			return money, true

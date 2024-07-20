@@ -175,13 +175,8 @@ function Cars:is_doesnt(owner,data)
         -- Преобразование конфигураций в нижний регистр для сравнения
         local storedConfig = tostring(datas.configuration):lower()
         local newData = tostring(data):lower()
-
-        -- Логирование конфигураций для сравнения
-        log("Stored configuration: " .. storedConfig, 4)
-        log("player data: " .. newData, 4)
         
         if storedConfig == newData then
-            log("Exact match found", 4)
             return true
         end
     

@@ -72,17 +72,22 @@ local function Circle(cx,cy,x1,y1,px,py) -- bool
 end
 
 local function getActiveVehicle(id) -- player_id -> server_car_id
-    if CTS[MP.GetPlayerName(id)] == nil then
+    local data = CTS[MP.GetPlayerName(id)]
+    if data == nil then
         return nil
     end
-    local car_pid = CTS[MP.GetPlayerName(id)].activeVehicle
-    for car_id,datacar in pairs(MP.GetPlayerVehicles(id)) do
+    local car_pid = data.activeVehicle
+    local car_veh = MP.GetPlayerVehicles(id)
+    if car_veh == nil then
+        return nil
+    end
+    for car_id,datacar in pairs(car_veh) do
         local s = string.find(datacar,'"vid":'..car_pid)
         if s ~= nil then
             return car_id
         end
     end
-    return 0
+    return nil
 end
 
 local function getPos(id,server_car_id)

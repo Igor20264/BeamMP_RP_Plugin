@@ -11,7 +11,6 @@ function SendRequestCTS()
         return
     end
     for id,name in pairs(online_player) do
-        print(id,name,"SendServerData")
         MP.TriggerClientEvent(id,"SendServerData",name)
     end
 end
@@ -80,6 +79,10 @@ end
 
 function OFF(sender_id,sender_name, message)
 	p2,case = MessageParser(message," ",2)
+    if p2 == nil then
+       SendMessage(sender_id, "Неверное количество аргументов")
+       return
+    end
 	block_ignore[p2] = true
 	MP.TriggerClientEvent(MP.GetId(p2), "ECOUNBLOCK", "SA")
 	return 0
