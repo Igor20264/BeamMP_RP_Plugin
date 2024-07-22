@@ -84,7 +84,7 @@ function Permissions:init()
     --чистая магия!
     setmetatable(public, self)
     self.__index = self
-	return public
+    return public
 end
 
 --[[

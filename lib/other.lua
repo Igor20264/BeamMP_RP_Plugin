@@ -1,5 +1,4 @@
-function lev_iter(strA,strB)
-        -- Creates a 2D matrix
+function lev_iter(strA,strB) -- Creates a 2D matrix
     local function matrix(row,col)
         local m = {}
         for i = 1,row do m[i] = {}

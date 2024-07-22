@@ -77,17 +77,18 @@ local function getActiveVehicle(id) -- player_id -> server_car_id
         return nil
     end
     local car_pid = data.activeVehicle
-    local car_veh = MP.GetPlayerVehicles(id)
-    if car_veh == nil then
+    local usercars = MP.GetPlayerVehicles(id)
+    if usercars == nil then
+        log({"User"..id.." "..MP.GetPlayerName(id).." | Car "..car_pid.." | MP.GetPlayerVehicles return nil",5})
         return nil
     end
-    for car_id,datacar in pairs(car_veh) do
+    for car_id,datacar in pairs(usercars) do
         local s = string.find(datacar,'"vid":'..car_pid)
         if s ~= nil then
             return car_id
         end
     end
-    return nil
+    return 0
 end
 
 local function getPos(id,server_car_id)

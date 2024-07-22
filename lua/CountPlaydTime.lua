@@ -122,6 +122,13 @@ playdtimeexmp = PlaydTime:init()
 function AddPlayTime()
     for _, player in pairs(MP.GetPlayers()) do
         playdtimeexmp:add(player, 10*60)
+        local ret = playdtimeexmp:get(sender_name) or 0
+        if ret ~= nil then
+            if type(ret) == "string" then
+                ret = tonumber(ret)
+            end
+            RemoutRun(-1, "setPlayerNickPrefix('"..player.."', '"..(eco:value(player, "playdtime")).."h')")
+        end
     end
 end
 

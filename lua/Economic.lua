@@ -129,7 +129,7 @@ function BAL(sender_id,sender_name, message)
     local old_work = true
     if ret1 == 0 then
         old_work = true
-        ret1 = eco:value(sender_name,"work","metr")
+        ret1 = eco:value(sender_name,"work","metr") or 0
     end
 	local ret2 = eco:value(sender_name,"work","name")
     if old_work then
@@ -144,7 +144,7 @@ end
 function PAY(sender_id,sender_name, message) -- Перевод от одного к другому
 	local p2,money = MessageParser(message," ",2) -- имя и колл-во денег
     local p2 = p2
-	local money = tonumber(money[1]) or "Error"
+    money = tonumber(money[1]) or "Error"
     if money == "Error" then
         SendMessage(sender_id, "Неверное значение")
         return

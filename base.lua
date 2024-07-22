@@ -67,7 +67,7 @@ function ThisIsAdmin(Name)
 end
 
 function uptime(sender_id, sender_name, message)
-    local EGG = timer.get()
+    local EGG = timer.runnig()
 	if EGG/3600> 1 then
         SendMessage(sender_id,"Время работы сервера: "..tostring(round(EGG/3600,2)).." ч.")
     elseif EGG/60 > 2 then --Если минуты
@@ -236,6 +236,14 @@ M.command = {
 {command = "PROXY",help = "", args = "[от чьего лица] [args1] [args2] [argsN]",func = "ProxyRun",roles = {"admin"}},
 }
 
+function OPTIMIZATOR()
+	local count1 = collectgarbage("count") -- получаем текущий размер памяти
+	collectgarbage("collect") -- выполняем сбор мусора
+	local count2 = collectgarbage("count") -- получаем размер памяти после сбора
+	log("Освобождено памяти: " .. (round((count1 - count2),2)).. " кб",5)
+end
+
+
 function onInit()
     log("base.lua",2)
 	M.command = RegEvent(M.command)
@@ -254,6 +262,7 @@ function onInit()
     EnvSync = import("EnvSync")
 
 	HeventTimer.addFunc(check_request_save_database, 5) -- 10 секунд иногда слишком долго
+	HeventTimer.addFunc(OPTIMIZATOR,60) -- раз в 10 минут
 	--HeventTimer.addFunc(SaveCarEveryXsec, 1) --, MP.CallStrategy.Precise
 
 	MP.RegisterEvent("onChatMessage", "MyChatMessageHandler")

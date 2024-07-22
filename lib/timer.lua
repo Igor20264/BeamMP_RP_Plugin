@@ -1,10 +1,15 @@
 local M = {}
 function M:init()
 	local privat = {}  --приватное свойство
+	privat.start = os.time()
 	local obj= {} --публичное свойство
 
 	function obj:get()
 		return os.time()
+	end
+
+	function obj:runnig()
+		return os.time()-privat.start
 	end
 
 	function obj:corrector(base)

@@ -71,7 +71,7 @@ function Promo:init()
 	return obj
 end
 
-promo = Promo:init()
+--promo = Promo:init()
 
 function USE_PROMO(sender_id,sender_name, message)
     local case = split(message," ")
@@ -117,12 +117,12 @@ function GET_ALL_PROMO(sender_id,sender_name,message)
     end
 end
 
-Module.command = {
-	{category = "promo" ,command = "use", help = "Использовать промокод.",args = "[promoname]", func = "USE_PROMO"},
-	{category = "promo" ,command = "create", help = "Создать промокод.",args = "[promoname] [money] [limit]", func = "CREAT_PROMO", roles = {"admin"}},
-	{category = "promo" ,command = "delete", help = "Удалить промокод.",args = "[promoname]", func = "DELETE_PROMO", roles = {"admin"}},
-	{category = "promo" ,command = "all", help = "Показать все промокоды.", func = "GET_ALL_PROMO", roles = {"admin"}},
-	}
+Module.command = {}
+	--{category = "promo" ,command = "use", help = "Использовать промокод.",args = "[promoname]", func = "USE_PROMO"},
+	--{category = "promo" ,command = "create", help = "Создать промокод.",args = "[promoname] [money] [limit]", func = "CREAT_PROMO", roles = {"admin"}},
+	--{category = "promo" ,command = "delete", help = "Удалить промокод.",args = "[promoname]", func = "DELETE_PROMO", roles = {"admin"}},
+	--{category = "promo" ,command = "all", help = "Показать все промокоды.", func = "GET_ALL_PROMO", roles = {"admin"}},
+	--}
 
 function Module.load()
 end

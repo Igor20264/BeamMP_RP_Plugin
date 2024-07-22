@@ -112,7 +112,7 @@ function Working:init()
 		end
 		gps:remove_active_path(name)
 		local money = (privat.neworking[name].dist*config.P4M)+(privat.neworking[name].lens*config.BonusOnCunt)
-		money = round(money,2)
+		money = round(money,2)*2
 		eco:add(name,"money",money)
 		SendMessage(MP.GetId(name),"Вам выплатили "..money.." "..config.currency)
 		if privat.neworking[name].lens >= 50 then
@@ -168,11 +168,11 @@ function START_WORK(sender_id,sender_name, message)
 	if work:stats(sender_name) == nil and work:nestats(sender_name) == nil then
 		if config.PLAYERMIN <= getonlineplayers() then
 			local works,zp,isnew = work:start(sender_name)
+			zp = tonumber(zp) or 0.1
 			if isnew then
-				SendMessage(sender_id,"💼 Вы начали доставку. Ваша работа: "..works.." | Зп за километр "..(zp*1000)..""..config.currency)
+				SendMessage(sender_id,"💼 Вы начали доставку. Ваша работа: "..works.." | Зп за километр "..(tonumber(zp)*1000)..""..config.currency)
 			else
 				SendMessage(sender_id,"💼 Вы начали работать. Ваша работа: "..works.." | Зп "..zp..""..config.currency)
-
 			end
 		else
 			SendMessage(sender_id,"Для работы на сервере нужно ещё "..config.PLAYERMIN-getonlineplayers().." игрока.")
@@ -187,7 +187,7 @@ function STOP_WORK(sender_id,sender_name, message)
 	if isnew then
 		SendMessage(sender_id,"Вы закончили работать. За время работы вам выплатили: "..pay.." "..config.currency)
 	else
-		SendMessage(sender_id,"Вы закончили работать. Вам заплатили: "..pay.." "..config.currency)
+		SendMessage(sender_id,"Вы закончили работать. Вам заплатили: "..(pay or 0).." "..config.currency)
 	end
 end
 

@@ -146,8 +146,13 @@ Util.CompareJson = function(original, modified)
     if modified.model == "unicycle" and modified.mainpartname == "unicycle" then
         return true
     else
+        if modified.model == nil or modified.mainpartname == nil then
+            log({"model or mainpartname is nil",modified},4)
+        else
         log("model: "..modified.model)
-        log("mainpartname: "..modified.mainpartname)
+        log("mainpartname: "..modified.mainpartname )
+        end
+
     end
     local function compareTables(tab1, tab2, path)
         local changes = {}
@@ -164,9 +169,6 @@ Util.CompareJson = function(original, modified)
         end
         return changes
     end
-
-
-
     return compareTables(original, modified)
 end
 
@@ -300,10 +302,18 @@ end
 -- Продать машину другому игроку
 function CarsSell(sender_id,sender_name, message)
     local case = split(message," ")
+    if case[1] == nil or case[2] == nil or case[3] == nil then
+        SendMessage(sender_id,"Использование: /cars sell <никнейм_игрока> <ник машины> <цена>")
+        return
+    end
     local name = erors(case[1],2)
     local id = cars:getidbynickname(sender_name,case[2])
+    if id == nil then
+        SendMessage(sender_id,"Такого никнейма нет")
+        return
+    end
     local coast = tonumber(case[3]) or 0
-    carSellQuore[name] = {sender_name, coast = coast,nickname = cars:value(sender_name, id, "nickname"), id = id}
+    carSellQuore[name] = {owner=sender_name, coast = coast,nickname = case[2], id = id}
     SendMessage(sender_id,"Вы отправили предложение о покупке своей машины игроку "..name)
     SendMessage(MP.GetId(name),"Вам отправили предложение о покупке машины: Игрок: "..data.nickname.." | car: "..(data.name or "None")..(data['engine'] or 'None').." "..(data['transmission'] or "None").." "..(data['transfer_case'] or "None").." За "..coast.." "..config.currency)
 end
@@ -324,14 +334,17 @@ function CarsSellAccept(sender_id,sender_name, message)
     end
 end
 
--- Показать все предложения о покупке
+-- Показать все предложение о покупке
 function CarsSellShow(sender_id,sender_name, message)
-    for i,data in pairs(carSellQuore) do
-        if i == sender_name then
-            SendMessage(sender_id,"Предложение о покупке машины от "..data.owner.." | Машину: "..data.nickname.." "..(data['engine'] or 'None').." "..(data['transmission'] or "None").." "..(data['transfer_case'] or "None").." | За:"..data.coast.." "..config.currency)
-        end
+    if carSellQuore[sender_name] == nil then
+        SendMessage(sender_id,"Нет предложений о покупке")
+        return
+    else
+        local data = carSellQuore[sender_name]
+        SendMessage(sender_id,"Предложение о покупке машины от "..data.owner.." | Машину: "..data.nickname.." "..(data['engine'] or 'None').." "..(data['transmission'] or "None").." "..(data['transfer_case'] or "None").." | За:"..data.coast.." "..config.currency)
+        SendMessage(sender_id,"Для принятия предложения введите команду "..config.prefix.."car sellaccept")
+
     end
-    SendMessage(sender_id,"Для принятия предложения введите команду "..config.prefix.."car sellaccept")
 end
 
 -- Отказать всем предложение о покупке
@@ -400,6 +413,10 @@ function CarsDelete(sender_id,sender_name, message)
 end
 
 function CarsSpawn(sender_id, sender_name, message)
+    if message:find(" ") ~= nil then
+        SendMessage("Никнейм машины должны быть в одно слово!")
+        return
+    end
     local id = cars:getidbynickname(sender_name, message)
     local carg = cars.database[sender_name][id]
     
