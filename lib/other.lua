@@ -476,7 +476,7 @@ function MessageParser(message, sep, levenhtein) -- return Name:str, message:tab
 	if player == nil or player == "" then
 		return player,box
 	else
-		local player = erors(player,levenhtein)
+		player = erors(player,levenhtein)
 		return player,box
 	end
 end

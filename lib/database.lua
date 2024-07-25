@@ -104,7 +104,11 @@ function Database:init(namedb) -- свойства
         if type(args[#args]) == "table" then
             currentTable[lastKey] = args[#args]
         else
-            currentTable[lastKey] = tonumber(args[#args]) or args[#args]
+            if args[#args] == "{}" then
+                currentTable[lastKey] = {fixed_path = 1}
+            else
+                 currentTable[lastKey] = tonumber(args[#args]) or args[#args]
+            end
         end
         obj:save()
         local ts = {}

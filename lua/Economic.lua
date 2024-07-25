@@ -143,14 +143,12 @@ end
 
 function PAY(sender_id,sender_name, message) -- Перевод от одного к другому
 	local p2,money = MessageParser(message," ",2) -- имя и колл-во денег
-    local p2 = p2
     money = tonumber(money[1]) or "Error"
     if money == "Error" then
         SendMessage(sender_id, "Неверное значение")
         return
     end
-    money = math.abs(money)
-    money = round(money,1)
+    money = round(math.abs(money),1)
 	local currency = config.currency
 
 	if MP.check_in_online(p2) == true or p2 == "CMD" then
