@@ -7,7 +7,7 @@ options.timeOfDay = {}
 --]]
 -- noting
 -- The length of an in-game day in real-world seconds. Note: The in-game time scales affect the actual real-world length of the day.
-options.timeOfDay.dayLengthRealTimeSeconds = 3000
+options.timeOfDay.dayLengthRealTimeSeconds = 3600
 
 -- The game clock time the server should start with (equivalent to the in-game time slider time, "12:00" is noon and "00:00" is midnight).
 options.timeOfDay.serverWorldStartTime = "10:00"
@@ -16,7 +16,7 @@ options.timeOfDay.serverWorldStartTime = "10:00"
 options.timeOfDay.daytimeScale = 1
 
 -- The factor at which the day progresses during the nighttime.
-options.timeOfDay.nighttimeScale = 2
+options.timeOfDay.nighttimeScale = 3
 
 -- The horizontal location of the sun in the sky (in degrees). This currently has no effect.
 options.timeOfDay.azimuth = 0
