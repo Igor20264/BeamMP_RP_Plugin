@@ -149,18 +149,19 @@ function PAY(sender_id,sender_name, message) -- Перевод от одного
         return
     end
     money = round(math.abs(money),1)
+    local money_nds = money*(config.nds or 0.05)
 	local currency = config.currency
 
 	if MP.check_in_online(p2) == true or p2 == "CMD" then
-		if (eco:value(sender_name,"money")-money >= 0) then
-            local p1 = eco:add(sender_name,"money",-money)
+		if (eco:value(sender_name,"money")-(money+money_nds) >= 0) then
+            local p1 = eco:add(sender_name,"money",-(money+money_nds))
             local pm2 = eco:add(p2,"money",money)
             if p2 == "CMD" then
                 SendMessage(-1,"Игрок "..sender_name.." перевел деньги в CMD в размере "..money.." "..currency)
             else
                 SendMessage(MP.GetId(p2), "Игрок " .. sender_name .." перевёл вам деньги 💵 в размере " .. money .. " "..currency)
             end
-            SendMessage(sender_id, "Вы перевели деньги игроку "..p2.." в размере "..money.." "..currency)
+            SendMessage(sender_id, "Вы перевели деньги игроку "..p2.." в размере "..money.." "..currency.." Комиссия: "..(money_nds).." "..currency)
 		else
 			SendMessage(sender_id, "У вас не хватает денег 💵")
 		end
@@ -168,6 +169,32 @@ function PAY(sender_id,sender_name, message) -- Перевод от одного
 		SendMessage(sender_id, "Проверьте написание."..p2)
 	end 
 	return 1
+end
+
+-- Функция для обработки ставки
+function ROLL(sender_id, sender_name, message)
+    local money = tonumber(message)
+    if not money then
+        SendMessage(sender_id, "Неверное значение")
+        return
+    end
+    money = math.abs(money)
+    if money < 1000 then
+        SendMessage(sender_id, "Минимальная ставка 1000")
+        return
+    end
+    if math.random() < config.winChance then
+        -- Выигрыш
+        local win = money * config.winMultiplier
+        local commission = win * config.commissionRate
+        local netWin = win - commission
+        eco:add(sender_name,"money",netWin)
+        SendMessage(sender_id, "Вы выиграли " .. win .. " денег. После вычета комиссии " .. commission .. " денег, ваш выигрыш составляет " .. netWin .. " денег.")
+    else
+        -- Проигрыш
+        eco:add(sender_name,"money",-money)
+        SendMessage(sender_id, "Вы проиграли " .. loss .. " денег. После добавления комиссии " .. commission .. " денег, ваш проигрыш составляет " .. netLoss .. " денег.")
+    end
 end
 
 function MYINFO(sender_id,sender_name, message)
@@ -244,6 +271,7 @@ M.command = {
 	{category = "eco",command = "getalltype", help = " Вывести все типы ",func = "GET_ALL_TYPE",roles = {"admin"}},
 	{command = "info", help = "Узнать информацию о себе, или предоставить ее другому игроку. ", args = "[name]",func = "MYINFO"},
     {command = "getinfo", help = "Узнать информацию о другом игроке. ", args = "[name]",func = "GETINFO",roles = {"moderator","admin"}},
+    {command = "roll", help = "Крутить казино", args = "[count money]",func = "ROLL"},
 }
 
 function M.load()

@@ -10,7 +10,6 @@ off = off or {}
 local lastCar = {}
 local CarCoast =  CarCoast or load_database("cars_coast.ixt") or {}
 local lisPlate = load_database("lisPlate.ixt") or {}
-local transfered = {}
 local carSellQuore = {}
 
 local function UDV(data)
@@ -552,9 +551,6 @@ end
 
 function CarsCheckUpdate(player_id,vehicle_id,data)
     local name = MP.GetPlayerName(player_id)
-    if block_ignore[name] == true then
-        return 0
-    end
 	local ret = vehicle_parser(data)
 	if ret.jbm == "unicycle" then
         return 0
