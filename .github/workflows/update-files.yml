@@ -21,15 +21,14 @@ jobs:
             rm -rf /root/server_dev/server-mods/BeamMP_RP_Plugin
             mkdir /root/server_dev/server-mods/BeamMP_RP_Plugin
 
-      - name: SFTP upload
-        uses: danhendrickson/sftp-transfer-action@v1.23
+      - name: SFTP uploader
+        uses: wangyucode/sftp-upload-action@v2.0.2
         with:
-          server: ${{ secrets.FTP_HOST }}
-          user: root
-          pass: password
-          port: 22
-          remote-path: /root/server_dev/server-mods/BeamMP_RP_Plugin
-          local-path: ./
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          localDir: ./
+          remoteDir: /root/server_dev/server-mods/BeamMP_RP_Plugin
       - name: Update Database
         uses: appleboy/ssh-action@v1.0.3
         with:
