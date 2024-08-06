@@ -9,19 +9,23 @@ jobs:
   update-files:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Update files
-        run: |
-          git update
-      - name: SFTP upload
-        uses: appleboy/sftp@v1
-        with:
-          host: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 22
-          remote-dir: /root/server_dev/server-mods/BeamMP_RP_Plugin
-          local-dir: ./
-          overwrite: true
+    - name: Checkout code
+      uses: actions/checkout@v3  
+    - name: SFTP upload
+      uses: pressidium/lftp-mirror-action@v1
+      with:
+        host: ${{ secrets.FTP_HOST }}
+        user: root
+        pass: password
+        port: 22
+        remoteDir: /root/server_dev/server-mods/BeamMP_RP_Plugin
+        localDir: ./
+        reverse: true
+    - name: Update Database
+	    uses: appleboy/ssh-action@v1.0.3
+	    with:
+	      host: ${{ secrets.FTP_HOST }}
+	      username: ${{ secrets.FTP_USERNAME }}
+	      password: ${{ secrets.FTP_PASSWORD }}
+	      script: |
+	        cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin/database
