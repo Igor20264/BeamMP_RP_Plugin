@@ -30,7 +30,6 @@ jobs:
           port: 22
           remote-path: /root/server_dev/server-mods/BeamMP_RP_Plugin
           local-path: ./
-          reverse: true
       - name: Update Database
         uses: appleboy/ssh-action@v1.0.3
         with:
