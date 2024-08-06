@@ -29,6 +29,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           localDir: ./
           remoteDir: /root/server_dev/server-mods/BeamMP_RP_Plugin
+          exclude: .git/**,.github/**,.gitignore,database/**,its_not_work/**,pattern/**
       - name: Update Database
         uses: appleboy/ssh-action@v1.0.3
         with:

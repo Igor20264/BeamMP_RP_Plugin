@@ -1,0 +1,39 @@
+name: Update Server
+on:
+  workflow_dispatch:
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Clear Old Code
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: |
+            rm -rf /root/backup_prod/economic
+            mkdir /root/backup_prod/economic
+            cp -r /root/server/server-mods/economic /root/backup_prod/economic
+            rm -rf /root/server/server-mods/BeamMP_RP_Plugin
+            mkdir /root/server/server-mods/BeamMP_RP_Plugin
+            cp -r /root/backup_prod/economic/database /root/server/server-mods/economic/database
+      - name: SFTP uploader
+        uses: wangyucode/sftp-upload-action@v2.0.2
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          localDir: ./
+          remoteDir: /root/server/server-mods/economic
+          exclude: .git/**,.github/**,.gitignore,database/**,its_not_work/**,pattern/**
+      - name: Clear Old Code
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: |
+            docker restart server_beammp-server_1
