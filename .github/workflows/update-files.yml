@@ -39,3 +39,5 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           script: |
             cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin/database
+            docker restart server_beammp-server_dev1
+
