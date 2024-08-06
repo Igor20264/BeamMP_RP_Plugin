@@ -102,9 +102,13 @@ function SendMessage(id,message)
 	if id == -2 or id == "CMD" then -- консолька
 		printRaw("["..M.pluginName.."] Message to Console: "..message)
 	else
-		local id = tonumber(id)
-		local message = tostring(message)
-		local message = split(message,"\n")
+		if type(id) == "string" then
+			id = tonumber(id)
+		end
+		if type(message) ~= "string" then
+			message = tostring(message)
+		end
+		message = split(message,"\n")
         for i,messages in ipairs(message) do
             MP.SendChatMessage(id, messages)
         end

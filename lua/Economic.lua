@@ -152,13 +152,13 @@ function PAY(sender_id,sender_name, message) -- Перевод от одного
     local money_nds = money*(config.nds or 0.05)
 	local currency = config.currency
 
-	if MP.check_in_online(p2) == true or p2 == "CMD" then
+	if p2 == "CMD" or MP.check_in_online(p2) == true then
 		if (eco:value(sender_name,"money")-(money+money_nds) >= 0) then
             local p1 = eco:add(sender_name,"money",-(money+money_nds))
-            local pm2 = eco:add(p2,"money",money)
             if p2 == "CMD" then
                 SendMessage(-1,"Игрок "..sender_name.." перевел деньги в CMD в размере "..money.." "..currency)
             else
+                local pm2 = eco:add(p2,"money",money)
                 SendMessage(MP.GetId(p2), "Игрок " .. sender_name .." перевёл вам деньги 💵 в размере " .. money .. " "..currency)
             end
             SendMessage(sender_id, "Вы перевели деньги игроку "..p2.." в размере "..money.." "..currency.." Комиссия: "..(money_nds).." "..currency)

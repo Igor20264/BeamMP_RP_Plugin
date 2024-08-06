@@ -464,6 +464,32 @@ function CarsSpawn(sender_id, sender_name, message)
     end
 end
 
+
+function CarsSellGos(sender_id, sender_name, message)
+    local case = split(message, " ")
+    local yes = case[1]
+    if yes ~= "yes" then
+        SendMessage(sender_id, "Отказ. Вы не согласились.\n!car sellgos yes [nickname]")
+        return
+    end
+    local id = cars:getidbynickname(sender_name,case[2])
+    if id == nil then
+        SendMessage(sender_id, "Машина не найдена")
+        return
+    end
+    local config_name = Util.JsonDecode(cars.database[sender_name][id].configuration).partConfigFilename
+    local price = CarCoast[config_name] or nil
+    if price == nil then
+        SendMessage(sender_id, "Не установлена стоимость "..(config_name or "корпус неизвестен"))
+        return
+    end
+    local pc = math.random(30,40)
+    eco:add(sender_name, "money", price*(pc/100))
+    cars.database[sender_name][id] = nil.ж
+    cars:save()
+    SendMessage(sender_id, "Машина продана. Вам заплатили за утилизацию "..pc.."% от стоимости. "..price*(pc/100)..""..config.currency)
+end
+
 -- Установить стоймость машины
 function CarsSetPrice(sender_id, sender_name, message)
     local case = split(message, " ")
@@ -617,7 +643,8 @@ M.command = {
 	{category = "car",command = "sell", help = "Предложить покупку машины.",args = "[игрок] [nickname_car] [цена]", func = "CarsSell"},
 	{category = "car",command = "sellshow", help = "Показать все предложения о покупке.", func = "CarsSellShow"},
     {category = "car",command = "selldecline", help = "Отказать в предложение о покупке. ", func = "CarsSellDecline"},
-    {category = "car",command = "sellaccept", help = "Принять предложение о покупке. ",args = "[имя игрока]", func = "CarsSellAccept"}
+    {category = "car",command = "sellaccept", help = "Принять предложение о покупке. ",args = "[имя игрока]", func = "CarsSellAccept"},
+    {category = "car",command = "sellgos", help = "Отправить предложение о покупке. ",args = "yes [имя машины]", func = "CarsSellGos"},
 	
 }
 

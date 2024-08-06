@@ -476,8 +476,14 @@ function MessageParser(message, sep, levenhtein) -- return Name:str, message:tab
 	if player == nil or player == "" then
 		return player,box
 	else
-		player = erors(player,levenhtein)
-		return player,box
+        if player == "CMD" then
+            return player,box
+        else
+            player = erors(player,levenhtein)
+            return player,box
+        end
+
+
 	end
 end
 
