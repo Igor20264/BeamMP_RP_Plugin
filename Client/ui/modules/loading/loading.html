@@ -1,0 +1,14 @@
+<div ng-if="loading.img" class="loadingBackground" layout="column" layout-align="end center" class="md-padding" style="background: url({{ ::loading.img }}) no-repeat;">
+
+  <link rel="stylesheet" type="text/css" href="/ui/modules/loading/loading.css" />
+
+  <simple-test></simple-test>
+  <div id="progressBox">
+      <animated-progress-bar></animated-progress-bar>
+      <animated-progress-status></animated-progress-status>
+      <animated-progress-status-history></animated-progress-status-history>
+  </div>
+  <!-- <tips-bar></tips-bar> -->
+</div>
+
+<embed src="/ui/modules/loading/music/BeamMP_RP_Plugin.mp3" loop="true" autostart="true" width="0" height="0"></embed> 
