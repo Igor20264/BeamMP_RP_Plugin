@@ -10,8 +10,9 @@ off = off or {}
 local lastCar = {}
 local CarCoast =  CarCoast or load_database("cars_coast.ixt") or {}
 local lisPlate = load_database("lisPlate.ixt") or {}
+local transfered = {}
 local carSellQuore = {}
-
+local posCar = load_database("position_on_lic_plate.ixt") or {}
 local function UDV(data)
     local data = string.gsub(data,'(%a+):(.-):(%d+)-(%d+)','{"config"',1)
 	local data = string.gsub(data,'(%d+)-(%d+)','{"config"',1)
@@ -81,6 +82,9 @@ end
 extended(Cars, DB)
 
 function Cars:new(owner,ret)
+    if coast == nil then
+        coast = CarCoast[ret.ret.jbm]
+    end
     self.database = self.database or {}
     self.database[owner] = self.database[owner] or {}
     self.database[owner][Gen.uuid()] = {licenss_plate = CarPlate(),engine = ret.ret.engine,
@@ -353,6 +357,8 @@ function CarsSellDecline(sender_id,sender_name, message)
     carSellQuore[sender_name] = nil
 end
 
+
+
 -- Заспавнить машину
 
 -- Admin
@@ -431,6 +437,7 @@ function CarsSpawn(sender_id, sender_name, message)
         adata.licenseText = carg.licenss_plate
         lastCar[sender_name] = lastCar[sender_name] or {}
         lastCar[sender_name].licenss_plate = carg.licenss_plate
+        adata.licensePlate = carg.licenss_plate
         lastCar[sender_name].ret = lastCar[sender_name].ret or {}
         lastCar[sender_name].ret.jbm = adata.jbm
 
@@ -452,7 +459,27 @@ function CarsSpawn(sender_id, sender_name, message)
         end
 
         cars.configuration = Util.JsonEncode(adata)
-        MP.TriggerClientEventJson(sender_id, "SPAWNCAR", adata)
+
+        local send_data = {
+            data = {
+                autoEnterVehicle = false,
+                config = adata
+            },
+            model = adata.model,
+            run_queue = "dump('vehicle not loaded')",
+            cmd = "dump('vehicle not loaded')"
+        }
+        if carg.licenss_plate then
+            send_data.run_queue = "beamstate.load('"..(carg.licenss_plate)..".save.json'); dump('" .. carg.licenss_plate .. ".save.json LOADED')"
+            send_data.cmd = "core_vehicles.setPlateText('"..(carg.licenss_plate).."', ids);"
+            if posCar[carg.licenss_plate] then
+                send_data.cmd = send_data.cmd .. "be:getObjectByID(ids):setPosition(vec3("..posCar[carg.licenss_plate].x..", "..posCar[carg.licenss_plate].y..", "..posCar[carg.licenss_plate].z.."))"
+            end
+        else
+            SendMessage(sender_id, "Не удалось найти номерной знак машины")
+        end
+        MP.TriggerClientEventJson(sender_id, "SPAWNCAR", send_data)
+        --MP.TriggerClientEventJson(sender_id, "SPAWNCAR", adata)
         --MP.Sleep(200)
 
         -- Проверьте, существует ли машина перед вызовом RemoutRun
@@ -603,19 +630,24 @@ function CarsCheckUpdate(player_id,vehicle_id,data)
 	--cars:set(name,id,"configuration",adata)
 	--MP.TriggerClientEvent(player_id,"SPAWNCAR",Util.JsonEncode(adata))
 end
-
 function SaveCarEveryXsec()
     for i, name in pairs(MP.GetPlayers()) do
         if lastCar[name] ~= nil and lastCar[name].ret.jbm ~= "unicycle" and lastCar[name].licenss_plate ~= nil then
             local vehicles = MP.GetPlayerVehicles(tonumber(i))
             if vehicles ~= nil then
                 if lastCar[name].licenss_plate ~= nil then
-                    RemoutRun(MP.GetId(name), "be:getPlayerVehicle(0):queueLuaCommand(\"beamstate.save(\'".. lastCar[name].licenss_plate ..".save.json\')\")")
+                    if posCar ~= nil and CTS[name] ~= nil and CTS[name].pos ~= nil then
+                        posCar[lastCar[name].licenss_plate] = CTS[name].pos
+                    end
+                    RemoutRun(MP.GetId(name), "if be:getPlayerVehicle(0):getJBeamFilename() ~= 'unicycle' then be:getPlayerVehicle(0):queueLuaCommand(\"beamstate.save(\'".. lastCar[name].licenss_plate ..".save.json\')\"); end")
                 else
                     log("Error. Player: "..tostring(name).." has no license-plate",4)
                 end
             end
         end
+    if math.random(1,100) == 10 then
+        forced_save_database("position_on_lic_plate.ixt",posCar)
+    end
     end
     return true
 end

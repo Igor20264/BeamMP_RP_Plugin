@@ -48,8 +48,8 @@ M.pluginName = "Economic_Rework_BeamMP_RP_Plugin_Ver"
 smallfunc = require "lib/other"
 HeventTimer = require("lib/EventTimer")
 files = require "lib/io"
-timer = require "lib/timer"
 files.pluginPath = M.pluginPath
+timer = require "lib/timer"
 config = load_config("settings/base")
 log("Время сервера с учётом коррекции: "..get_hour().." ч. | Коррекция: "..config.corrector.." ч.",4)
 --permission = require "lib/permission"
@@ -241,12 +241,13 @@ M.command = {
 }
 
 function OPTIMIZATOR()
-	local count1 = collectgarbage("count") -- получаем текущий размер памяти
+	local c1 = collectgarbage("count") -- получаем текущий размер памяти
+	local c2 = collectgarbage("count")
+	local alpha = ((c1-c2))
 	collectgarbage("collect") -- выполняем сбор мусора
 	local count2 = collectgarbage("count") -- получаем размер памяти после сбора
-	log("Освобождено памяти: " .. (round((count1 - count2),2)).. " кб",5)
+	log("Освобождено памяти: " .. (round(((c1 - count2)-(alpha*3)),2)).. " кб",5)
 end
-
 
 function onInit()
     log("base.lua",2)
@@ -267,14 +268,15 @@ function onInit()
 
 	HeventTimer.addFunc(check_request_save_database, 5) -- 10 секунд иногда слишком долго
 	HeventTimer.addFunc(OPTIMIZATOR,60) -- раз в 10 минут
-	--HeventTimer.addFunc(SaveCarEveryXsec, 1) --, MP.CallStrategy.Precise
+	HeventTimer.addFunc(SaveCarEveryXsec, 1) --, MP.CallStrategy.Precise
 
 	MP.RegisterEvent("onChatMessage", "MyChatMessageHandler")
 	MP.RegisterEvent("onConsoleInput", "MyCmdHandler")
 	MP.RegisterEvent("STOP", "onShutdown")
 end
+
 function onShutdown()
-	for i,case in pairs(M.onShut) do
+	for _,case in pairs(M.onShut) do
 		log("Выключение подсистемы",3)
 		case()
 	end

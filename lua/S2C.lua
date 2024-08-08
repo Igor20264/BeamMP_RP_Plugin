@@ -126,6 +126,21 @@ function unhack(sender_id,sender_name, message)
     SendMessage(sender_id,"Для применения изменений ожидайте 5 сек.")
 end
 
+function onJoinS2C(user_id)
+     HeventTimer.Createtask(10,LoadAllScript,user_id.."LoadScripts",user_id)
+end
+
+function AddToSendServerData(tag,data)
+    SendScript[#SendScript+1] = 'AddDataToSendServerData([['..tag..'$$$'..data..']])'
+end
+
+function LoadAllScript(user_id)
+    for i,data in pairs(SendScript) do
+        RemoutRun(user_id,data)
+    end
+end
+
+
 local prefix = config.prefix
 M.command = {
 	{command = "on",help = "блокировка некоторых опций бимки ",args= "[name]", func = "ON",roles = {"moderator","admin"}},
