@@ -11,6 +11,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Clear Old Code
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -21,15 +22,36 @@ jobs:
             rm -rf /root/server_dev/server-mods/BeamMP_RP_Plugin
             mkdir /root/server_dev/server-mods/BeamMP_RP_Plugin
 
-      - name: SFTP uploader
+      - name: SFTP Plugin uploader
+        uses: wangyucode/sftp-upload-action@v2.0.2
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          localDir: ./Server/
+          remoteDir: /root/server_dev/server-mods/BeamMP_RP_Plugin
+          exclude: .git/**,.github/**,.gitignore,Server/database/**,Server/its_not_work/**,Server/pattern/**
+
+      - name: Pack Mod to zip
+        run: |
+          cd Client
+          zip -r ../Client.zip .
+          cd ..
+          ls
+          
+
+      - name: SFTP mod uploader
         uses: wangyucode/sftp-upload-action@v2.0.2
         with:
           host: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           localDir: ./
-          remoteDir: /root/server_dev/server-mods/BeamMP_RP_Plugin
-          exclude: .git/**,.github/**,.gitignore,database/**,its_not_work/**,pattern/**
+          remoteDir: /root/server_dev/client-mods/
+          forceUpload: true
+          exclude: .git/**,.github/**,.gitignore,Server/**,Client/**
+
+
       - name: Update Database
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -39,4 +61,3 @@ jobs:
           script: |
             cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin/database
             docker restart server_beammp-server_dev1
-
