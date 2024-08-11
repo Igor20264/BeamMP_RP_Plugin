@@ -61,3 +61,12 @@ jobs:
           script: |
             cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin/database
             docker restart server_beammp-server_dev1
+
+      - name: chmod all files
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: |
+            chmod -R 777 /root/server_dev/server-mods/BeamMP_RP_Plugin

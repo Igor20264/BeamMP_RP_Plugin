@@ -512,7 +512,7 @@ function CarsSellGos(sender_id, sender_name, message)
     end
     local pc = math.random(30,40)
     eco:add(sender_name, "money", price*(pc/100))
-    cars.database[sender_name][id] = nil.ж
+    cars.database[sender_name][id] = nil
     cars:save()
     SendMessage(sender_id, "Машина продана. Вам заплатили за утилизацию "..pc.."% от стоимости. "..price*(pc/100)..""..config.currency)
 end
