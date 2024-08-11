@@ -42,7 +42,6 @@ luac.out
 # database
 *.ixt
 *.toml
-*.json
 
 # pycharm
 *.idea
