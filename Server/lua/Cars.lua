@@ -196,7 +196,7 @@ function Cars:is_doesnt(owner,data)
             for i, v in ipairs(t) do
                 log("Difference: " .. v, 4)
                 local case = split(v, '.')
-                if case[1] ~= "paints" and case[#case] ~= "licenseText" then
+                if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "licensetext" then
                     log("Non-allowed difference: " .. case[#case], 4)
                     ts = false
                     break
