@@ -1,7 +1,7 @@
 local M = {}
 M.efunc = {}
 M.times = 1 -- seconds
-M.info = "Система Продвинутых таймеров"
+M.info = "Система Продвинутых таймеров и задач"
 M.ver = "0.3 Beta"
 local tasker = M.tasker or {}
 local endtask = M.endtask or {}

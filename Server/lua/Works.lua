@@ -110,7 +110,9 @@ function Working:init()
 				return true
 			end
 		end
-		if (privat.neworking[name].last_work_time-os.time()) < 40 then
+
+		if (os.time()-privat.neworking[name].last_work_time) < 40 then
+			print(os.time()-privat.neworking[name].last_work_time,"overspeed",name)
 			return true
 		end
 		gps:remove_active_path(name)

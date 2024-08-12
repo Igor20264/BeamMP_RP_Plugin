@@ -11,7 +11,7 @@ function PlaydTime:init()
         if eco.database[username] ~= nil and eco.database[username]["playdtime"] == nil then
             eco:set(username, "playdtime", 0) -- Каждые 10 минут
             return true
-        elseif eco.database[username]["playdtime"] ~= nil then
+        elseif eco.database[username] ~= nil and eco.database[username]["playdtime"] ~= nil then
             return true
         end
         return false
