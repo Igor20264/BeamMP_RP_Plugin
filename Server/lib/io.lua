@@ -44,6 +44,21 @@ local function verify(namefile,new_data)
     end
 end
 
+function forced_save_database(namefile,data)
+	log(namefile,3)
+	local file, err = io.open(pluginPath .."/database/"..namefile,"w")
+	if file==nil then
+		log("Couldn't open file: "..err,5)
+		return false
+	else
+		data = Util.JsonEncode(data)
+		--file:write(Util.JsonPrettify(data))
+		file:write(data)
+		file:close()
+		return true
+	end
+end
+
 function check_request_save_database()
     for namefile,data in pairs(req_save_database) do
         if gettime() >= data.time then
