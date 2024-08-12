@@ -89,7 +89,7 @@ function Working:init()
 		else
 			local type_work = eco.database[name]["work"]["type"] or true
 			local dist,uuid = gps:set_random_path(name,type_work)
-			privat.neworking[name] = {lens=0,dist=dist,uuid=uuid,alltimemoney=0,last_uuid="RANDOM"}
+			privat.neworking[name] = {lens=0,dist=dist,uuid=uuid,alltimemoney=0,last_uuid="RANDOM",last_work_time = os.time()}
 			if eco.database[name]["work"]["metr"] == nil then
 				eco.database[name]["work"]["metr"] = config.P4M
 			end
@@ -110,6 +110,9 @@ function Working:init()
 				return true
 			end
 		end
+		if (privat.neworking[name].last_work_time-os.time()) < 40 then
+			return true
+		end
 		gps:remove_active_path(name)
 		local money = (privat.neworking[name].dist*config.P4M)+(privat.neworking[name].lens*config.BonusOnCunt)
 		money = round(money,2)*2
@@ -124,6 +127,7 @@ function Working:init()
 				return false,"Слишком мало игроков или время пойти поспать."
 			end
 		end
+		privat.neworking[name].last_work_time = os.time()
 		privat.neworking[name].last_uuid = uuid
 		privat.neworking[name].lens = privat.neworking[name].lens + 1
 		local type_work = eco.database[name]["work"]["type"] or true
