@@ -26,7 +26,7 @@ local function longtask(id,time,command) -- sec, func, tag
         log("Автоматическое создание папки",4)
         FS.CreateDirectory("Resources/Server/long_task/")
     end
-    log("Добавлена задача с большой продолжительностью\: "..tostring(id).." "..command,2)
+    log("Добавлена задача с большой продолжительностью",2)
     local path = tryname(os.time()+time)
     local file = io.open(path, "w")
     file:write(command)
