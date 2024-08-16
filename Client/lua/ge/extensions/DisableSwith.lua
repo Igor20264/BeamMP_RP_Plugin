@@ -4,13 +4,11 @@ local currTime = 0
 local updateTime = 0.1
 local setDistance = 10
 
-local turnedLightsOff = nil
 local fadeLights = true
 
 local dataLights = nil
 local dataLightsBrightness = nil
 
-local lightDistanceTreshold = 100
 local lightShouldCastShadowDistanceTreshold = 30
 
 local lightShouldCastShadowDistanceTresholdSquared = lightShouldCastShadowDistanceTreshold * lightShouldCastShadowDistanceTreshold
@@ -169,7 +167,6 @@ local function updateLightsTime()
 end
 
 local function skipPlayers(egg)
-	settings.setValue("", egg)
     settings.setValue("skipOtherPlayersVehicles", egg)
 	settings.setValue("nameTagFadeEnabled", egg)
 	settings.setValue("nameTagFadeDistance", 20)
@@ -189,15 +186,12 @@ local function skipPlayers(egg)
 	settings.setValue("unicycleAutoSave", true)
 	settings.setValue("protectConfigFromClone", true)
 	settings.setValue("enablePosSmoother", false)
-
 	settings.setValue("spawnVehicleIgnitionLevel", 0)
 	settings.setValue("startThermalsPreHeated", false)
 	settings.setValue("startBrakeThermalsPreHeated", false)
 	settings.setValue("defaultGearboxBehavior", "realistic")
 	settings.setValue("absBehavior", "realistic")
 	settings.setValue("escBehavior", "realistic")
-
-
 	settings.requestSave()
 	
 end
@@ -233,6 +227,7 @@ local function SpawnCar(data)
 	if type(data) ~= "table" then
 		data = json.decode(data)
 	end
+	print("DEBUG CAR SPAWN",data)
 	local vih = core_vehicles.spawnNewVehicle(data["model"], data.data)
 	vih:queueLuaCommand(data.run_queue)
 	load("local ids = "..(vih:getId())..";"..data["cmd"])()
@@ -240,7 +235,6 @@ local function SpawnCar(data)
 	print("data.run_queue:" .. data.run_queue)
     return
 end
-
 
 local function block(data)
 	local data = split(data," ")

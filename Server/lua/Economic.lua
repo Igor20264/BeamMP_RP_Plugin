@@ -172,8 +172,8 @@ end
 
 function WIPE(sender_id,sender_name, message)
     eco.database[message] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence)}
-    eco.database[MP.GetPlayerName(id)]["drivelicence"]["A"] = true
-    eco:set(username, "roles", {"player"})
+    eco.database[message]["drivelicence"]["A"] = true
+    eco:set(message, "roles", {"player"})
     local carss = cars:get_all(sender_name)
     if carss ~= nil then
         for i,v in pairs(carss) do
