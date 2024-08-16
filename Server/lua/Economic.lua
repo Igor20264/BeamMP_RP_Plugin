@@ -315,6 +315,8 @@ function ACCEPT_COINFLIP(sender_id, sender_name, message)
     local case = split(message, " ")
     local challenger_name = erors(case[1], 2)
     local bet_amount = tonumber(case[2]) or 0
+    bet_amount = math.abs(bet_amount)
+    bet_amount = round(bet_amount, 2)
 
     if not coin_flips[challenger_name] or coin_flips[challenger_name].opponent_name ~= sender_name or coin_flips[challenger_name].bet_amount ~= bet_amount then
         SendMessage(sender_id, "Нет активного вызова на бросок монетки от игрока " .. challenger_name .. ".")
@@ -330,8 +332,10 @@ function ACCEPT_COINFLIP(sender_id, sender_name, message)
     local winner_name = math.random() < 0.5 and challenger_name or sender_name
     local loser_name = winner_name == challenger_name and sender_name or challenger_name
 
+    local commission = bet_amount * config.commissionFlip
+
     -- Transfer the bet amount from the loser to the winner
-    eco:add(winner_name, "money", bet_amount)
+    eco:add(winner_name, "money", bet_amount-commission)
     eco:add(loser_name, "money", -bet_amount)
 
     local currency = config.currency
