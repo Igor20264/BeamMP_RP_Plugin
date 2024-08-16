@@ -169,6 +169,7 @@ local function updateLightsTime()
 end
 
 local function skipPlayers(egg)
+	settings.setValue("", egg)
     settings.setValue("skipOtherPlayersVehicles", egg)
 	settings.setValue("nameTagFadeEnabled", egg)
 	settings.setValue("nameTagFadeDistance", 20)
@@ -184,6 +185,19 @@ local function skipPlayers(egg)
 	settings.setValue("showSpectators", true)
 	settings.setValue("debugOutput", false)
 	settings.setValue("unicycle_pc", "beamling")
+	settings.setValue("skipModSecurityWarning", true)
+	settings.setValue("unicycleAutoSave", true)
+	settings.setValue("protectConfigFromClone", true)
+	settings.setValue("enablePosSmoother", false)
+
+	settings.setValue("spawnVehicleIgnitionLevel", 0)
+	settings.setValue("startThermalsPreHeated", false)
+	settings.setValue("startBrakeThermalsPreHeated", false)
+	settings.setValue("defaultGearboxBehavior", "realistic")
+	settings.setValue("absBehavior", "realistic")
+	settings.setValue("escBehavior", "realistic")
+
+
 	settings.requestSave()
 	
 end
