@@ -56,11 +56,11 @@ local Cars = {}
 function CarPlate()
     local letters = {'A', 'B', 'C', 'E', 'H', 'K', 'M', 'O', 'P', 'T', 'X', 'Y'}
     local function randomLetter()
-        local letter = letters[Util.RandomIntRange(1,#letters)]
+        local letter = letters[math.random(1,#letters)]
         return letter
     end
     -- Формат номера: X000XX00, где X - буква, 0 - цифра, 7 - цифра
-    local carNumber = randomLetter()..""..tostring(Util.RandomIntRange(0,9))..""..tostring(Util.RandomIntRange(0,9))..""..tostring(Util.RandomIntRange(0,9))..""..randomLetter()..""..randomLetter().."91"
+    local carNumber = randomLetter()..""..tostring(math.random(0,9))..""..tostring(math.random(0,9))..""..tostring(math.random(0,9))..""..randomLetter()..""..randomLetter().."91"
     if lisPlate[carNumber] then
         carNumber = CarPlate()
     else
@@ -235,25 +235,21 @@ end
 function CarsBuy(sender_id, sender_name, message)
     if not lastCar[sender_name] then
         SendMessage(sender_id, "Ошибка: не удалось найти данные о последней машине.")
-        print("Ошибка: lastCar[sender_name] не существует")
         return
     end
     
     local coast = lastCar[sender_name].price
     if not coast then
         SendMessage(sender_id, "Ошибка: цена машины не установлена.")
-        print("Ошибка: lastCar[sender_name].price не существует")
         return
     end
     
     if eco:value(sender_name, "money") >= coast then
         eco:add(sender_name, "money", -coast)
         local num = cars:new(sender_name, lastCar[sender_name])
-        SendMessage(sender_id, "Вы купили машину.")
-        print("Покупка успешна: " .. sender_name .. " купил машину за " .. coast .. " денег.")
+        SendMessage(sender_id, "Вы купили машину "..lastCar[sender_name].name..".")
     else
         SendMessage(sender_id, "У вас недостаточно денег")
-        print("Ошибка: недостаточно денег у " .. sender_name)
         return
     end
 end

@@ -147,9 +147,10 @@ function Util:rgb2hex(r,g,b)
 end
 
 
-function levi(name,list)
+function levi(name,list,len_iter)
+    len_iter = len_iter or 1
 	for i,case in ipairs(list) do
-		if lev_iter(name,case) <= 1 then
+		if lev_iter(name,case) <= len_iter then
 			return case
 		end
 	end

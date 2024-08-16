@@ -299,11 +299,9 @@ function Otk(user_id)
 end
 
 function SPAWN_ALL_OBJECT(user_id)
-    print("IM RUN")
     for id,data in pairs(gps:get_table_by_distancse(0,0,0)) do
         if data.type.work == true or data.type.public == true then
             local s = fitCube(data.nickname,data.geo[1],data.geo[2])
-            print(s)
             RemoutRun(user_id,s)
         end
     end

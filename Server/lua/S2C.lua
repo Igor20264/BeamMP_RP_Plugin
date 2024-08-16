@@ -7,7 +7,7 @@ CTS = {}
 
 function SendRequestCTS()
     if online_player == nil then
-        print("online_player == nil")
+        log("online_player == nil",2)
         return
     end
     for id,name in pairs(online_player) do
