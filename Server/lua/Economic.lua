@@ -7,7 +7,7 @@ M.ver = "2.0"
 online_player = {}
 local Player = require "lib.player"
 
-local shablon = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,on_works = false}, drivelicence = config.drivelicence,perm = 1}
+local shablon = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence)}
 --
 local Eco = {}
 extended(Eco,DB)
@@ -24,14 +24,13 @@ end
 
 function Eco:join(id)
     if self.database[MP.GetPlayerName(id)] == nil then
-        self.database[MP.GetPlayerName(id)] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence),perm = 1}
+        self.database[MP.GetPlayerName(id)] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence)}
         eco.database[MP.GetPlayerName(id)]["drivelicence"]["A"] = true
         self:save()
     end
 end
 
 function Eco:joinOnServer(id)
-    print("joinOnServer",id)
     if self.database[MP.GetPlayerName(id)]["online"] == true and self.database[MP.GetPlayerName(id)]["work"]["on_works"] == true then
         Eco:add(MP.GetPlayerName(id),"money",(self.database[MP.GetPlayerName(id)]["work"]["money"]/4))
         SendMessage(id,"Вам начислена компенсация в размере"..(self.database[MP.GetPlayerName(id)]["work"]["money"]/4).." "..config.currency)
@@ -171,6 +170,19 @@ function PAY(sender_id,sender_name, message) -- Перевод от одного
 	return 1
 end
 
+function WIPE(sender_id,sender_name, message)
+    eco.database[message] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence)}
+    eco.database[MP.GetPlayerName(id)]["drivelicence"]["A"] = true
+    eco:set(username, "roles", {"player"})
+    local carss = cars:get_all(sender_name)
+    if carss ~= nil then
+        for i,v in pairs(carss) do
+            cars:transfer(message,sender_name,v['nickname'])
+        end
+    end
+    eco:save()
+end
+
 -- Функция для обработки ставки
 function ROLL(sender_id, sender_name, message)
     local money = tonumber(message)
@@ -181,6 +193,14 @@ function ROLL(sender_id, sender_name, message)
     money = math.abs(money)
     if money < 1000 then
         SendMessage(sender_id, "Минимальная ставка 1000")
+        return
+    end
+    if money > 5000000 then
+        SendMessage(sender_id, "Максимальная ставка 5000000")
+        return
+    end
+    if eco.database[sender_name]["money"] == nil or eco.database[sender_name]["money"] < money then
+        SendMessage(sender_id, "У вас не хватает денег 💵")
         return
     end
     if math.random() < config.winChance then
@@ -259,6 +279,71 @@ function GETINFO(sender_id,sender_name, message)
     SendMessage(sender_id,ret)
 end
 
+function COINFLIP(sender_id, sender_name, message)
+    local case = split(message, " ")
+    local opponent_name = erors(case[1], 2)
+    local bet_amount = tonumber(case[2]) or 0
+    local currency = config.currency
+
+    bet_amount = math.abs(bet_amount)
+    bet_amount = round(bet_amount, 2)
+
+    if not MP.check_in_online(opponent_name) then
+        SendMessage(sender_id, "Игрок " .. opponent_name .. " не в сети.")
+        return
+    end
+
+    if bet_amount <= 0 then
+        SendMessage(sender_id, "Неверная ставка.")
+        return
+    end
+
+    if eco:value(sender_name, "money") < bet_amount then
+        SendMessage(sender_id, "У вас не хватает денег для этой ставки.")
+        return
+    end
+
+    local opponent_id = MP.GetId(opponent_name)
+    SendMessage(opponent_id, "Игрок " .. sender_name .. " вызывает вас на бросок монетки на сумму " .. bet_amount .. " " .. currency .. ". Примите вызов с помощью команды /accept " .. sender_name .. " " .. bet_amount)
+    SendMessage(sender_id, "Вызов игрока " .. opponent_name .. " на бросок монетки на сумму " .. bet_amount .. " " .. currency .. " отправлен.")
+
+    -- Store the coin flip challenge in a table
+    coin_flips[sender_name] = {opponent_name = opponent_name, bet_amount = bet_amount}
+end
+
+function ACCEPT_COINFLIP(sender_id, sender_name, message)
+    local case = split(message, " ")
+    local challenger_name = erors(case[1], 2)
+    local bet_amount = tonumber(case[2]) or 0
+
+    if not coin_flips[challenger_name] or coin_flips[challenger_name].opponent_name ~= sender_name or coin_flips[challenger_name].bet_amount ~= bet_amount then
+        SendMessage(sender_id, "Нет активного вызова на бросок монетки от игрока " .. challenger_name .. ".")
+        return
+    end
+
+    if eco:value(sender_name, "money") < bet_amount then
+        SendMessage(sender_id, "У вас не хватает денег для этой ставки.")
+        return
+    end
+
+    -- Randomly select a winner
+    local winner_name = math.random() < 0.5 and challenger_name or sender_name
+    local loser_name = winner_name == challenger_name and sender_name or challenger_name
+
+    -- Transfer the bet amount from the loser to the winner
+    eco:add(winner_name, "money", bet_amount)
+    eco:add(loser_name, "money", -bet_amount)
+
+    local currency = config.currency
+    SendMessage(-1, "Игрок " .. winner_name .. " выиграл бросок монетки у игрока " .. loser_name .. " и получил " .. bet_amount .. " " .. currency .. ".")
+
+    -- Remove the coin flip challenge from the table
+    coin_flips[challenger_name] = nil
+end
+
+-- Initialize the coin_flips table
+coin_flips = {}
+
 -- LOAD PEREMENNI
 eco = Eco:init("players.ixt")
 M.eco = eco
@@ -271,7 +356,10 @@ M.command = {
 	{category = "eco",command = "getalltype", help = " Вывести все типы ",func = "GET_ALL_TYPE",roles = {"admin"}},
 	{command = "info", help = "Узнать информацию о себе, или предоставить ее другому игроку. ", args = "[name]",func = "MYINFO"},
     {command = "getinfo", help = "Узнать информацию о другом игроке. ", args = "[name]",func = "GETINFO",roles = {"moderator","admin"}},
-    {command = "roll", help = "Крутить казино", args = "[count money]",func = "ROLL"},
+    {command = "coinflip", help = "Вызвать игрока на бросок монетки.", args = "[name] [bet_amount]", func = "COINFLIP"},
+    {command = "accept", help = "Принять вызов на бросок монетки.", args = "[name] [bet_amount]", func = "ACCEPT_COINFLIP"},
+    {command = "roll", help = "Крутить рулетку", args = "[count money]",func = "ROLL"},
+    {command = "wipe", help = "Очистить баланс и машину.", args = "[name]",func = "WIPE",roles = {"admin"}},
 }
 
 function M.load()

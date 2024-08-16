@@ -11,6 +11,30 @@ local function task(time,func,hextag,...) -- sec, func, tag
     table.insert(tasker,{end_time = timer.get()+time,func = func,tag=hextag,data = {...}})
 end
 
+
+local function tryname(time)
+    local path = "Resources/Server/long_task/".. round(time,0)..".task"
+    if FS.Exists(path) == true then
+        log("Задача с таким именем уже существует",4)
+        return tryname(time+1)
+    end
+    return path
+end
+
+local function longtask(id,time,command) -- sec, func, tag
+    if FS.Exists("Resources/Server/long_task/") == false then
+        log("Автоматическое создание папки",4)
+        FS.CreateDirectory("Resources/Server/long_task/")
+    end
+    log("Добавлена задача с большой продолжительностью\: "..tostring(func).." "..hextag,2)
+    local path = tryname(os.time()+time)
+    local file = io.open(path, "w")
+    file:write(command)
+    file:close()
+end
+
+local function cancellongtssk(id)  end
+
 local function canceltask(hextag)
     for i,tasks in ipairs(tasker) do
         if tasks.tag == hextag then

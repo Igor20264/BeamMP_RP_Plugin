@@ -168,10 +168,6 @@ local function updateLightsTime()
   
 end
 
-local function invalidateCache()
-  dataLights = nil
-end
-
 local function skipPlayers(egg)
     settings.setValue("skipOtherPlayersVehicles", egg)
 	settings.setValue("nameTagFadeEnabled", egg)
