@@ -216,6 +216,7 @@ function ShowAllCars(sender_id,sender_name, message)
     local ret = "Ваши машины: \n"
     if data == nil then
         SendMessage(sender_id,"У вас нет машин")
+        return
     else
         for i, data in pairs(data) do
         if data ~= nil and data['nickname'] ~= nil and (data['confiscation'] == nil or data['confiscation'] == false) then
@@ -454,6 +455,9 @@ function CarsSpawn(sender_id, sender_name, message)
             end
         end
 
+        if adata.mainPartName == nil then
+            adata.mainPartName = adata.model
+        end
         if adata.model == nil then
             adata.model = adata.mainPartName
         end

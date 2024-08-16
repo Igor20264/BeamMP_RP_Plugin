@@ -234,8 +234,7 @@ local function SpawnCar(data)
 	local vih = core_vehicles.spawnNewVehicle(data["model"], data.data)
 	vih:queueLuaCommand(data.run_queue)
 	load("local ids = "..(vih:getId())..";"..data["cmd"])()
-	print("data.data: " .. data.data)
-	print("data.run_queue:" .. data.run_queue)
+	print("Vehicle spawned")
     return
 end
 
