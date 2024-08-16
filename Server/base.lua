@@ -205,7 +205,6 @@ function HELP(sender_id, sender_name, message)
 	local category_target = ""
 	local text_message = ""
 	if message == "" then
-		print(message)
 		page = 10
 	elseif message:is_integer() then
 		page = tonumber(message)*line
@@ -228,15 +227,14 @@ function HELP(sender_id, sender_name, message)
 
 	if category_target ~= "" then
 		for i,case in ipairs(M.command) do
-			if case.category == category_target and not case.hide then
+			if case.category == category_target and (case.hide == false or case.hide == nil) then
 				text_message = text_message..(permissions:role_in_roles('admin',case.roles) and "[A]" or "")..config.prefix..""..case.category.." "..case.command.." "..case.args.." |\t "..case.help.."\n"
 			end
 		end
-		return
 	else
 		local trues = {}
 		for i,case in ipairs(M.command) do
-			if (page-10 < i and i <= page) and not case.hide then
+			if (page-10 < i and i <= page) and case.hide == false then
 				if trues[case.roles] == true or permissions:roles_in_roles(case.roles,sender_name) then
 					trues[case.roles] = true
 					if permissions:role_in_roles('admin',case.roles) then
@@ -256,7 +254,8 @@ function HELP(sender_id, sender_name, message)
 			end
 		end
 	end
-	if text_message ~= "" then
+
+	if text_message ~= "" and category_target == "" then
 		text_message = text_message.."-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n"
 		text_message = text_message.."!help "..round((page/10)+1,0).." | Для просмотра следующей страницы напишите"
 		if page == 10 then
@@ -309,7 +308,6 @@ function HELP(sender_id, sender_name, message)
 	elseif text_message == "" then
 		text_message = "НИКОМУ НЕ РАССКАЗЫВАЙ ;)"
 	end
-
 	SendMessage(sender_id,text_message)
 	return "pass"
 end
