@@ -476,18 +476,12 @@ function CarsSpawn(sender_id, sender_name, message)
                 send_data.cmd = send_data.cmd .. "be:getObjectByID(ids):setPosition(vec3("..posCar[carg.licenss_plate].x..", "..posCar[carg.licenss_plate].y..", "..posCar[carg.licenss_plate].z.."))"
             end
         else
-            SendMessage(sender_id, "Не удалось найти номерной знак машины")
+            cars.database[sender_name][id].licenss_plate = CarPlate()
+            SendMessage(sender_id, "При спавне машины была обноружена ошибка выдачи номера. Вам выдан номер "..cars.database[sender_name][id].licenss_plate)
+            CarsSpawn(sender_id, sender_name, message)
+            return
         end
         MP.TriggerClientEventJson(sender_id, "SPAWNCAR", send_data)
-        --MP.TriggerClientEventJson(sender_id, "SPAWNCAR", adata)
-        --MP.Sleep(200)
-
-        -- Проверьте, существует ли машина перед вызовом RemoutRun
-        --if carg.licenss_plate then
-            --RemoutRun(sender_id, "dump(be:getPlayerVehicle(0):queueLuaCommand(\"beamstate.load('" .. carg.licenss_plate .. ".save.json')\"))")
-        --else
-            --SendMessage(sender_id, "Не удалось найти номерной знак машины")
-        --end
     end
 end
 

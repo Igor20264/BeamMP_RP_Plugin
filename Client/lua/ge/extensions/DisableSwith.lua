@@ -227,7 +227,10 @@ local function SpawnCar(data)
 	if type(data) ~= "table" then
 		data = json.decode(data)
 	end
-	print("DEBUG CAR SPAWN",data)
+
+	print("DEBUG CAR SPAWN")
+	print(data)
+
 	local vih = core_vehicles.spawnNewVehicle(data["model"], data.data)
 	vih:queueLuaCommand(data.run_queue)
 	load("local ids = "..(vih:getId())..";"..data["cmd"])()
