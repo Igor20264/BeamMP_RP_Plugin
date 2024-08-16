@@ -340,7 +340,7 @@ function ACCEPT_COINFLIP(sender_id, sender_name, message)
     eco:add(loser_name, "money", -bet_amount)
 
     local currency = config.currency
-    SendMessage(-1, "Игрок " .. winner_name .. " выиграл бросок монетки у игрока " .. loser_name .. " и получил " .. bet_amount .. " " .. currency .. ".")
+    SendMessage(-1, "Игрок " .. winner_name .. " выиграл бросок монетки у игрока " .. loser_name .. " и получил " .. bet_amount-commission .. " " .. currency .. ".")
 
     -- Remove the coin flip challenge from the table
     coin_flips[challenger_name] = nil

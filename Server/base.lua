@@ -77,10 +77,6 @@ function uptime(sender_id, sender_name, message)
 end
 
 -- Чат + Консолька
--- -2 вернуть в консоль
-function DiscordApiHandler(sender_name,message)
-	return handlers(-3,sender_name,message)
-end
 
 function MyChatMessageHandler(sender_id, sender_name, message)
 	return handlers(sender_id, sender_name, message)
@@ -128,7 +124,7 @@ function run(case,sender_id,sender_name,message)
 	return
 end
 
-function handlers(sender_id, sender_name, message) --Create by OpenGPT 
+function handlers(sender_id, sender_name, message)
 	if message:sub(1,1) ~= "!" then return 0 end -- если сообщение не начинается с "!", возвращаем 0
 	local cmd, args = message:match("!([^%s]+)%s*(.*)") -- ищем команду и аргументы в сообщении
 	if not cmd then return 0 end -- если команда не найдена, возвращаем 0
@@ -205,7 +201,6 @@ function HELP(sender_id, sender_name, message)
 	local category_target = ""
 	local text_message = ""
 	if message == "" then
-		print(message)
 		page = 10
 	elseif message:is_integer() then
 		page = tonumber(message)*line
@@ -228,15 +223,14 @@ function HELP(sender_id, sender_name, message)
 
 	if category_target ~= "" then
 		for i,case in ipairs(M.command) do
-			if case.category == category_target and not case.hide then
+			if case.category == category_target and (case.hide == false or case.hide == nil) then
 				text_message = text_message..(permissions:role_in_roles('admin',case.roles) and "[A]" or "")..config.prefix..""..case.category.." "..case.command.." "..case.args.." |\t "..case.help.."\n"
 			end
 		end
-		return
 	else
 		local trues = {}
 		for i,case in ipairs(M.command) do
-			if (page-10 < i and i <= page) and not case.hide then
+			if (page-10 < i and i <= page) and case.hide == false then
 				if trues[case.roles] == true or permissions:roles_in_roles(case.roles,sender_name) then
 					trues[case.roles] = true
 					if permissions:role_in_roles('admin',case.roles) then
@@ -256,7 +250,8 @@ function HELP(sender_id, sender_name, message)
 			end
 		end
 	end
-	if text_message ~= "" then
+
+	if text_message ~= "" and category_target == "" then
 		text_message = text_message.."-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n"
 		text_message = text_message.."!help "..round((page/10)+1,0).." | Для просмотра следующей страницы напишите"
 		if page == 10 then
@@ -309,7 +304,6 @@ function HELP(sender_id, sender_name, message)
 	elseif text_message == "" then
 		text_message = "НИКОМУ НЕ РАССКАЗЫВАЙ ;)"
 	end
-
 	SendMessage(sender_id,text_message)
 	return "pass"
 end
@@ -324,11 +318,9 @@ M.command = {
 
 function OPTIMIZATOR()
 	local c1 = collectgarbage("count") -- получаем текущий размер памяти
-	local c2 = collectgarbage("count")
-	local alpha = ((c1-c2))
 	collectgarbage("collect") -- выполняем сбор мусора
 	local count2 = collectgarbage("count") -- получаем размер памяти после сбора
-	log("Освобождено памяти: " .. (round(((c1 - count2)-(alpha*3)),2)).. " кб",5)
+	log("Освобождено памяти: " .. (round(((c1 - count2)),2)).. " кб",5)
 end
 
 function onInit()
@@ -349,7 +341,7 @@ function onInit()
     EnvSync = import("EnvSync")
 
 	HeventTimer.addFunc(check_request_save_database, 5) -- 10 секунд иногда слишком долго
-	HeventTimer.addFunc(OPTIMIZATOR,60) -- раз в 10 минут
+	HeventTimer.addFunc(OPTIMIZATOR,600) -- раз в 10 минут
 	HeventTimer.addFunc(SaveCarEveryXsec, 1) --, MP.CallStrategy.Precise
 
 	MP.RegisterEvent("onChatMessage", "MyChatMessageHandler")
