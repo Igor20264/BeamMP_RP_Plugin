@@ -177,10 +177,10 @@ function WIPE(sender_id,sender_name, message)
     local carss = cars:get_all(sender_name)
     if carss ~= nil then
         for i,v in pairs(carss) do
-            print(i,v)
-            cars:transfer(message,"CMD",v['nickname'])
+            cars:transfer(message,"CMD",i)
         end
     end
+    SendMessage(sender_id, "Вы вайпнули игрока "..message)
     eco:save()
 end
 

@@ -229,7 +229,7 @@ local function SpawnCar(data)
 	end
 
 	print("DEBUG CAR SPAWN")
-	print(data)
+	dump(data)
 
 	local vih = core_vehicles.spawnNewVehicle(data["model"], data.data)
 	vih:queueLuaCommand(data.run_queue)

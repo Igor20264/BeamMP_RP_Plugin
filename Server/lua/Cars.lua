@@ -477,7 +477,7 @@ function CarsSpawn(sender_id, sender_name, message)
             end
         else
             cars.database[sender_name][id].licenss_plate = CarPlate()
-            SendMessage(sender_id, "При спавне машины была обноружена ошибка выдачи номера. Вам выдан номер "..cars.database[sender_name][id].licenss_plate)
+            SendMessage(sender_id, "При спавне машины была обнаружена ошибка выдачи номера. Вам выдан номер "..cars.database[sender_name][id].licenss_plate)
             CarsSpawn(sender_id, sender_name, message)
             return
         end
