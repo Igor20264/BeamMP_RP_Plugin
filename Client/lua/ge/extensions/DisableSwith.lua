@@ -167,6 +167,11 @@ local function updateLightsTime()
 end
 
 local function skipPlayers(egg)
+	settings.setValue("richPresence", true)
+	settings.setValue("richPresenceDiscord", true)
+	settings.setValue("uiAcceleratedRender", true)
+	settings.setValue("showMissionMarkers", true)
+	settings.setValue("enableGasStationsInFreeroam", true)
     settings.setValue("skipOtherPlayersVehicles", egg)
 	settings.setValue("nameTagFadeEnabled", egg)
 	settings.setValue("nameTagFadeDistance", 20)
