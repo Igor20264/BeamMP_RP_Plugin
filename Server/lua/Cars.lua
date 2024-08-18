@@ -86,16 +86,13 @@ end
 extended(Cars, DB)
 
 function Cars:new(owner,ret)
-    if coast == nil then
-        coast = CarCoast[ret.ret.jbm]
-    end
     self.database = self.database or {}
     self.database[owner] = self.database[owner] or {}
     self.database[owner][Gen.uuid()] = {licenss_plate = CarPlate(),engine = ret.ret.engine,
         transmission = ret.ret.transmission, transfer_case = ret.ret.transfer_case,
         configuration = ret.config,body = ret.ret.body,color = ret.ret.color_name,confiscation = false,
 		former_owners = {},name = cars_name[ret.ret.jbm] or ret.ret.mainPartName,
-        nickname=ret.ret.jbm:sub(0,math.min(#ret.ret.jbm-1,3))..""..Gen.generateRandomData(3)}
+        nickname=(ret.ret.jbm or ret.ret.mainPartName):sub(0,math.min(#(ret.ret.jbm or ret.ret.mainPartName)-1,3))..""..Gen.generateRandomData(3)}
     self:save()
     return #self.database[owner]+1
 end
@@ -142,6 +139,9 @@ function Cars:setnick(owner,id,nick)
 end
 
 function Cars:getidbynickname(owner,nickname)
+    if self.database[owner] == nil then
+		return nil
+	end
     for i,data in pairs(self.database[owner]) do
         if data.nickname == nickname then
             return i
@@ -405,6 +405,8 @@ end
 function CarsTestDrive(sender_id, sender_name, message)
     local case = split(message, " ")
     local name = erors(case[1], 2)
+    local timed = case[3] or "2h"
+
     local id = cars:getidbynickname(sender_name, case[2])
     if id == nil then
         SendMessage(sender_id, "Такого никнейма нет")
@@ -488,6 +490,7 @@ function CarsSell(sender_id,sender_name, message)
     end
     local coast = tonumber(case[3]) or 0
     carSellQuore[name] = {owner=sender_name, coast = coast,nickname = case[2], id = id}
+    local data = cars.database[id]
     SendMessage(sender_id,"Вы отправили предложение о покупке своей машины игроку "..name)
     SendMessage(MP.GetId(name),"Вам отправили предложение о покупке машины: Игрок: "..data.nickname.." | car: "..(data.name or "None")..(data['engine'] or 'None').." "..(data['transmission'] or "None").." "..(data['transfer_case'] or "None").." За "..coast.." "..config.currency)
 end
@@ -554,10 +557,10 @@ function CarsUpdate(sender_id,sender_name, message)
     local case = split(message," ")
     local name = erors(case[1],2)
     local id = cars:getidbynickname(name,case[2])
-    cars.database[name][id].configuration = lastCar[name].config
-    cars.database[name][id].engine = lastCar[name].ret.engine
-    cars.database[name][id].transmission = lastCar[name].ret.transmission
-    cars.database[name][id].transfer_case = lastCar[name].ret.transfer_case
+    cars.database[name][id].configuration = lastCar[name].config or "UNKNOWN"
+    cars.database[name][id].engine = lastCar[name].ret.engine or "UNKNOWN"
+    cars.database[name][id].transmission = lastCar[name].ret.transmission or "UNKNOWN"
+    cars.database[name][id].transfer_case = lastCar[name].ret.transfer_case or "UNKNOWN"
     cars:save()
     SendMessage(sender_id,"Машина обновлена")
 end

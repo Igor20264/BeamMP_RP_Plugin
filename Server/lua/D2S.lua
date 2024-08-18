@@ -1,5 +1,5 @@
 local M = {}
-M.info = "Система Связи Discord"
+M.info = "system connection Discord"
 M.ver = "BETA 0.4"
 long_tasks = {}
 
@@ -17,7 +17,7 @@ end
 
 function GetLongTask()
     if FS.Exists("Resources/Server/long_task/") == false then
-        log("Автоматическое создание папки",4)
+        log("auto create folder",4)
         FS.CreateDirectory("Resources/Server/long_task/")
     end
     local fileList = FS.ListFiles("Resources/Server/long_task/")
