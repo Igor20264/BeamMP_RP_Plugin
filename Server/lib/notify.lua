@@ -41,6 +41,7 @@ end
 
 
 local notifications = Notifications:init("notifications.ixt")
+
 function Notifications:onPlayerJoin(playerId)
     local playerName = MP.GetPlayerName(playerId)
     local notify notifications:getNotifications(playerName)
@@ -52,9 +53,10 @@ function Notifications:onPlayerJoin(playerId)
     end
 end
 
-
-MP.RegisterEvent("onPlayerJoin", function(playerId)
+function Notify_on_PlayerJoin(playerId)
     notifications:onPlayerJoin(playerId)
-end)
+end
+
+MP.RegisterEvent("onPlayerJoin", 'Notify_on_PlayerJoin')
 
 return notifications

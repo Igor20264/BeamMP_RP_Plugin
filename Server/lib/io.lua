@@ -87,13 +87,7 @@ function load_database(namefile)
 	log(namefile,3)
 	local file, err = io.open (M.pluginPath.."/database/"..namefile,"r")
 	if file==nil then
-		if err == "/beammp/Resources/Server/Economic_Rework/database/notifications.ixt: No such file or directory" then
-			FS.CreateDirectory(M.pluginPath .."/database/")
-			file, err = io.open(M.pluginPath .."/database/"..namefile,"w")
-			file.write("{}")
-		else
-			log("Couldn't open file: "..err,5)
-		end
+		log("Couldn't open file: "..err,5)
 		return nil
 	else
 	    local read = file:read("*all")

@@ -47,8 +47,8 @@ log(pluginPath,4)
 smallfunc = require "lib/other"
 HeventTimer = require("lib/EventTimer")
 files = require "lib/io"
-notify = require "lib/notify"
 files.pluginPath = M.pluginPath
+notify = require "lib/notify"
 timer = require "lib/timer"
 config = load_config("settings/base")
 log("Время сервера с учётом коррекции: "..get_hour().." ч. | Коррекция: "..config.corrector.." ч.",4)
