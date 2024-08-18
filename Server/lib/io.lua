@@ -20,6 +20,11 @@ local function save_database(namefile,data)
 	log(namefile,3)
 	local file, err = io.open(M.pluginPath .."/database/"..namefile,"w")
 	if file==nil then
+		if err == "/beammp/Resources/Server/Economic_Rework/database/notifications.ixt: No such file or directory" then
+			FS.CreateDirectory(M.pluginPath .."/database/")
+			file, err = io.open(M.pluginPath .."/database/"..namefile,"w")
+			file.write("{}")
+		end
 		log("Couldn't open file: "..err,5)
 		return false
 	else
@@ -82,7 +87,13 @@ function load_database(namefile)
 	log(namefile,3)
 	local file, err = io.open (M.pluginPath.."/database/"..namefile,"r")
 	if file==nil then
-		log("Couldn't open file: "..err,5)
+		if err == "/beammp/Resources/Server/Economic_Rework/database/notifications.ixt: No such file or directory" then
+			FS.CreateDirectory(M.pluginPath .."/database/")
+			file, err = io.open(M.pluginPath .."/database/"..namefile,"w")
+			file.write("{}")
+		else
+			log("Couldn't open file: "..err,5)
+		end
 		return nil
 	else
 	    local read = file:read("*all")
