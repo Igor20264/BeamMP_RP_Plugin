@@ -13,6 +13,10 @@ local lisPlate = load_database("lisPlate.ixt") or {}
 local transfered = {}
 local carSellQuore = {}
 local posCar = load_database("position_on_lic_plate.ixt") or {}
+local testDriveCars = load_database("testDriveCars.ixt") or {} -- Загружаем данные о машинах на тест-драйве
+local testDriveRequests = {} -- Таблица для хранения запросов на тест-драйв
+local freeTestDriveTime = 604800 -- 7 дней в секундах
+
 local function UDV(data)
     local data = string.gsub(data,'(%a+):(.-):(%d+)-(%d+)','{"config"',1)
 	local data = string.gsub(data,'(%d+)-(%d+)','{"config"',1)
@@ -96,16 +100,30 @@ function Cars:new(owner,ret)
     return #self.database[owner]+1
 end
 
-function Cars:transfer(owner,new_owner,id)
+function Cars:transfer(owner,new_owner,id, isTestDrive)
     if self.database[owner][id] == nil then
         SendMessage(owner,"Нет такой машины")
         return false
     else
+        if testDriveCars[id] ~= nil then -- Проверка на тест-драйв
+            SendMessage(owner, "Эта машина сейчас на тест-драйве. Передача невозможна.")
+            return false
+        end
         local tables = self.database[owner][id]
         self.database[new_owner] = self.database[new_owner] or {}
         self.database[owner][id] = nil
         self.database[new_owner][id] = tables
         self:save()
+
+        -- Если это тест-драйв, добавляем информацию в таблицу testDriveCars
+        if isTestDrive then
+            testDriveCars[id] = {
+                owner = owner,
+                tester = new_owner,
+                endTime = os.time() + freeTestDriveTime -- Время окончания тест-драйва (7 дней)
+            }
+        end
+
         return true
     end
 end
@@ -136,13 +154,107 @@ function Cars:update(owner,id,...)
     self.set(owner,id,...)
 end
 
+Util.CompareJsonNew = function(original, modified)
+    if original == nil or modified == nil then
+        return {}, {}, {} -- Возвращаем пустые таблицы, если один из аргументов nil
+    end
+
+    original = Util.JsonDecode(original)
+    modified = Util.JsonDecode(modified)
+
+    -- Проверка на unicycle
+    if modified.model == "unicycle" and modified.mainpartname == "unicycle" then
+        return {}, {}, {}
+    end
+
+    local function compareTables(tab1, tab2, path)
+        local changed = {}
+        local added = {}
+        local removed = {}
+        path = path or ""
+
+        -- Проверка на изменения и добавленные элементы
+        for k, v1 in pairs(tab1) do
+            local v2 = tab2[k]
+            if type(v1) == "table" and type(v2) == "table" then
+                local ch, ad, rm = compareTables(v1, v2, path .. "." .. k)
+                for _, v in pairs(ch) do table.insert(changed, v) end
+                for _, v in pairs(ad) do table.insert(added, v) end
+                for _, v in pairs(rm) do table.insert(removed, v) end
+            elseif v2 == nil then
+                table.insert(removed, {path = path .. "." .. k, value = v1})
+            elseif v1 ~= v2 then
+                table.insert(changed, {path = path .. "." .. k, original = v1, modified = v2})
+            end
+        end
+
+        -- Проверка на удаленные элементы
+        for k, v2 in pairs(tab2) do
+            if tab1[k] == nil then
+                table.insert(added, {path = path .. "." .. k, value = v2})
+            end
+        end
+
+        return changed, added, removed
+    end
+
+    return compareTables(original, modified)
+end
+
+function Cars:is_newdoesnt(owner,data)
+    for i, datas in pairs((self.database[owner] or {})) do
+        -- Преобразование конфигураций в нижний регистр для сравнения
+        local storedConfig = tostring(datas.configuration):lower()
+        local newData = tostring(data):lower()
+
+        if storedConfig == newData then
+            return true
+        end
+
+        local changed, added, removed = Util.CompareJsonNew(storedConfig, newData)
+
+        -- Проверьте, есть ли значительные изменения (например, больше 10 изменений)
+        if #changed + #added + #removed > 10 then
+            log({#changed + #added + #removed,changed, added, removed}, 4)
+            log("Слишком много изменений", 4)
+            return false
+        end
+
+        -- Проверка на недопустимые изменения
+        for _, change in ipairs(changed) do
+            local path = change.path
+            local case = split(path, '.')
+            if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "licensetext" and case[#case] ~= "mainpartname" then
+                log("Недопустимое изменение: " .. path, 4)
+                return false
+            end
+        end
+
+        -- Проверка на недопустимые добавления
+        for _, add in ipairs(added) do
+            local path = add.path
+            local case = split(path, '.')
+            if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "licensetext" and case[#case] ~= "mainpartname" then
+                log("Недопустимое добавление: " .. path, 4)
+                return false
+            end
+        end
+
+        -- Если все проверки пройдены, конфигурации считаются достаточно похожими
+        return true
+    end
+
+    log("Сходств не обнаружено, returning false", 4)
+    return false
+end
+
 -- Функция для сравнения двух JSON-объектов
 Util.CompareJson = function(original, modified)
     if original == nil or modified == nil then
         return false
     end
-    local original = Util.JsonDecode(original)
-    local modified = Util.JsonDecode(modified)
+    original = Util.JsonDecode(original)
+    modified = Util.JsonDecode(modified)
     if (original.model ~= modified.model and original.mainpartname ~= modified.mainpartname) and (original.model ~= nil or modified.model ~= nil) then
         return false
     end
@@ -159,14 +271,17 @@ Util.CompareJson = function(original, modified)
     end
     local function compareTables(tab1, tab2, path)
         local changes = {}
-        local path = path or ""
+        path = path or ""
         for k, v1 in pairs(tab1) do
             local v2 = tab2[k]
             if type(v2) == "table" then
-                compareTables(v1, v2, path .. "." .. k)
+                local nestedChanges = compareTables(v1, v2, path .. "." .. k)
+                for _, change in ipairs(nestedChanges) do
+                    table.insert(changes, change)
+                end
             else
                 if v1 ~= v2 then
-                    table.insert(changes, path .. "." .. k)
+                    table.insert(changes, {path = path .. "." .. k, original = v1, modified = v2})
                 end
             end
         end
@@ -176,7 +291,8 @@ Util.CompareJson = function(original, modified)
 end
 
 function Cars:is_doesnt(owner,data)
-    for i, datas in pairs((self.database[owner] or {})) do
+    log(self:is_newdoesnt(owner,data),4)
+    for _, datas in pairs((self.database[owner] or {})) do
         -- Преобразование конфигураций в нижний регистр для сравнения
         local storedConfig = tostring(datas.configuration):lower()
         local newData = tostring(data):lower()
@@ -193,7 +309,7 @@ function Cars:is_doesnt(owner,data)
         if t and #t <= 10 then
             local ts = true
             log("Differences found:", 4)
-            for i, v in ipairs(t) do
+            for _, v in ipairs(t) do
                 log("Difference: " .. v, 4)
                 local case = split(v, '.')
                 if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "licensetext" and case[#case] ~= "mainpartname" then
@@ -208,7 +324,6 @@ function Cars:is_doesnt(owner,data)
     
     log("Сходств не обнаружено, returning false", 4)
     return false
-    
 end
 -- User Command
 function ShowAllCars(sender_id,sender_name, message)
@@ -218,9 +333,9 @@ function ShowAllCars(sender_id,sender_name, message)
         SendMessage(sender_id,"У вас нет машин")
         return
     else
-        for i, data in pairs(data) do
-        if data ~= nil and data['nickname'] ~= nil and (data['confiscation'] == nil or data['confiscation'] == false) then
-            ret = ret.."nick: "..(data['nickname'] or "Ошибка Сообщите администратору что машина сломалась.").." | car: "..(data['name'] or "None").." | engine:"..(data['engine'] or "None").." | "..(data['transmission'] or "None").." "..(data['transfer_case'] or "None").."\n"
+        for _, item in pairs(data) do
+        if item ~= nil and item['nickname'] ~= nil and (item['confiscation'] == nil or item['confiscation'] == false) then
+            ret = ret.."nick: "..(item['nickname'] or "Ошибка Сообщите администратору что машина сломалась.").." | car: "..(item['name'] or "None").." | engine:"..(item['engine'] or "None").." | "..(item['transmission'] or "None").." "..(item['transfer_case'] or "None").."\n"
         end
     end
 
@@ -285,6 +400,65 @@ function CarsGive(sender_id,sender_name, message)
     end
 
 end
+
+-- Функция для передачи машины на тест-драйв
+function CarsTestDrive(sender_id, sender_name, message)
+    local case = split(message, " ")
+    local name = erors(case[1], 2)
+    local id = cars:getidbynickname(sender_name, case[2])
+    if id == nil then
+        SendMessage(sender_id, "Такого никнейма нет")
+        return
+    end
+
+    -- Проверяем, доступна ли машина для тест-драйва
+    if testDriveCars[id] ~= nil then
+        SendMessage(sender_id, "Эта машина уже на тест-драйве.")
+        return
+    end
+
+    -- Просим пользователя подтвердить тест-драйв
+    local requestData = {
+        owner = sender_name,
+        tester = name,
+        carId = id
+    }
+    testDriveRequests[name] = requestData
+    SendMessage(MP.GetId(name), "Вам предлагают тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. ".")
+    SendMessage(MP.GetId(name), "Чтобы принять тест-драйв, введите команду /testdrive accept. Для отказа введите /testdrive decline.")
+    SendMessage(sender_id, "Вы отправили запрос на тест-драйв машине " .. cars:value(sender_name, id, "nickname") .. " игроку " .. name .. ".")
+end
+
+-- Функция для обработки запроса на тест-драйв
+function CarsTestDriveAccept(sender_id, sender_name, message)
+    local requestData = testDriveRequests[sender_name]
+    if requestData == nil then
+        SendMessage(sender_id, "Нет активных запросов на тест-драйв.")
+        return
+    end
+
+    -- Передаем машину на тест-драйв
+    local success = cars:transfer(requestData.owner, requestData.tester, requestData.carId, true)
+    if success then
+        SendMessage(MP.GetId(requestData.owner), "Игрок " .. requestData.tester .. " принял запрос на тест-драйв. Машина " .. cars:value(requestData.owner, requestData.carId, "nickname") .. " передана на 7 дней.")
+        SendMessage(sender_id, "Вы приняли тест-драйв машины " .. cars:value(requestData.owner, requestData.carId, "nickname") .. ".")
+        testDriveRequests[sender_name] = nil -- Удаляем запрос
+    else
+        SendMessage(sender_id, "Ошибка при передаче машины на тест-драйв.")
+    end
+end
+
+function CarsTestDriveDecline(sender_id, sender_name, message)
+    local requestData = testDriveRequests[sender_name]
+    if requestData == nil then
+        SendMessage(sender_id, "Нет активных запросов на тест-драйв.")
+        return
+    end
+    SendMessage(MP.GetId(requestData.owner), "Игрок " .. requestData.tester .. " отклонил запрос на тест-драйв.")
+    SendMessage(sender_id, "Вы отказались от тест-драйва.")
+    testDriveRequests[sender_name] = nil -- Удаляем запрос
+end
+
 
 function RegenerateNick(sender_id,sender_name,message)
     local case = split(message," ")
@@ -400,7 +574,7 @@ function CarsChekEdit(sender_id,sender_name, message)
     else
         local rt = Util.CompareJson(carg.configuration,lastCar[name].config)
         for i,data in ipairs(rt) do
-            text = text..data.."\n"
+            text = text..data.path.." | "..tostring(data.original).." -> "..tostring(data.modified).."\n" -- Выводим только измененные значения
         end
         SendMessage(sender_id,text)
     end
@@ -643,6 +817,27 @@ function SaveCarEveryXsec()
         forced_save_database("position_on_lic_plate.ixt",posCar)
     end
     end
+
+    -- Проверяем время окончания тест-драйва
+    for id, data in pairs(testDriveCars) do
+        if os.time() >= data.endTime then
+            -- Возвращаем машину владельцу
+            cars:transfer(data.tester, data.owner, id)
+            if MP.check_in_online(data.owner) then
+                SendMessage(MP.GetId(data.owner), "Машина " .. cars:value(data.owner, id, "nickname") .. " вернулась с тест-драйва.")
+
+            end
+            if MP.check_in_online(data.tester) then
+                SendMessage(MP.GetId(data.tester), "Время тест-драйва машины " .. cars:value(data.tester, id, "nickname") .. " истекло.")
+
+            end
+            testDriveCars[id] = nil -- Удаляем информацию о тест-драйве
+        end
+    end
+
+    -- Сохраняем данные о тест-драйве
+    save_database("testDriveCars.ixt", testDriveCars)
+
     return true
 end
 
@@ -671,7 +866,9 @@ M.command = {
     {category = "car",command = "selldecline", help = "Отказать в предложение о покупке. ", func = "CarsSellDecline"},
     {category = "car",command = "sellaccept", help = "Принять предложение о покупке. ",args = "[имя игрока]", func = "CarsSellAccept"},
     {category = "car",command = "sellgos", help = "Отправить предложение о покупке. ",args = "yes [имя машины]", func = "CarsSellGos"},
-	
+	{ category = "car", command = "testdrive", help = "Предложить тест-драйв машины.", args = "[игрок] [nickname_car]", func = "CarsTestDrive"},
+    { category = "car", command = "testdrive", help = "Принять запрос на тест-драйв.", command = "accept", func = "CarsTestDriveAccept"},
+    { category = "car", command = "testdrive", help = "Отклонить запрос на тест-драйв.", command = "decline", func = "CarsTestDriveDecline"},
 }
 
 M.lastCar = lastCar

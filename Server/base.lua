@@ -47,6 +47,7 @@ log(pluginPath,4)
 smallfunc = require "lib/other"
 HeventTimer = require("lib/EventTimer")
 files = require "lib/io"
+notify = require "lib/notify"
 files.pluginPath = M.pluginPath
 timer = require "lib/timer"
 config = load_config("settings/base")

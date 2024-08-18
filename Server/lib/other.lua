@@ -366,9 +366,9 @@ function round(numder,p)
 	return tonumber(string.format("%."..p.."f",numder)) 
 end
 
-function table.shallow_copy(t)
+function table.shallow_copy(self)
 		local t = {}
-		for k,v in pairs(t) do
+		for k,v in pairs(self) do
 			t[k] = v
 		end
 		return t

@@ -127,7 +127,7 @@ function AddPlayTime()
             if type(ret) == "string" then
                 ret = tonumber(ret)
             end
-            RemoutRun(-1, "setPlayerNickPrefix('"..player.."', '"..(eco:value(player, "playdtime")).."h')")
+            RemoutRun(-1, "setPlayerNickPrefix('"..player.."', '"..(round(eco:value(player, "playdtime")/(60*60),0)).."h')")
         end
     end
 end
