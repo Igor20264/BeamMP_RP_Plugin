@@ -1,0 +1,94 @@
+{
+  "name": "rus_regular_noflag",
+  "version": 2,
+  "data": {
+    "gen": {
+      "pattern": [ "%let%d%d%d%let%let%regd", "%let%d%d%d%let%let%regt" ],
+      "patternData": {
+        "let": [ "A", "B", "E", "K", "M", "H", "O", "P", "C", "T", "Y", "X"  ],
+        "regd" : [ "01", "02", "05", "06", "07", "09", "10", "12", "14", "15", "16", "93", "21", "23", "24", "25", "26", "27", "30", "31", "32", "34", "36", "39", "40", "43", "45", "46", "47", "50", "51", "54", "55", "58", "59", "63", "64", "66", "68", "96", "70", "72", "78", "98", "89", "77", "97", "99" ],
+        "regt" : [ "102", "113", "116", "118", "121", "123", "134", "138", "152", "154", "252", "155", "59", "159", "163", "164", "196", "173", "174", "774", "178", "177", "150", "190", "777", "790", "797", "977" ]
+      }
+    },
+    "format": {
+      "52-11": { //EU
+        "size": {
+          "x": 1024,
+          "y": 216
+        },
+        "text": {
+          "x": 0.405,
+          "color": "black",
+			 "extraStyles": {
+				"defaultStyles": 3,
+				"regular_car3x": {
+					"src": "_3x_"
+				},
+				"setStyles": [
+					{
+					"styleNum": [2, 3],
+					"types": ["regular_car", "regular_car3x", "regular_trailer"],
+					"font": "bold"
+					}
+				],
+			 },
+			 "type": "regular",
+        },
+		"generator": "vehicles/common/licenseplates/htnv/script/rus_plates.html",
+		"characterLayout": "vehicles/common/licenseplates/htnv/font/font_rus.json",
+        "diffuse": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_d.png",
+          "backgroundImg": "vehicles/common/licenseplates/rus/regular/rus_noflag_d_1.png",
+          "fillStyle": "white"
+        },
+        "bump": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_n.png",
+          "backgroundImg": "vehicles/common/licenseplates/rus/regular/rus_noflag_n_1.png",
+          "fillStyle": "rgb(0,0,255)"
+        },
+        "specular": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_S.png",
+          "fillStyle": "rgb(233,233,233)"
+        }
+      },
+	  "30-15": { //US
+		"size": {
+          "x": 850,
+          "y": 425
+        },
+		"text": {
+          "color": "black",
+			 "extraStyles": {
+				"regular_car3x": {
+					"src": "_3x_",
+				},
+				"setStyles": [
+					{
+					"styleNum": [2, 3],
+					"types": ["regular_car", "regular_car3x", "regular_trailer"],
+					"font": "bold"
+					}
+				],
+			 },
+			 "type": "regular",
+        },
+		"generator": "vehicles/common/licenseplates/htnv/script/rus_plates.html",
+		"characterLayout": "vehicles/common/licenseplates/htnv/font/font_rus.json",
+		"diffuse": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_d.png",
+          "backgroundImg": "vehicles/common/licenseplates/rus/regular/rus_sq_noflag_d_1.png",
+          "fillStyle": "white"
+        },
+        "bump": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_n.png",
+          "backgroundImg": "vehicles/common/licenseplates/rus/regular/rus_sq_noflag_n_1.png",
+          "fillStyle": "rgb(0,0,255)"
+        },
+        "specular": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_s.png",
+          "fillStyle": "rgb(233,233,233)"
+        }
+	  }
+    }
+  }
+}

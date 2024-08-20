@@ -1,0 +1,21 @@
+{
+
+"license_plate_htnv_rus_regularnoflag_2_1": {
+
+"information":{
+
+"authors":"htnv",
+
+"name":"htnv's Russian Plate Design (Regular, Without Flag)",
+
+"value":50
+
+},
+
+"slotType" : "licenseplate_design_2_1",
+
+"licenseplate_path" : "vehicles/common/licenseplates/rus/regular/rus_regular_noflag.json"
+
+}
+
+}

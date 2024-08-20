@@ -1,0 +1,7 @@
+{
+"keyOff"                 :{"cat":"vehicle",       "order": 19.0, "ctx": "vlua", "onDown"  :"electrics.setIgnitionLevel(0)","title" :"Key Off","desc" :"Set the key position to off"},
+"keyAcc-ButtonBox"       :{"cat":"vehicle",       "order": 19.1, "ctx": "vlua", "onDown"  :"electrics.setIgnitionLevel(1)","title" :"Key Acc Button Box","onUp" :"electrics.setIgnitionLevel(0)","desc" :"Use this if you're using a switch that has a off position that doesn't send an input"},
+"keyAcc"                 :{"cat":"vehicle",       "order": 19.2, "ctx": "vlua", "onDown"  :"electrics.setIgnitionLevel(1)","title" :"Key Acc","desc" :"Set the key position to the accessory position"},
+"keyOn"                  :{"cat":"vehicle",       "order": 19.3, "ctx": "vlua", "onDown"  :"electrics.setIgnitionLevel(2)","title" :"Key On", "desc" :"Set the key position to the on position"},
+"keyIgnition"            :{"cat":"vehicle",       "order": 19.4, "ctx": "vlua", "onDown"  :"electrics.setIgnitionLevel(3)","onUp" :"electrics.setIgnitionLevel(2)", "title": "Starter", "desc" :"Engage the starter motor"}
+}

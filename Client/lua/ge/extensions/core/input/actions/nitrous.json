@@ -1,0 +1,4 @@
+{
+    "armNitrousOxide"         :{"cat":"vehicle",       "order": 34.5,"ctx":"vlua", "onDown"  :"for _,v in pairs(controller.getControllersByType('nitrousOxideInjection')) do v.toggleActive() end", "onUp" :"for _,v in pairs(controller.getControllersByType('nitrousOxideInjection')) do v.toggleActive() end", "title" :"Arm Nitrous", "desc" :"Arm Nitrous for as long as this input is held down"},
+//WARNING!!! Danger to manifold.
+}

@@ -1,0 +1,17 @@
+{
+  "domElement": "<distance-display></distance-display>",
+  "name": "Endurance HUD",
+  "types": [
+    "ui.apps.categories.utility"
+  ],
+  "description": "Tracks driven distance for every spawned vehicle separately and more",
+  "css": {
+    "left": "320px",
+    "top": "180px",
+    "height": "auto",
+    "width": "400px"
+  },
+  "author": "danielr",
+  "version": "0.1",
+  "directive": "distanceDisplay"
+}

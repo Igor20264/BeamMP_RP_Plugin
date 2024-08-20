@@ -1,0 +1,4 @@
+{
+	"nextDashGaugeMode"	:{"cat":"vehicle", "order": 169, "ctx": "vlua", "onDown": "if boost and boost.nextMode then boost.nextMode() end", "title": "Next TTSport gauge mode","desc" :"Switch to the next TTSport gauge mode"},
+	"prevDashGaugeMode"	:{"cat":"vehicle", "order": 170, "ctx": "vlua", "onDown": "if boost and boost.prevMode then boost.prevMode() end", "title": "Previous TTSport gauge mode","desc" :"Switch to the previous TTSport gauge mode"}
+}

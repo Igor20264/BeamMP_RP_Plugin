@@ -1,0 +1,21 @@
+{
+
+"license_plate_htnv_rus_transit_2_1": {
+
+"information":{
+
+"authors":"htnv",
+
+"name":"htnv's Russian Plate Design (Transit)",
+
+"value":50
+
+},
+
+"slotType" : "licenseplate_design_2_1",
+
+"licenseplate_path" : "vehicles/common/licenseplates/rus/transit/rus_transit.json"
+
+}
+
+}

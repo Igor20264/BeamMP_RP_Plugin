@@ -1,0 +1,1 @@
+setExtensionUnloadMode('AutoKick', "manual")

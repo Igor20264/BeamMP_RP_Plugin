@@ -1,0 +1,21 @@
+{
+
+"license_plate_htnv_rus_police_2_1": {
+
+"information":{
+
+"authors":"htnv",
+
+"name":"htnv's Russian Plate Design (Police)",
+
+"value":50
+
+},
+
+"slotType" : "licenseplate_design_2_1",
+
+"licenseplate_path" : "vehicles/common/licenseplates/rus/police/rus_police.json"
+
+}
+
+}

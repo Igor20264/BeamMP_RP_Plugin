@@ -1,0 +1,70 @@
+{
+  "name": "htnv_rus_retro",
+  "version": 2,
+  "data": {
+    "gen": {
+      "pattern": [ "%type%let%let%d%d%d%reg" ],
+      "patternData": {
+        "let": [ "A", "B", "E", "K", "M", "H", "O", "P", "C", "T", "Y", "X"  ],
+        "type": [ "K", "C", "T"  ],
+        "reg" : [ "01", "05", "10", "14", "15", "16", "93", "23", "84", "26", "31", "34", "36", "39", "40", "43", "51", "72", "78", "98", "89", "77", "97", "99" ]
+      }
+    },
+    "format": {
+      "52-11": { //EU
+        "size": {
+          "x": 1024,
+          "y": 216
+        },
+        "text": {
+          "x": 0.48,
+          "color": "black",
+          "type": "retro"
+        },
+		"generator": "vehicles/common/licenseplates/htnv/script/rus_plates.html",
+		"characterLayout": "vehicles/common/licenseplates/htnv/font/font_rus.json",
+        "diffuse": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_d.png",
+          "backgroundImg": "vehicles/common/licenseplates/rus/retro/rus_retro_d.png",
+          "fillStyle": "white"
+        },
+        "bump": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_n.png",
+          "backgroundImg": "vehicles/common/licenseplates/rus/retro/rus_retro_n.png",
+          "fillStyle": "rgb(0,0,255)"
+        },
+        "specular": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_s.png",
+          "fillStyle": "rgb(233,233,233)"
+        }
+      },
+	  "30-15": { //US
+		"size": {
+          "x": 850,
+          "y": 425
+        },
+		"text": {
+          "x": 0.70,
+          "color": "black",
+          "type": "retro"
+        },
+		"generator": "vehicles/common/licenseplates/htnv/script/rus_plates.html",
+		"characterLayout": "vehicles/common/licenseplates/htnv/font/font_rus.json",
+		"diffuse": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_d.png",
+          "backgroundImg": "vehicles/common/licenseplates/rus/retro/rus_retro_sq_d.png",
+          "fillStyle": "white"
+        },
+        "bump": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_n.png",
+          "backgroundImg": "vehicles/common/licenseplates/rus/retro/rus_retro_sq_n.png",
+          "fillStyle": "rgb(0,0,255)"
+        },
+        "specular": {
+          "spriteImg": "vehicles/common/licenseplates/htnv/font/font_rus_s.png",
+          "fillStyle": "rgb(233,233,233)"
+        }
+	  }
+    }
+  }
+}
