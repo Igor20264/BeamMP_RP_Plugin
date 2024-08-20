@@ -12,7 +12,7 @@ local currentMenuItems = {}
 -- same as GE/core/quickAccess/addEntry - sync with it!
 local function addEntry(_args)
   local args = deepcopy(_args) -- do not modify the outside table by any chance
-  if type(args.generator) ~= 'function' and (type(args.title) ~= 'string' or (type(args.onSelect) ~= 'function' and type(args.goto) ~= 'string')) then
+  if type(args.generator) ~= 'function' and (type(args.title) ~= 'string' or (type(args.onSelect) ~= 'function' and type(args.gotopath) ~= 'string')) then
     -- TODO: add proper warning/error
     log('W', 'quickaccess', 'Menu item needs at least a title and an onSelect function callback: ' .. dumps(args))
     --return false
@@ -60,13 +60,13 @@ local function onExtensionLoaded()
     return
   end
 
-  addEntry({ level = '/', title = 'ui.radialmenu2.electrics', goto = '/electrics/', icon = 'radial_electrics'} )
+  addEntry({ level = '/', title = 'ui.radialmenu2.electrics', gotopath = '/electrics/', icon = 'radial_electrics'} )
 
   --addEntry({ level = '/', title = 'test', onSelect = function() print('test') end} )
 
   -- headlights
   addEntry({ level = '/electrics/', generator = function(entries)
-    local e = { title = 'ui.radialmenu2.electrics.headlights', goto = '/electrics/headlights/', icon = 'radial_headlights' }
+    local e = { title = 'ui.radialmenu2.electrics.headlights', gotopath = '/electrics/headlights/', icon = 'radial_headlights' }
     if electrics.values.lights_state == 1 then e.color = '#33ff33'; e.icon = 'radial_headlights_low' end
     if electrics.values.lights_state == 2 then e.color = '#3333ff' end
     table.insert(entries, e)
@@ -105,7 +105,7 @@ local function onExtensionLoaded()
     table.insert(entries, e)
 
     -- signals
-    e = { title = 'ui.radialmenu2.electrics.signals', icon='radial_signal', goto = '/electrics/signals/' }
+    e = { title = 'ui.radialmenu2.electrics.signals', icon='radial_signal', gotopath = '/electrics/signals/' }
     if electrics.values.hazard_enabled == 0 and (electrics.values.signal_left_input == 1 or electrics.values.signal_right_input == 1) then e.color = '#33ff33' end
     table.insert(entries, e)
   end})
@@ -122,7 +122,7 @@ local function onExtensionLoaded()
 
   addEntry({ level = '/', generator = function(entries)
     if beamstate.hasCouplers() then
-      table.insert(entries, { title = 'ui.radialmenu2.couplers', priority = 30, goto = '/couplers/', icon = 'radial_couplers' })
+      table.insert(entries, { title = 'ui.radialmenu2.couplers', priority = 30, gotopath = '/couplers/', icon = 'radial_couplers' })
     end
   end})
 
@@ -136,7 +136,7 @@ local function onExtensionLoaded()
   addEntry({ level = '/', generator = function(entries)
     if next(powertrain.getDevices()) then
       -- has a powertrain
-      table.insert(entries, { title = 'ui.radialmenu2.powertrain', priority = 40, goto = '/powertrain/', icon = 'radial_powertrain' })
+      table.insert(entries, { title = 'ui.radialmenu2.powertrain', priority = 40, gotopath = '/powertrain/', icon = 'radial_powertrain' })
     end
   end})
 
@@ -160,7 +160,7 @@ local function onExtensionLoaded()
 
 
   addEntry({ level = '/', generator = function(entries)
-      table.insert(entries, { title = 'ui.radialmenu2.ai', priority = 50, goto = '/ai/', icon = 'radial_ai' })
+      table.insert(entries, { title = 'ui.radialmenu2.ai', priority = 50, gotopath = '/ai/', icon = 'radial_ai' })
   end})
 
   addEntry({ level = '/ai/', generator = function(entries)
@@ -198,7 +198,7 @@ local function onExtensionLoaded()
   end})
 
   addEntry({ level = '/ai/', generator = function(entries)
-    table.insert(entries, { title = 'ui.radialmenu2.traffic', priority = 53, goto = '/ai/traffic/', icon = 'material_traffic' })
+    table.insert(entries, { title = 'ui.radialmenu2.traffic', priority = 53, gotopath = '/ai/traffic/', icon = 'material_traffic' })
   end})
 
   addEntry({ level = '/ai/traffic/', generator = function(entries)
@@ -227,7 +227,7 @@ local function onExtensionLoaded()
     end
   end})
 
-  addEntry({ level = '/', title = 'ui.radialmenu2.funstuff', priority = 99, goto = '/funstuff/', icon = 'material_tag_faces'} )
+  addEntry({ level = '/', title = 'ui.radialmenu2.funstuff', priority = 99, gotopath = '/funstuff/', icon = 'material_tag_faces'} )
   addEntry({ level = '/funstuff/', title = 'ui.radialmenu2.funstuff.Break', icon = 'radial_break',  onSelect = function() beamstate.breakAllBreakgroups() end} )
   addEntry({ level = '/funstuff/', title = 'ui.radialmenu2.funstuff.Hinges', icon = 'radial_hinges',  onSelect = function() beamstate.breakHinges() end} )
   addEntry({ level = '/funstuff/', title = 'ui.radialmenu2.funstuff.Tires', icon = 'garage_wheels',  onSelect = function() beamstate.deflateTires() end} )
@@ -259,7 +259,7 @@ local function onExtensionLoaded()
 
   -- generator tests
   addEntry({ level = '/', generator = function(entries)
-    table.insert(entries, { title = 'dynamic vehicle submenu', goto = '/test_dynamic2/'})
+    table.insert(entries, { title = 'dynamic vehicle submenu', gotopath = '/test_dynamic2/'})
   end})
 
   addEntry({ level = '/test_dynamic2/', generator = function(entries)
@@ -319,9 +319,9 @@ local function selectItem(id)
   end
 
   -- actual action implementation
-  if type(item.goto) == 'string' then
+  if type(item.gotopath) == 'string' then
     obj:queueGameEngineLua('core_quickAccess.pushTitle( "' .. item.title ..'" )')
-    return itemSelectCallback({'goto', item.goto})
+    return itemSelectCallback({'gotopath', item.gotopath})
 
   elseif type(item.onSelect) == 'function' then
     return itemSelectCallback(item.onSelect(item))
