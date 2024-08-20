@@ -406,10 +406,15 @@ function CarsTestDrive(sender_id, sender_name, message)
     local case = split(message, " ")
     local name = erors(case[1], 2)
     local timed = case[3] or "2h"
+    timed = timeConverter(timed)
+    if timed == nil then
+        SendMessage(sender_id, "Вы указали некорректно время. Попробуйте ещё раз.")
+        return
+    end
 
     local id = cars:getidbynickname(sender_name, case[2])
     if id == nil then
-        SendMessage(sender_id, "Такого никнейма нет")
+        SendMessage(sender_id, "Такой машины у вас нет. (Проверте написание никнейма)")
         return
     end
 
@@ -423,12 +428,14 @@ function CarsTestDrive(sender_id, sender_name, message)
     local requestData = {
         owner = sender_name,
         tester = name,
-        carId = id
+        carId = id,
+        timed = timed
     }
     testDriveRequests[name] = requestData
-    SendMessage(MP.GetId(name), "Вам предлагают тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. ".")
+    local totime = sectotime(timed)
+    SendMessage(MP.GetId(name), "Вам предлагают тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м.")
     SendMessage(MP.GetId(name), "Чтобы принять тест-драйв, введите команду /testdrive accept. Для отказа введите /testdrive decline.")
-    SendMessage(sender_id, "Вы отправили запрос на тест-драйв машине " .. cars:value(sender_name, id, "nickname") .. " игроку " .. name .. ".")
+    SendMessage(sender_id, "Вы отправили запрос на тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " игроку " .. name .. ". Сроком на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м. ")
 end
 
 -- Функция для обработки запроса на тест-драйв
@@ -442,8 +449,9 @@ function CarsTestDriveAccept(sender_id, sender_name, message)
     -- Передаем машину на тест-драйв
     local success = cars:transfer(requestData.owner, requestData.tester, requestData.carId, true)
     if success then
-        SendMessage(MP.GetId(requestData.owner), "Игрок " .. requestData.tester .. " принял запрос на тест-драйв. Машина " .. cars:value(requestData.owner, requestData.carId, "nickname") .. " передана на 7 дней.")
-        SendMessage(sender_id, "Вы приняли тест-драйв машины " .. cars:value(requestData.owner, requestData.carId, "nickname") .. ".")
+        local totime = sectotime(requestData.timed)
+        SendMessage(MP.GetId(requestData.owner), "Игрок " .. requestData.tester .. " принял запрос на тест-драйв. Машина " .. cars:value(requestData.owner, requestData.carId, "nickname") .. " передана на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м.")
+        SendMessage(sender_id, "Вы приняли тест-драйв машины " .. cars:value(requestData.owner, requestData.carId, "nickname") .. " на" .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м.")
         testDriveRequests[sender_name] = nil -- Удаляем запрос
     else
         SendMessage(sender_id, "Ошибка при передаче машины на тест-драйв.")
@@ -647,7 +655,7 @@ function CarsSpawn(sender_id, sender_name, message)
             cmd = "dump('vehicle not loaded')"
         }
         if carg.licenss_plate then
-            send_data.run_queue = "beamstate.load('"..(carg.licenss_plate)..".save.json'); dump('" .. carg.licenss_plate .. ".save.json LOADED')"
+            send_data.run_queue = "beamstate.load('settings\\BeamMP\\Server\\BeamMP_RP_Plugin\\"..(carg.licenss_plate)..".save.json'); dump('settings\\BeamMP\\Server\\BeamMP_RP_Plugin\\" .. carg.licenss_plate .. ".save.json LOADED')"
             send_data.cmd = "core_vehicles.setPlateText('"..(carg.licenss_plate).."', ids);"
             if posCar[carg.licenss_plate] then
                 send_data.cmd = send_data.cmd .. "be:getObjectByID(ids):setPosition(vec3("..posCar[carg.licenss_plate].x..", "..posCar[carg.licenss_plate].y..", "..posCar[carg.licenss_plate].z.."))"
@@ -810,7 +818,7 @@ function SaveCarEveryXsec()
                     if posCar ~= nil and CTS[name] ~= nil and CTS[name].pos ~= nil then
                         posCar[lastCar[name].licenss_plate] = CTS[name].pos
                     end
-                    RemoutRun(MP.GetId(name), "if be:getPlayerVehicle(0):getJBeamFilename() ~= 'unicycle' then be:getPlayerVehicle(0):queueLuaCommand(\"beamstate.save(\'".. lastCar[name].licenss_plate ..".save.json\')\"); end")
+                    RemoutRun(MP.GetId(name), "if be:getPlayerVehicle(0):getJBeamFilename() ~= 'unicycle' then be:getPlayerVehicle(0):queueLuaCommand(\"settings\\BeamMP\\Server\\BeamMP_RP_Plugin\\beamstate.save(\'".. lastCar[name].licenss_plate ..".save.json\')\"); end")
                 else
                     log("Error. Player: "..tostring(name).." has no license-plate",4)
                 end
@@ -869,7 +877,7 @@ M.command = {
     {category = "car",command = "selldecline", help = "Отказать в предложение о покупке. ", func = "CarsSellDecline"},
     {category = "car",command = "sellaccept", help = "Принять предложение о покупке. ",args = "[имя игрока]", func = "CarsSellAccept"},
     {category = "car",command = "sellgos", help = "Отправить предложение о покупке. ",args = "yes [имя машины]", func = "CarsSellGos"},
-	{ category = "car", command = "testdrive", help = "Предложить тест-драйв машины.", args = "[игрок] [nickname_car]", func = "CarsTestDrive"},
+	{ category = "car", command = "testdrive", help = "Предложить тест-драйв машины.", args = "[игрок] [nickname_car] (7d or 1d or 1m or 1h default: 2h)", func = "CarsTestDrive"},
     { category = "car", command = "testdrive", help = "Принять запрос на тест-драйв.", command = "accept", func = "CarsTestDriveAccept"},
     { category = "car", command = "testdrive", help = "Отклонить запрос на тест-драйв.", command = "decline", func = "CarsTestDriveDecline"},
 }

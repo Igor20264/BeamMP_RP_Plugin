@@ -305,7 +305,7 @@ function COINFLIP(sender_id, sender_name, message)
     end
 
     local opponent_id = MP.GetId(opponent_name)
-    SendMessage(opponent_id, "Игрок " .. sender_name .. " вызывает вас на бросок монетки на сумму " .. bet_amount .. " " .. currency .. ". Примите вызов с помощью команды /accept " .. sender_name .. " " .. bet_amount)
+    SendMessage(opponent_id, "Игрок " .. sender_name .. " вызывает вас на бросок монетки на сумму " .. bet_amount .. " " .. currency .. ". Примите вызов с помощью команды /accept " .. sender_name)
     SendMessage(sender_id, "Вызов игрока " .. opponent_name .. " на бросок монетки на сумму " .. bet_amount .. " " .. currency .. " отправлен.")
 
     -- Store the coin flip challenge in a table
@@ -315,11 +315,9 @@ end
 function ACCEPT_COINFLIP(sender_id, sender_name, message)
     local case = split(message, " ")
     local challenger_name = erors(case[1], 2)
-    local bet_amount = tonumber(case[2]) or 0
-    bet_amount = math.abs(bet_amount)
-    bet_amount = round(bet_amount, 2)
+    local bet_amount = coin_flips[challenger_name].bet_amount
 
-    if not coin_flips[challenger_name] or coin_flips[challenger_name].opponent_name ~= sender_name or coin_flips[challenger_name].bet_amount ~= bet_amount then
+    if not coin_flips[challenger_name] or coin_flips[challenger_name].opponent_name ~= sender_name then
         SendMessage(sender_id, "Нет активного вызова на бросок монетки от игрока " .. challenger_name .. ".")
         return
     end
@@ -362,7 +360,7 @@ M.command = {
 	{command = "info", help = "Узнать информацию о себе, или предоставить ее другому игроку. ", args = "[name]",func = "MYINFO"},
     {command = "getinfo", help = "Узнать информацию о другом игроке. ", args = "[name]",func = "GETINFO",roles = {"moderator","admin"}},
     {command = "coinflip", help = "Вызвать игрока на бросок монетки.", args = "[name] [bet_amount]", func = "COINFLIP"},
-    {command = "accept", help = "Принять вызов на бросок монетки.", args = "[name] [bet_amount]", func = "ACCEPT_COINFLIP"},
+    {command = "accept", help = "Принять вызов на бросок монетки.", args = "[name]", func = "ACCEPT_COINFLIP"},
     {command = "roll", help = "Крутить рулетку", args = "[count money]",func = "ROLL"},
     {command = "wipe", help = "Очистить баланс и машину.", args = "[name]",func = "WIPE",roles = {"admin"}},
 }

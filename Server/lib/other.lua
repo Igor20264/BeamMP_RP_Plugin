@@ -428,6 +428,14 @@ function timeConverter(time)
     end
 end
 
+function sectotime(seconds)
+    local days = math.floor(seconds / 86400)
+    local hours = math.floor((seconds - (days * 86400)) / 3600)
+    local minutes = math.floor((seconds - (days * 86400) - (hours * 3600)) / 60)
+    local seconds = seconds - (days * 86400) - (hours * 3600) - (minutes * 60)
+    return days, hours, minutes, seconds
+end
+
 function MP.GetBeamId(name)
 	local id = MP.GetId(name)
 	local tablinfo = MP.GetPlayerIdentifiers(id)

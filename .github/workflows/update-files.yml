@@ -30,7 +30,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           localDir: ./Server/
           remoteDir: /root/server_dev/server-mods/BeamMP_RP_Plugin
-          exclude: .git/**,.github/**,.gitignore,Server/database/**,Server/its_not_work/**,Server/pattern/**
+          exclude: .git/**,.github/**,.gitignore,Server/database/**,Server/its_not_work/**,Server/pattern/**,do_not_portable/**
 
       - name: Pack Mod to zip
         run: |
@@ -49,7 +49,7 @@ jobs:
           localDir: ./
           remoteDir: /root/server_dev/client-mods/
           forceUpload: true
-          exclude: .git/**,.github/**,.gitignore,Server/**,Client/**
+          exclude: .git/**,.github/**,.gitignore,Server/**,Client/**,do_not_portable/**
 
       - name: Update Database
         uses: appleboy/ssh-action@v1.0.3
