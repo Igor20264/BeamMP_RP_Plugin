@@ -5,6 +5,21 @@ local recesime = {}
 block_ignore = {}
 CTS = {}
 
+local data_setup = [[extensions.core_input_actionFilter.setGroup("renamed", data {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
+'editorToggle', 'parts_selector', 'toggleCamera', 'funTires', 'dropCameraAtPlayer', 'dropPlayerAtCamera', 'loadHome',
+'pause', 'toggleTraffic', 'dropPlayerAtCameraNoReset', 'faster_motion', 'forceField', 'vehicleEditorToggle','movefast','changeCameraSpeed',
+'toggle_slow_motion', 'funRandomTire', 'funFire', 'reload_vehicle', 'toggleAITraffic', 'saveHome', 'editorNewLevel',
+'cefdev_console_toggle', 'reset_all_physics', 'debugmode_toggle', 'funBoom', 'lua_reload', 'editorOpenLevel', 'toggleConsoleNG',
+'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
+'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
+'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
+'toggle_play', 'reset_physics'});skipPlayers(true)
+]]
+
+local data_block = [[extensions.core_input_actionFilter.addAction(0, "renamed", true);skipPlayers(true);core_gamestate.setGameState("career", "multiplayer", "career")]]
+local data_unblock = [[extensions.core_input_actionFilter.addAction(0, "renamed", false);skipPlayers(false);core_gamestate.setGameState("multiplayer", "multiplayer", "multiplayer")]]
+
+
 function SendRequestCTS()
     if online_player == nil then
         log("online_player == nil",2)
@@ -64,6 +79,7 @@ function RetRun(data)
 end
 
 function onSpawn(player_id, vehicle_id, data)
+    RemoutRun(MP.GetId(p2), data_block)
 	MP.TriggerClientEvent(player_id, "ECOBLOC", M.data)
 	return 0
 end
@@ -71,6 +87,7 @@ end
 function ON(sender_id,sender_name, message)
 	p2,case = MessageParser(message," ",2)
 	block_ignore[p2] = false
+    RemoutRun(MP.GetId(p2), data_block)
 	-- Подробнее см. E:\SteamLibrary\steamapps\common\BeamNG.drive\lua\ge\extensions\core\input\actionFilter.lua
     -- E:\SteamLibrary\steamapps\common\BeamNG.drive\lua\ge\extensions\core\input\actions
 	MP.TriggerClientEvent(MP.GetId(p2), "ECOBLOC", M.data)
@@ -84,6 +101,7 @@ function OFF(sender_id,sender_name, message)
        return
     end
 	block_ignore[p2] = true
+    RemoutRun(MP.GetId(p2), data_unblock)
 	MP.TriggerClientEvent(MP.GetId(p2), "ECOUNBLOCK", "SA")
 	return 0
 end
@@ -135,6 +153,7 @@ function AddToSendServerData(tag,data)
 end
 
 function LoadAllScript(user_id)
+    RemoutRun(user_id,data_setup)
     for i,data in pairs(SendScript) do
         RemoutRun(user_id,data)
     end
@@ -154,7 +173,8 @@ M.command = {
     {client = true, reg = "GetCTS", func = "GetRequestCTS"},
 	}
 
-function M.load() 
+function M.load()
+    MP.RegisterEvent("onPlayerJoin","onJoinS2C")
 	MP.RegisterEvent("onVehicleSpawn","onSpawn")
     HeventTimer.addFunc(SendRequestCTS, 5)
 end

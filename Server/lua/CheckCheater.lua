@@ -11,13 +11,16 @@ function whileCheckCheater()
         RemoutRun(id,"TriggerServerEvent('IMMOD','okey')")
     end
     if send_ansfer == nil then
-        print("send_ansfer == nil")
         return
     end
     for name,times in pairs(send_ansfer) do
         if math.abs(os.time() - times) > 60 then
-            MP.DropPlayer(MP.GetId(name),"Ошибка: L0 x48")
-            send_ansfer[name] = nil
+            if MP.check_in_online(name) then
+                MP.DropPlayer(MP.GetId(name),"Ошибка: L0 x48")
+                send_ansfer[name] = nil
+            else
+                send_ansfer[name] = nil
+            end
         end
     end
 end

@@ -840,15 +840,14 @@ function SaveCarEveryXsec()
             end
             if MP.check_in_online(data.tester) then
                 SendMessage(MP.GetId(data.tester), "Время тест-драйва машины " .. cars:value(data.tester, id, "nickname") .. " истекло.")
-
             end
             testDriveCars[id] = nil -- Удаляем информацию о тест-драйве
         end
     end
-    if old_testDriveCars == nil or testDriveCars ~= old_testDriveCars then
+    if testDriveCars ~= nil and (old_testDriveCars == nil or testDriveCars ~= old_testDriveCars) then
     -- Сохраняем данные о тест-драйве
         save_database("testDriveCars.ixt", testDriveCars)
-        old_testDriveCars = testDriveCars
+        old_testDriveCars = table.shallow_copy(testDriveCars)
     end
     return true
 end

@@ -38,7 +38,7 @@ local function verify(namefile,new_data)
     local backup = load_database(namefile)
     local err = save_database(namefile,new_data)
     local checl = load_database(namefile)
-	if err == false then
+	if err == false or backup == nil then
 	    return 'write_error'
 	end 
     if checl == nil then
@@ -91,6 +91,10 @@ function load_database(namefile)
 		return nil
 	else
 	    local read = file:read("*all")
+		if read == nil or read == "" then
+			file:close()
+			return nil
+		end
 		local result, data = pcall(Util.JsonDecode,read)
 		if data == nil then
             log("failed to decode file: " .. namefile,5)
