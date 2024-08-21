@@ -161,6 +161,10 @@ function import(NameModule, com, adver)
 	adver = adver or true
 
 	if(status) then
+		if Mods == nil then
+			log("Вероятно вы ввели неправильное имя модуля [ "..NameModule.." ] или не возвращаете переменную",5)
+			return
+		end
 		M.onShut[#M.onShut+1] = Mods.unload
 		Mods.pluginPath = M.pluginPath
 		Mods.group = Group
