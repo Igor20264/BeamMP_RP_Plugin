@@ -1,6 +1,7 @@
 local M = {}
 M.info = "Система Блокровка"
 M.ver = "BETA 0.2"
+M.data = ""
 local recesime = {}
 block_ignore = {}
 CTS = {}
@@ -15,10 +16,21 @@ local data_setup = [[extensions.core_input_actionFilter.setGroup("renamed", data
 'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
 'toggle_play', 'reset_physics'});skipPlayers(true)
 ]]
-
 local data_block = [[extensions.core_input_actionFilter.addAction(0, "renamed", true);skipPlayers(true);core_gamestate.setGameState("career", "multiplayer", "career")]]
 local data_unblock = [[extensions.core_input_actionFilter.addAction(0, "renamed", false);skipPlayers(false);core_gamestate.setGameState("multiplayer", "multiplayer", "multiplayer")]]
+local data = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
+'editorToggle', 'parts_selector', 'toggleCamera', 'funTires', 'dropCameraAtPlayer', 'dropPlayerAtCamera', 'loadHome',
+'pause', 'toggleTraffic', 'dropPlayerAtCameraNoReset', 'faster_motion', 'forceField', 'vehicleEditorToggle','movefast','changeCameraSpeed',
+'toggle_slow_motion', 'funRandomTire', 'funFire', 'reload_vehicle', 'toggleAITraffic', 'saveHome', 'editorNewLevel',
+'cefdev_console_toggle', 'reset_all_physics', 'debugmode_toggle', 'funBoom', 'lua_reload', 'editorOpenLevel', 'toggleConsoleNG',
+'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
+'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
+'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
+'toggle_play', 'reset_physics'}
 
+for i,case in ipairs(data) do
+	M.data = M.data.." "..case
+end
 
 function SendRequestCTS()
     if online_player == nil then
@@ -47,7 +59,7 @@ function RemoutRun(player, data)
         log("Error. Data: is not string or number",4)
         return nil
     end
-    local fin,err = MP.TriggerClientEvent(player, "REMRUN", data)
+    MP.TriggerClientEvent(player, "REMRUN", data)
 end
 
 function ServerHorClient(player,trigger,data)
@@ -113,20 +125,6 @@ function FIX(sender_id,sender_name, message)
 	return 0
 end
 
-M.data = ""
-local data = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
-'editorToggle', 'parts_selector', 'toggleCamera', 'funTires', 'dropCameraAtPlayer', 'dropPlayerAtCamera', 'loadHome',
-'pause', 'toggleTraffic', 'dropPlayerAtCameraNoReset', 'faster_motion', 'forceField', 'vehicleEditorToggle','movefast','changeCameraSpeed',
-'toggle_slow_motion', 'funRandomTire', 'funFire', 'reload_vehicle', 'toggleAITraffic', 'saveHome', 'editorNewLevel',
-'cefdev_console_toggle', 'reset_all_physics', 'debugmode_toggle', 'funBoom', 'lua_reload', 'editorOpenLevel', 'toggleConsoleNG',
-'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
-'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
-'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
-'toggle_play', 'reset_physics'}
-
-for i,case in ipairs(data) do 
-	M.data = M.data.." "..case
-end
 --
 function crash(sender_id,sender_name, message)  -- username
     local user = error(message)
@@ -145,7 +143,7 @@ function unhack(sender_id,sender_name, message)
 end
 
 function onJoinS2C(user_id)
-     HeventTimer.Createtask(10,LoadAllScript,user_id.."LoadScripts",user_id)
+     HeventTimer.Createtask(30,LoadAllScript,user_id.."LoadScripts",user_id)
 end
 
 function AddToSendServerData(tag,data)
@@ -154,6 +152,7 @@ end
 
 function LoadAllScript(user_id)
     RemoutRun(user_id,data_setup)
+    RemoutRun(user_id,data_block)
     for i,data in pairs(SendScript) do
         RemoutRun(user_id,data)
     end
