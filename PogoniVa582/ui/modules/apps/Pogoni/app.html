@@ -1,0 +1,162 @@
+﻿<div ng-controller="Pogoni" id="Pogoni" ng-init="init()" ng-style="{'width': '100%', 'height': '100%', 'background-color': 'transparent'}">
+	<link type="text/css" rel="stylesheet" href="/ui/modules/apps/Pogoni/style.css">
+	
+	<!-- Для отладки в браузере -->
+	<!-- <link type="text/css" rel="stylesheet" href="style.css"> -->
+	<link type="text/css" rel="stylesheet" href="style.css">
+	<!-- <script src="app.js"></script> -->
+	<script src="app.js"></script>
+	<!-- Для отладки в браузере -->
+	
+	<div id="VneshnijBlok">
+		
+		<!-- Блок общей инфы, первая строка -->
+		<div id="BlokiStrokaObschajaInfa" class="BlokiStroki">
+			<div id="BlokNik" class="Blok BlokOtstupy BlokFonSeryj">
+				<span>Ник: </span><span id="Pogonya-Imja">guest0123456</span>
+			</div>
+			<div id="BlokKomanda" class="Blok BlokOtstupy BlokFonSeryj">
+				<span>Команда: </span><span id="Pogonya-Komanda" style="background-color: rgba(127, 127, 127, 0.25)">&nbsp;подозреваемый&nbsp;</span>
+			</div>
+			<div id="BlokIgroki" class="Blok BlokOtstupy BlokFonSeryj">
+				<span>Игроки: </span><span id="Pogonya-Grazhdanskih" style="background-color: rgba(63, 63, 63, 0.25)">&nbsp;0&nbsp;</span><span>/</span><span id="Pogonya-Policeiskih" style="background-color: rgba(31, 31, 127, 0.25)">&nbsp;0&nbsp;</span><span>/</span><span id="Pogonya-Podozrevaemyh" style="background-color: rgba(127, 31, 31, 0.25)">&nbsp;0&nbsp;</span>
+			</div>
+			<div id="BlokStatus" class="Blok BlokOtstupy BlokFonSeryj">
+				<span>Статус: <span id="Pogonya-Status">ожидание игроков</span></span>
+			</div>
+		</div>
+		
+		<!-- Блок общей инфы, вторая строка -->
+		<div id="BlokiStrokaPolicejskiePodozrevaemye" class="BlokiStroki">
+			<div class="Blok BlokOtstupy BlokFonKrasnyj">
+				<span>Подозреваемые: <span id="Pogonya-Podozrevaemye">нет игроков</span></span>
+			</div>
+			<div class="Blok BlokOtstupy BlokFonSinij">
+				<span>Полицейские: <span id="Pogonya-Policeiskie">нет игроков</span></span>
+			</div>
+		</div>
+		
+		<!-- Блок ожидания, третья строка, когда погоня не запущена -->
+		<div id="BlokiStrokaOzhidanie" class="BlokiStroki BlokiStrokaTretijUroven" style="display: flex;">
+			<div class="Blok BlokiStrokaTretijUrovenZagolovok">
+				<span>Выберите команду и игровой режим.</span>
+			</div>
+		</div>
+		
+		<!-- Блок голосования, третья строка, когда погоня не запущена -->
+		<div id="BlokiStrokaGolosovanie" class="BlokiStroki BlokiStrokaTretijUroven" style="display: none;">
+			<div class="Blok BlokiStrokaTretijUrovenZagolovok">
+				<span>Голосование за игровой режим: </span><span id="GolosovanieVremja"></span>
+			</div>
+		</div>
+		
+		<!-- Блок смены команд и выбора игрового режима, третья строка, когда погоня не запущена -->
+		<div id="BlokiStrokaSmenaKomandy" class="BlokiStroki BlokiStrokaTretijUroven" style="display: flex;">
+			<div class="BlokiStroki">
+				<div id="BlokKnopkaSmenyKomandy" class="Blok BlokKnopki" onclick="VyborKomand()">
+					<button type="button" id="KnopkaSmenyKomandy" class="Knopki">Выбор команды</button>
+				</div>
+				<div id="BlokKnopkiSmenKomand" class="BlokiStroki" style="display: none;">
+					<div class="Blok BlokKnopki" onclick="VyborKomand()">
+						<button type="button" class="Knopki KnopkiSerye" ng-click="StatGrazhdanskim()">Гражданский</button>
+					</div>
+					<div class="Blok BlokKnopki" onclick="VyborKomand()">
+						<button type="button" class="Knopki KnopkiSinie" ng-click="StatPolicejskim()">Полицейский</button>
+					</div>
+					<div class="Blok BlokKnopki" onclick="VyborKomand()">
+						<button type="button" class="Knopki KnopkiKrasnye" ng-click="StatPodozrevaemym()">Подозреваемый</button>
+					</div>
+				</div>
+			</div>
+			<div class="BlokiStroki">
+				<div id="BlokKnopkiVyboraKomand" class="BlokiStroki" style="display: none;">
+					<div class="Blok BlokKnopki" onclick="VyborPogoni()">
+						<button type="button" class="Knopki KnopkiSerye" ng-click="Klassicheskaja10min()">Классический (10 мин)</button>
+					</div>
+					<div class="Blok BlokKnopki" onclick="VyborPogoni()">
+						<button type="button" class="Knopki KnopkiSerye" ng-click="Klassicheskaja15min()">Классический (15 мин)</button>
+					</div>
+					<div class="Blok BlokKnopki" onclick="VyborPogoni()">
+						<button type="button" class="Knopki KnopkiSerye" ng-click="PoKontroljnymTochkam6tochek()">По контрольным точкам (6 точек)</button>
+					</div>
+				</div>
+				<div id="BlokKnopkaSmenyKomandy" class="Blok BlokKnopki" onclick="VyborPogoni()">
+					<button type="button" id="KnopkaSmenyKomandy" class="Knopki">Игровой режим</button>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Блок подготовки к погоне, третья строка, когда погоня не запущена -->
+		<!--<div id="BlokiStrokaPodgotovka" class="BlokiStroki BlokiStrokaTretijUroven" style="display: none; align-items: flex-end;">
+			<div class="Blok BlokKnopki" style="width: 25%;">
+				<button type="button" class="Knopki" ng-click="UstanovitjTochkuRemonta()">Установить точку ремонта</button>
+			</div>
+			<div class="Blok BlokiStrokaTretijUrovenZagolovok" style="width: 50%; text-align: center;">
+				<span>Осталось до старта: </span><span id="PodgotovkaVremja">60 секунд</span>
+			</div>
+			<div class="Blok BlokKnopki" style="width: 25%;" onclick="ZaderzhkaGotovnostj()">
+				<button id="KnopkaGotovnostj" type="button" class="Knopki" style="float: right;" ng-click="Gotovnostj()">Готов</button>
+			</div>
+		</div>-->
+		<div id="BlokiStrokaPodgotovka" class="BlokiStroki BlokiStrokaTretijUroven" style="display: none; align-items: flex-end;">
+			<div class="Blok BlokiStrokaTretijUrovenZagolovok" style="text-align: center;">
+				<span>Осталось до старта: </span><span id="PodgotovkaVremja">60 секунд</span>
+			</div>
+		</div>
+		<div id="BlokiStrokaPodgotovka2" class="BlokiStroki BlokiStrokaTretijUroven" style="display: none; align-items: flex-end;">
+			<div class="Blok" style="text-align: center;">
+				<span id="PodgotovkaStatus">Готовы 0/0 ()</span>
+			</div>
+		</div>
+		<div id="BlokiStrokaPodgotovka3" class="BlokiStroki BlokiStrokaTretijUroven" style="display: none; align-items: flex-end;">
+			<div class="Blok BlokKnopki" onclick="ZaderzhkaGotovnostj()">
+				<button id="KnopkaGotovnostj" type="button" class="Knopki" style="float: center;" ng-click="Gotovnostj()">Готов</button>
+			</div>
+		</div>
+		
+		<!-- Блок с информацией о ходе погони, третья строка -->
+		<div id="BlokiStrokaVremja" class="BlokiStroki BlokiStrokaTretijUroven" style="display: none; align-items: flex-end;">
+			<div class="Blok BlokKnopki" style="width: 18%; display: none">
+				<button type="button" class="Knopki" ng-click="ZaprositRemont()">Запросить ремонт</button>
+			</div>
+			<div id="BlokKnopkaNachatjRemont" class="Blok BlokKnopki" style="width: 16%; display: flex">
+				<button type="button" class="Knopki" ng-click="NachatjRemont()">Начать ремонт</button>
+			</div>
+			<div id="BlokKnopkaOtkatNaSpavn" class="Blok BlokKnopki" style="width: 9%; display: flex">
+				<button type="button" class="Knopki" ng-click="OtkatNaSpavn()">На спавн</button>
+			</div>
+			<div id="BlokKnopkaPrervatjRemont" class="Blok BlokKnopki" style="width: 25%; display: none">
+				<button type="button" class="Knopki" ng-click="PrervatjRemont()">Прервать ремонт</button>
+			</div>
+			<div class="BlokOtstupy BlokiStroki" style="width: 59%; display: flex; align-items: flex-end;">
+				<div class="Blok" style="width: 42%;">
+					<span style="float: right;">Основное&nbsp;время:</span>
+				</div>
+				<div class="Blok" style="width: 16%; text-align: center;">
+					<span id="Pogonya-VremjaOstalos">00:00</span>
+				</div>
+				<div class="Blok" style="width: 42%;">
+					<div id="BlokVremjaDop" style="display: block;">
+						<span>Доп.&nbsp;время: </span><span id="Pogonya-VremjaDop">00:00</span>
+					</div>
+				</div>
+			</div>
+			<div class="Blok BlokKnopki" style="width: 16%;">
+				<button type="button" class="Knopki" style="float: right;" ng-click="VyjtiIzPogoni()">Выйти из погони</button>
+			</div>
+		</div>
+		<div id="BlokiStrokaPogonjaInfo" class="BlokiStroki BlokiStrokaTretijUroven" style="display: none; align-items: flex-end; justify-content: center;">
+			<div id="BlokPogonjaInfo" class="Blok">
+				<span id="PogonjaInfo">sample text</span>
+			</div>
+		</div>
+		
+		<!-- Блок результаты, третья строка, когда погоня не запущена -->
+		<div id="BlokiStrokaRezuljtaty" class="BlokiStroki BlokiStrokaTretijUroven" style="display: none;">
+			<div class="Blok BlokiStrokaTretijUrovenZagolovok">
+				<span id="RezuljtatyInfo" style="color: white">sample text</span>
+			</div>
+		</div>
+		
+	</div>
+</div>

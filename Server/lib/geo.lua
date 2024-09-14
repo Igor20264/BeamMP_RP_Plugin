@@ -4,23 +4,6 @@ local function D3toD2(x,y,z) -- vec3 to vec2
     return x,y
 end
 
-local function minDistancePointRect(px, py, x1, y1, x2, y2)
-  local left = x1
-  local right = x2
-  local top = y1
-  local bottom = y2
-
-  -- Clamp the point to the rectangle's bounds
-  local clampedX = math.max(left, math.min(px, right))
-  local clampedY = math.max(top, math.min(py, bottom))
-
-  -- Calculate the distance between the point and the clamped point
-  local distanceX = math.abs(px - clampedX)
-  local distanceY = math.abs(py - clampedY)
-
-  return math.sqrt(distanceX^2 + distanceY^2)
-end
-
 local function minDistancePointRect(x1, y1, x2, y2,px, py)
   local left = math.min(x1, x2)
   local right = math.max(x1, x2)

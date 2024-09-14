@@ -95,7 +95,7 @@ function load_database(namefile)
 			file:close()
 			return nil
 		end
-		local result, data = pcall(Util.JsonDecode,read)
+		local _, data = pcall(Util.JsonDecode,read)
 		if data == nil then
             log("failed to decode file: " .. namefile,5)
             return nil

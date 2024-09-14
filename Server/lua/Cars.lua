@@ -764,7 +764,7 @@ function CarsCheckCreate(player_id,vehicle_id,data)
 	local isd = cars:is_doesnt(name,lastCar[name].config)
 
     if isd==false and lastCar[name].price~= nil and ret.jbm ~= "unicycle" then
-        SendMessage(player_id,"Стоимость машины в диллерском центре. "..lastCar[name].price..""..config.currency)
+        SendMessage(player_id,"Стоимость машины в диллерском центре. "..CarCoast[adata.partConfigFilename]..""..config.currency)
     end
 	if isd == true then
 		return 0
@@ -898,3 +898,20 @@ function M.unload()
 end
 
 return M
+
+--[[
+
+
+Cars.ixt
+
+--
+
+Cars.hex.ixt
+```
+id = {player,nickname_car,path}
+```
+Cars/{id}.ixt
+
+
+
+--]]

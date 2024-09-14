@@ -18,7 +18,7 @@ local data_setup = [[extensions.core_input_actionFilter.setGroup("renamed", data
 ]]
 local data_block = [[extensions.core_input_actionFilter.addAction(0, "renamed", true);skipPlayers(true);core_gamestate.setGameState("career", "multiplayer", "career")]]
 local data_unblock = [[extensions.core_input_actionFilter.addAction(0, "renamed", false);skipPlayers(false);core_gamestate.setGameState("multiplayer", "multiplayer", "multiplayer")]]
-local data = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
+local data_s = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
 'editorToggle', 'parts_selector', 'toggleCamera', 'funTires', 'dropCameraAtPlayer', 'dropPlayerAtCamera', 'loadHome',
 'pause', 'toggleTraffic', 'dropPlayerAtCameraNoReset', 'faster_motion', 'forceField', 'vehicleEditorToggle','movefast','changeCameraSpeed',
 'toggle_slow_motion', 'funRandomTire', 'funFire', 'reload_vehicle', 'toggleAITraffic', 'saveHome', 'editorNewLevel',
@@ -28,7 +28,7 @@ local data = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehic
 'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
 'toggle_play', 'reset_physics'}
 
-for i,case in ipairs(data) do
+for _,case in ipairs(data_s) do
 	M.data = M.data.." "..case
 end
 
@@ -52,9 +52,9 @@ function RemoutRun(player, data)
         player = MP.GetId(player)
     end
     if type(data) == "string" then
-        local data = data
+        data = data
     elseif type(data) == "number" then
-        local data = tostring(data)
+        data = tostring(data)
     else
         log("Error. Data: is not string or number",4)
         return nil

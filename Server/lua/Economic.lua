@@ -5,10 +5,7 @@ M.info = "Экономическая система"
 M.ver = "2.0"
 
 online_player = {}
-local Player = require "lib.player"
 
-local shablon = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence)}
---
 local Eco = {}
 extended(Eco,DB)
 

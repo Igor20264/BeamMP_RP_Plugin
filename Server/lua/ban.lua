@@ -176,7 +176,7 @@ function CheckAFK()
 
     for k, v in pairs(players) do
     local playerveh = MP.GetPlayerVehicles(k)
-        for k2, v2 in pairs(playerveh or {}) do
+        for _, v2 in pairs(playerveh or {}) do
             local username, num1, num2 = string.match(v2, '(%w+):(%d+)-(%d+)')
             local vehRaw = MP.GetPositionRaw(tonumber(num1), tonumber(num2))
             if vehRaw ~= nil then

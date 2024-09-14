@@ -1,0 +1,57 @@
+@font-face {
+    font-family: OpenSans-Regular;
+	/* Для отладки в MS Edge */
+    src: local(RobotoCondensed-Regular), url(OpenSans-Regular.ttf);
+}
+
+/* Для отладки в MS Edge*/
+body {
+	margin: 0px;
+}
+
+#BlokZaderzhanie {
+	width: 500px;
+	height: 80px;
+	justify-content: flex-end;
+	align-items: center;
+	display: flex;
+	padding: 0;
+	margin: 0;
+	flex-direction: column;
+	/*border: 1px solid rgba(127, 127, 127, 0.45);*/
+	/*padding: 1px;*/
+}
+
+.BlokiZaderzhanie {
+	/*background: rgba(255, 255, 255, 0.1);*/
+	justify-content: flex-start;
+	border-radius: 10px;
+	align-items: center;
+	position: relative;
+	display: flex;
+	height: 36px;
+	margin: 2px;
+	width: 500px;
+	background-color: rgba(135, 101, 65, 0.25);/**/
+}
+
+.BlokiZaderzhanieZapolnenie {
+	/*animation: load 0.125s normal forwards;*/
+	border-radius: 10px;
+	/*background-color: rgba(255, 128, 2, 0.75);*/
+	background-color: rgba(232, 41, 0, 0.9);/**/
+	height: 32px;
+	margin: 2px;
+	transition-property: width;
+	transition-duration: 0.1s;
+	transition-timing-function: linear;
+}
+
+.BlokiZaderzhanieTekst {
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	color: #FFF;
+	font-family: OpenSans-Regular;
+	font-size: 20px;
+}

@@ -1,0 +1,252 @@
+@font-face {
+    font-family: OpenSans-Regular;
+	/* Для отладки в MS Edge */
+    src: local(RobotoCondensed-Regular), url(OpenSans-Regular.ttf);
+}
+
+@font-face {
+    font-family: RobotoCondensed-Regular;
+	/* Для отладки в MS Edge */
+    src: local(RobotoCondensed-Regular), url(RobotoCondensed-Regular.ttf);
+}
+
+@font-face {
+    font-family: RobotoCondensed-Bold;
+	/* Для отладки в MS Edge */
+    src: local(RobotoCondensed-Bold), url(RobotoCondensed-Bold.ttf);
+}
+
+/* Для отладки в MS Edge*/
+body {
+	margin: 0px;
+}
+
+
+#VneshnijBlok {
+	font-family: RobotoCondensed-Regular;
+	width: 750px;
+	height: 100px;
+	color: rgba(255, 255, 255, 1);
+	display: flex;
+	flex-direction: column;
+	font-size: 15px;
+	/*border: 1px solid rgba(127, 127, 127, 0.45);*/
+	/*background-color: rgba(63, 63, 63, 0.1);*/
+	/*padding: 1px;*/
+}
+
+.BlokiStroki {
+	border: none;
+	display: flex;
+	flex-direction: row;
+	margin: 0px;
+	padding: 0px;
+	width: auto;
+}
+
+#BlokiStrokaObschajaInfa {
+	/*position: absolute;
+	top: 0px;
+	font-size: 15px;*/
+	height: 23px;
+	display: flex;
+	flex-direction: row nowrap;
+}
+
+#BlokNik {
+	width: 146px; /* 146 */
+}
+#BlokKomanda {
+	width: 170px; /* 146 + 170 = 316 */
+}
+#BlokIgroki {
+	width: 106px; /* 316 + 106 = 422 */
+}
+#BlokStatus {
+	width: 304px; /* 750 - 422 = 304 */
+}
+
+#BlokiStrokaPolicejskiePodozrevaemye {
+	/*position: absolute;
+	top: 25px;*/
+	display: flex;
+	font-size: 11px;
+	height: 19px;
+}
+
+.BlokiStrokaTretijUroven {
+	height: min-content;
+	width: 100%;
+	justify-content: center;
+}
+
+.BlokiStrokaTretijUrovenZagolovok {
+	font-size: 24px;
+	font-family: OpenSans-Regular;/**/
+}
+
+#BlokiStrokaVremja {
+	font-size: 18px;
+	height: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+/*
+#BlokVremjaOstalos {
+	
+}
+*/
+
+#Pogonya-VremjaOstalos {
+	font-family: RobotoCondensed-Bold;/**/
+	font-size: 28px;
+}
+
+#Pogonya-VremjaDop {
+	font-family: RobotoCondensed-Bold;/**/
+}
+
+/*
+#BlokVremjaDop {
+	
+}
+*/
+
+#BlokiStrokaSmenaKomandy {
+	height: 21px;
+	justify-content: space-between;
+}
+
+#KnopkaGotovnostj {
+	font-size: 24px;
+	
+}
+
+
+
+.StrokaDiv {
+	display: flex;
+	width: 100%;
+	/*justify-content: center;*/
+	/*flex-flow: row nowrap;*/
+}
+
+.Blok {
+	border: none;
+	white-space: nowrap;
+	overflow: hidden;
+	min-width: auto;
+}
+
+.BlokOtstupy {
+	margin: 1px;
+	padding: 2px 2px 0px 2px;
+}
+
+
+.BlokFonSeryj {
+	background-color: rgba(66, 66, 66, 0.35);
+}
+
+.BlokFonKrasnyj {
+	background-color: rgba(127, 31, 31, 0.45);
+}
+
+.BlokFonSinij {
+	background-color: rgba(31, 31, 127, 0.45);
+}
+
+.BlokKnopki {
+	margin: 1px;
+}
+
+.Knopki {
+	font-family: RobotoCondensed-Regular;
+	font-size: 15px;
+	border: 0px;
+	border-radius: 5px;
+	transition: 0.20s;
+	/*height: min-content;*/
+	padding: 0px 2px 1px 2px;
+	margin: 0px;
+	transition: 0.20s;
+	color: #FFF;
+	background-color: rgba(255, 102, 0, 0.5);
+}
+
+.Knopki:hover {
+	color: #FFFFFF;
+	background-color: rgba(177, 70, 0, 0.5);
+}
+
+/* Переназначить стили для событий кнопок. Если не задавать, то будет взято из BeamNG E:\SteamLibrary\steamapps\common\BeamNG.drive\ui\entrypoints\main\main.css */
+.Knopki:focus {
+  box-shadow: none;
+  /* box-shadow: 0 0 0 2px hsla(0, 0%, 0%, 1), 0 0 0 4px hsla(24, 100%, 50%, 1), inset 0 0 0 25em hsla(0, 0%, 0%, 0.2); */
+}
+.Knopki:focus::before {
+  content: "";
+  display: block;
+  position: relative;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  border-radius: 0px;
+  border: none;
+  padding: 0px;
+  margin: 0px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+#BlokKnopkaSmenyKomandy {
+	/*margin: 1px;*/
+	/*background-color: rgba(66, 66, 66, 0.15);*/
+}
+
+/*
+#BlokKnopkiSmenKomand {
+	
+}
+*/
+
+.KnopkiSerye {
+	background-color: rgba(66, 66, 66, 0.35);
+}
+.KnopkiSerye:hover {
+	background-color: rgba(66, 66, 66, 0.55);
+}
+
+.KnopkiSinie {
+	background-color: rgba(31, 31, 127, 0.45);
+}
+.KnopkiSinie:hover {
+	background-color: rgba(31, 31, 127, 0.65);
+}
+
+.KnopkiKrasnye {
+	background-color: rgba(127, 31, 31, 0.45);
+}
+.KnopkiKrasnye:hover {
+	background-color: rgba(127, 31, 31, 0.65);
+}
+
+#BlokiStrokaPogonjaInfo {
+	
+}
+
+#BlokPogonjaInfo {
+	text-align: center;
+	background-color: rgba(0, 0, 0, 0.5);
+	padding: 2px 6px;
+}
+
+#PogonjaInfo {
+	font-size: 14px;
+	color: red;
+	
+}

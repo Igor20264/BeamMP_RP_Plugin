@@ -55,16 +55,7 @@ log("Время сервера с учётом коррекции: "..get_hour()
 --permission = require "lib/permission"
 M.onShut = {}
 
-function ThisIsAdmin(Name)
-	if Name == "CMD" then return true end
-	local admin = load_database("admin.ixt")
-	for i,case in ipairs(admin) do
-		if case == Name then
-			return true
-		end
-	end
-	return false
-end
+
 
 function uptime(sender_id, sender_name, message)
     local EGG = timer.runnig()
@@ -105,7 +96,7 @@ function SendMessage(id,message)
 			message = tostring(message)
 		end
 		message = split(message,"\n")
-        for i,messages in ipairs(message) do
+        for _,messages in ipairs(message) do
             MP.SendChatMessage(id, messages)
         end
 	end
@@ -130,7 +121,7 @@ function handlers(sender_id, sender_name, message)
 	local cmd, args = message:match("!([^%s]+)%s*(.*)") -- ищем команду и аргументы в сообщении
 	if not cmd then return 0 end -- если команда не найдена, возвращаем 0
 	local cmd = "!"..cmd -- bal -> !bal
-	for i, case in ipairs(M.command) do -- проходим по массиву команд
+	for _, case in ipairs(M.command) do -- проходим по массиву команд
 	    cmd = cmd:gsub("!", "")
 	    if case.category == cmd then
             local cases = split(args," ")
@@ -212,7 +203,7 @@ function HELP(sender_id, sender_name, message)
 	else
 		local all_category = {}
 		local cleared = {}
-		for i,case in ipairs(M.command) do
+		for _,case in ipairs(M.command) do
 			if case.category ~= nil then
 				all_category[case.category] = true
 			end
@@ -227,7 +218,7 @@ function HELP(sender_id, sender_name, message)
 	end
 
 	if category_target ~= "" then
-		for i,case in ipairs(M.command) do
+		for _,case in ipairs(M.command) do
 			if case.category == category_target and (case.hide == false or case.hide == nil) then
 				text_message = text_message..(permissions:role_in_roles('admin',case.roles) and "[A]" or "")..config.prefix..""..case.category.." "..case.command.." "..case.args.." |\t "..case.help.."\n"
 			end
@@ -355,10 +346,6 @@ function onInit()
 end
 
 function onShutdown()
-	for _,case in pairs(M.onShut) do
-		log("Выключение подсистемы",3)
-		case()
-	end
 	exit()
 end 
 return M

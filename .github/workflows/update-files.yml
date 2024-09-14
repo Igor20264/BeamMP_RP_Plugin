@@ -40,7 +40,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           localDir: ./Server/
           remoteDir: /root/server_dev/server-mods/BeamMP_RP_Plugin
-          exclude: .git/**,.github/**,.gitignore,database/**,its_not_work/**,pattern/**
+          exclude: database/**,its_not_work/**,pattern/**
 
       - name: SFTP mod uploader
         uses: wangyucode/sftp-upload-action@v2.0.2
@@ -51,7 +51,7 @@ jobs:
           localDir: ./
           remoteDir: /root/server_dev/client-mods/
           forceUpload: true
-          exclude: .git/**,.github/**,.gitignore,Server/**,Client/**,do_not_portable/**
+          exclude: .git/**,.github/**,.gitignore,Server/**,Client/**,PogoniVa582/**,RolePlaySub/**,BeamMP_RP_PluginServer/**,BeamMP_RP_PluginClient/**
 
       - name: Update Database
         uses: appleboy/ssh-action@v1.0.3

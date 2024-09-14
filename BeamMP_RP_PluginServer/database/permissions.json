@@ -1,0 +1,40 @@
+{
+    "permissionLevels": [
+        {
+            "commands": [
+                "votekick",
+                "countdown",
+                "help",
+                "dm",
+                "interface"
+            ],
+            "level": 0.0,
+            "name": "member"
+        },
+        {
+            "commands": [
+                "ban",
+                "unban",
+                "kick",
+                "tempban",
+                "mute",
+                "tempmute",
+                "unmute",
+                "say",
+                "whitelist"
+            ],
+            "level": 1.0,
+            "name": "moderator"
+        },
+        {
+            "commands": [
+                "ip",
+                "banip",
+                "setrole",
+                "reloadconf"
+            ],
+            "level": 2.0,
+            "name": "administrator"
+        }
+    ]
+}

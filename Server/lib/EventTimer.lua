@@ -21,20 +21,6 @@ local function tryname(time)
     return path
 end
 
-local function longtask(id,time,command) -- sec, func, tag
-    if FS.Exists("Resources/Server/long_task/") == false then
-        log("Автоматическое создание папки",4)
-        FS.CreateDirectory("Resources/Server/long_task/")
-    end
-    log("Добавлена задача с большой продолжительностью",2)
-    local path = tryname(os.time()+time)
-    local file = io.open(path, "w")
-    file:write(command)
-    file:close()
-end
-
-local function cancellongtssk(id)  end
-
 local function canceltask(hextag)
     for i,tasks in ipairs(tasker) do
         if tasks.tag == hextag then
@@ -45,7 +31,7 @@ local function canceltask(hextag)
 end
 
 local function getendtask(hextag)
-    for i,tasks in ipairs(endtask) do
+    for _,tasks in ipairs(endtask) do
         if tasks.tag == hextag then
             return tasks
         end
@@ -70,7 +56,7 @@ local function remFunc(func)
 end
 
 local function runFunc()
-    for i,f in ipairs(M.efunc) do
+    for _,f in ipairs(M.efunc) do
         if M.times % f[2] == 0 then
             try_exept(f[1])
         end

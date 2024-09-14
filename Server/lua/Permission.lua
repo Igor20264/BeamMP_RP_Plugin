@@ -1,17 +1,20 @@
 local M = {}
-local Permissions = {}
 M.info = "Система ролей"
 M.ver = "0.1 Beta"
+local cache = {}
 
+local Permissions = {}
+Permissions.__index = Permissions
 function Permissions:init()
+    local public = setmetatable({}, self)
+
     local private = {}
-    local public = {}
+    private.cache = {}
     function public:init_user(username)
         if eco.database[username] ~= nil and eco.database[username]["roles"] == nil then
             eco:set(username, "roles", {"player"})
         end
     end
-
     function public:get_roles(username)
         if username == nil then
             return nil
@@ -26,11 +29,27 @@ function Permissions:init()
     end
     function public:set_roles(username, roles) -- roles - {"admin", "player"}
         eco:set(username, "roles", roles)
+        public:clear_cache_user(username)
     end
+    function public:clear_cache_user(username)
+        if private.cache[username] ~= nil then
+            private.cache[username] = nil
+        end
+        if cache[username] ~= nil then
+            cache[username] = nil
+        end
+    end
+
+    function public:clear_cache()
+        private.cache = {}
+        cache = {}
+    end
+
     function public:add_role(username, role) -- role - "admin"
         local roles = public:get_roles(username) or {}
         table.merge(roles, {role})
         eco:set(username, "roles", roles)
+        public:clear_cache_user(username)
     end
     function public:remove_role(username, role)
         local roles = public:get_roles(username) or {}
@@ -40,14 +59,23 @@ function Permissions:init()
                 break
             end
         end
-        eco:add(username, "roles", roles)
+        eco:set(username, "roles", roles)
+        public:clear_cache_user(username)
     end
     function public:role_in_roles(role,roles)
-        for i, v in ipairs(roles) do
+        private.cache.role = private.cache.role or {}
+        local str_roles = table.concat(roles)
+        if private.cache.role[role][str_roles] ~= true then
+            return private.cache.role[role][str_roles]
+        end
+
+        for _, v in ipairs(roles) do
             if v == role then
+                private.cache.role[role][str_roles] = true
                 return true
             end
         end
+        private.cache.role[role][str_roles] = false
         return false
     end
 
@@ -60,7 +88,12 @@ function Permissions:init()
         end
         return false
     end
+
     function public:roles_in_roles(command_roles, user)
+        local str_command_roles =table.concat(command_roles)
+        if private.cache[user] ~= nil and private.cache[user][str_command_roles] == true then
+            return true
+        end
         if user == nil then
             return false
         end
@@ -71,21 +104,21 @@ function Permissions:init()
         if user_roles == nil then
             return false
         end
-        for i, v in ipairs(user_roles) do
-            for j, w in ipairs(command_roles) do
+        for _, v in ipairs(user_roles) do
+            for _, w in ipairs(command_roles) do
                 if v == w then
+                    private.cache[user][str_command_roles] = true
                     return true
                 end
             end
         end
+        private.cache[user][str_command_roles] = false
         return false
     end
 
-    --чистая магия!
-    setmetatable(public, self)
-    self.__index = self
     return public
 end
+
 
 --[[
 local function test_permission()
@@ -124,11 +157,16 @@ local function permission_decorator(allowed_roles)
             return original_function(...)
         end
         local user_roles = permissions:get_roles(user_name)
+        if cache ~= nil and cache[user_name] and cache[user_name][original_function] then
+            return original_function(...)  -- Вызываем оригинальную функцию с измененными аргументами
+        end
         -- перенбираем все роли игрока и ищем схожие
         if user_roles ~= nil then
-            for i, role in ipairs(user_roles) do
-                for j, allowed_role in ipairs(allowed_roles) do
+            for _, role in ipairs(user_roles) do
+                for _, allowed_role in ipairs(allowed_roles) do
                     if role == allowed_role then
+                        cache[user_name] = cache[user_name] or {}
+                        cache[user_name][original_function] = true
                         return original_function(...)  -- Вызываем оригинальную функцию с измененными аргументами
                     end
                 end
@@ -140,7 +178,7 @@ local function permission_decorator(allowed_roles)
 end
 
 function DELETEALLROLES(sender_id,sender_name, message)
-    for i,player in MP.GetPlayers() do
+    for _,player in MP.GetPlayers() do
         if permissions:has_role(player, "admin") then
             permissions:remove_role(player, "admin")
         end

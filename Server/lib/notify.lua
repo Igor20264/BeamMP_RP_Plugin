@@ -35,7 +35,6 @@ function sendNotificationsDelayed(playerId, notifications)
         text = text:sub(1, -2)
     end
 
-
     SendMessage(playerId, text)
 end
 
@@ -48,7 +47,7 @@ function Notifications:onPlayerJoin(playerId)
 
     if #notifications > 0 then
         -- Используем task для отправки уведомлений через 60 секунд
-        HeventTimer.Createtask(60, sendNotificationsDelayed, playerName.."notifications", playerId, notify)
+        HeventTimer.Createtask(90, sendNotificationsDelayed, playerName.."notifications", playerId, notify)
         notifications:clearNotifications(playerName)
     end
 end

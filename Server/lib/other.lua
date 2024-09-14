@@ -37,7 +37,7 @@ function split(inputstr, sep)
 	return t
 end
 
-function extended (child, parent)
+function extended(child, parent)
     setmetatable(child,{__index = parent})
 end
 
@@ -146,7 +146,6 @@ function Util:rgb2hex(r,g,b)
         math.floor(b))
 end
 
-
 function levi(name,list,len_iter)
     len_iter = len_iter or 1
 	for i,case in ipairs(list) do
@@ -187,8 +186,6 @@ local function off_checkForUpdates()
     local oldversion = io.open(VERSIONPATH, "r")
     local localVersion = oldversion:read()
     oldversion:close()
-
-
 
     --retire les deux premier caractères de localVersion (--)
     localVersion = string.sub(localVersion, 3)
@@ -449,10 +446,11 @@ function MP.GetIp(name)
 end
 
 function MP.check_in_online(player_name)
-	if type(player_name) == "number" then 
-		local player_name = MP.GetPlayerName(player_name) 
+	if type(player_name) == "number" then
+        log("This function is not supported for numbers",4)
+		return nil
 	end
-	for i,name in pairs(MP.GetPlayers()) do
+	for _,name in pairs(MP.GetPlayers()) do
 		if name == player_name then return true end
 	end
 	return false

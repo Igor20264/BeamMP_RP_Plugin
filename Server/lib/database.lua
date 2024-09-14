@@ -36,7 +36,7 @@ function Database:init(namedb) -- свойства
 
         return template
     end
-
+    --[[
     function private:clear_template(database)
         database = database or private.database
         local data = private:genSchema(database)
@@ -56,9 +56,9 @@ function Database:init(namedb) -- свойства
         end
         -- save file
         --save_config("pattern/"..split(private.database_name,'.')[1], egg)
-    end
-    --[[if private.database ~= nil then
+    if private.database ~= nil then
         private:clear_template(private.database)
+    end
     end--]]
 	function obj:getTable(name)
 		for i,data in pairs(obj.database) do
@@ -112,7 +112,7 @@ function Database:init(namedb) -- свойства
         end
         obj:save()
         local ts = {}
-        for i,data in pairs(args) do
+        for _,data in pairs(args) do
             ts[#ts+1] = data
         end
         table.remove(ts,#ts)
