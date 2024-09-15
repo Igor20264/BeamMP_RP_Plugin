@@ -3,15 +3,15 @@ M.info = "Команды связанные с РП"
 M.ver = "BETA 0.4"
 
 function TRY(sender_id, sender_name, message) --Проверка действия
-	local random = Util.RandomIntRange(0,1)
+	local random = math.random(0,1)
     if message == nil then
-        if random == Util.RandomIntRange(0,1) then
+        if random == math.random(0,1) then
             SendMessage(-1,"^7"..sender_name.." ^lУспешно ^r^7сделал некое действие")
         else
             SendMessage(-1,"^7"..sender_name.." ^lНеудачно ^r^7сделал некое действие")
         end
     else
-        if random == Util.RandomIntRange(0,1) then
+        if random == math.random(0,1) then
             SendMessage(-1,"^7"..sender_name.." ^lУспешно ^r^7 " .. message)
         else
             SendMessage(-1,"^7"..sender_name.." ^lНеудачно ^r^7 " .. message)

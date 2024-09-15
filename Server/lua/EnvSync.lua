@@ -34,7 +34,6 @@ BeamMPEnvSync = {
             azimuth = 0,
             fixed = false
         },
-
         syncRate = 2,
     },
     options = {},

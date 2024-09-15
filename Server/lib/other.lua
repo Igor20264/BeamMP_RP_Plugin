@@ -66,32 +66,7 @@ function RegEvent(KRF)
 	end
 	return cmd
 end
--- Color
---[[
 
-^r 	reset
-^p 	newline (descriptions only)
-^n 	underline
-^l 	bold
-^m 	strike-through
-^o 	italic
-^0 	black
-^1 	blue
-^2 	green
-^3 	light blue
-^4 	red
-^5 	pink
-^6 	orange
-^7 	grey
-^8 	dark grey
-^9 	light purple
-^a 	light green
-^b 	light blue
-^c 	dark orange
-^d 	light pink
-^e 	yellow
-^f 	white
---]]
 function Color.purple(text)
     return "^c"..text.."^f"
 end
@@ -106,6 +81,7 @@ end
 function Gen.uuid()
     local seed={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'}
     local tb={}
+    math.randomseed(os.time())
     for i=1,32 do
         table.insert(tb,seed[Util.RandomIntRange(1,16)])
     end
@@ -148,7 +124,7 @@ end
 
 function levi(name,list,len_iter)
     len_iter = len_iter or 1
-	for i,case in ipairs(list) do
+	for _,case in ipairs(list) do
 		if lev_iter(name,case) <= len_iter then
 			return case
 		end
@@ -489,9 +465,35 @@ function MessageParser(message, sep, levenhtein) -- return Name:str, message:tab
             player = erors(player,levenhtein)
             return player,box
         end
-
-
 	end
 end
 
 -- api
+
+
+-- Color
+--[[
+
+^r 	reset
+^p 	newline (descriptions only)
+^n 	underline
+^l 	bold
+^m 	strike-through
+^o 	italic
+^0 	black
+^1 	blue
+^2 	green
+^3 	light blue
+^4 	red
+^5 	pink
+^6 	orange
+^7 	grey
+^8 	dark grey
+^9 	light purple
+^a 	light green
+^b 	light blue
+^c 	dark orange
+^d 	light pink
+^e 	yellow
+^f 	white
+--]]

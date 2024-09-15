@@ -1,0 +1,17 @@
+{
+    "read": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "name": "beammp_itlcore",
+        "user": "beammp_itlcore",
+        "pass": "yourpasshere"
+    },
+    "write": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "name": "beammp_itlcore",
+        "user": "beammp_itlcore",
+        "pass": "yourpasshere"
+    },
+    "debug": false
+}

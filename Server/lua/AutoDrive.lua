@@ -26,7 +26,7 @@ function AutoDriveAddPrava(sender_id, sender_name, message)
         return
     end
     eco.database[name]["drivelicence"][category] = true
-    eco:add(name, 'money', -config.drivelicence_cost[category])
+    eco:add(name, 'money', -math.abs(config.drivelicence_cost[category]))
     SendMessage(MP.GetId(name), "Вам выдали права на категорию: "..category.."\nС вашего счёта снята сумма: "..config.drivelicence_cost[category].." "..config.currency)
     eco:save()
 end

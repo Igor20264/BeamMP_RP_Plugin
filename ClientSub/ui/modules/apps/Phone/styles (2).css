@@ -1,0 +1,111 @@
+.phone {
+    width: 382px;
+    height: 778px;
+    background-color: #c52f2f;
+    position: relative;
+    overflow: hidden;
+}
+.phone_content {
+    top: 85px;
+    left: 23px;
+    width: 333px;
+    height: 591px;
+    background-color: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+.home_content{
+    width: 334px; height: 593px; background: linear-gradient(162deg, #FF0000 0%, #4B8F83 51%, #AD00FF 100%)
+}
+
+.open_phone, .close_phone {
+    width: 382px;
+    height: 50px;
+    background-color: #ffffff00;
+    border-color: #ffffff00;
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+    z-index: 10;
+}
+
+.open_phone {
+    bottom: 0; /* располагаем кнопку открытия внизу */
+    background-image: url('/ui/modules/apps/Phone/assets/phone_cart.png');
+}
+
+.close_phone {
+    top: 0; /* располагаем кнопку закрытия сверху */
+    display: none;
+    background-color: #ff000000;
+    text-align: center;
+    line-height: 50px;
+}
+
+.phone .phone-image {
+    width: 100%;
+    height: 100%;
+    background-image: url('./assets/phone_cart.png');
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+    bottom: -100%; /* скрываем изображение ниже контейнера */
+    left: 0;
+    z-index: 5;
+    transition: bottom 0.5s ease-in-out; /* плавный переход для bottom */
+}
+
+.phone .phone-image.visible {
+    bottom: 0; /* отображаем изображение при добавлении класса .visible */
+}
+
+.phone .phone-image.visible + .close_phone {
+    display: block; /* отображаем кнопку закрытия, когда изображение видно */
+}
+
+/* Кнопки */
+.global_buttons{
+    position: absolute;
+    color: #4B8F83;
+    width: 200px;
+    height: 50px;
+    top: 685px;
+    left: 55px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, calc(30% - 30px)); /* 50% минус промежутки */
+    grid-gap: 80px; /* Расстояние между элементами */
+}
+.back_btn{
+    width: 50px;
+    height: 50px;
+    background-color: #ffffff00;
+    border-color: #ffffff00;
+}
+.home_btn{
+    width: 50px;
+    height: 50px;
+    background-color: #ffffff00;
+    border-color: #ffffff00;
+}
+
+.apps_buttons {
+    position: absolute;
+    left: 40px;
+    top: 50px;
+    width: 250px;
+    height: 500px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, calc(30% - 30px)); /* 50% минус промежутки */
+    grid-gap: 50px; /* Расстояние между элементами */
+}
+
+.bank_app_button{
+    background-image: url('/ui/modules/apps/Phone/assets/app/bank.png');
+    width: 71px;
+    height: 71px;
+    background-color: #ffffff00;
+    border-color: #ff000000;
+    
+}
+

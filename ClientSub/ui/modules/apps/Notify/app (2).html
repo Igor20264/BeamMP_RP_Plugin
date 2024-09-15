@@ -1,0 +1,11 @@
+<div class="not-block" ng-controller="NotifyInit as ctrl">
+	<link type="text/css" rel="stylesheet" href="/ui/modules/apps/Notify/style.css">
+    <div class="notif animate-show-hide" ng-repeat="notification in notifications" ng-show="notification.visible">
+        <div class="loading" ng-class="{'yellow': notification.type === 'yellow', 'red': notification.type === 'red', 'green': notification.type === 'green'}" style="width: {{notification.width}}%;"></div>
+        <div class="icon" ng-class="{'info-icon': notification.type === 'yellow', 'no-icon': notification.type === 'red', 'good-icon': notification.type === 'green'}"></div>
+        <div class="notification">
+            <div class="not-title">{{notification.title}}</div>
+            <div class="not-text">{{notification.text}}</div>	
+        </div>
+    </div>
+</div>

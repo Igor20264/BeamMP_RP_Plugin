@@ -6,32 +6,7 @@ local recesime = {}
 block_ignore = {}
 CTS = {}
 
-local data_setup = [[extensions.core_input_actionFilter.setGroup("renamed", data {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
-'editorToggle', 'parts_selector', 'toggleCamera', 'funTires', 'dropCameraAtPlayer', 'dropPlayerAtCamera', 'loadHome',
-'pause', 'toggleTraffic', 'dropPlayerAtCameraNoReset', 'faster_motion', 'forceField', 'vehicleEditorToggle','movefast','changeCameraSpeed',
-'toggle_slow_motion', 'funRandomTire', 'funFire', 'reload_vehicle', 'toggleAITraffic', 'saveHome', 'editorNewLevel',
-'cefdev_console_toggle', 'reset_all_physics', 'debugmode_toggle', 'funBoom', 'lua_reload', 'editorOpenLevel', 'toggleConsoleNG',
-'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
-'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
-'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
-'toggle_play', 'reset_physics'});skipPlayers(true)
-]]
-local data_block = [[extensions.core_input_actionFilter.addAction(0, "renamed", true);skipPlayers(true);core_gamestate.setGameState("career", "multiplayer", "career")]]
-local data_unblock = [[extensions.core_input_actionFilter.addAction(0, "renamed", false);skipPlayers(false);core_gamestate.setGameState("multiplayer", "multiplayer", "multiplayer")]]
-local data_s = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
-'editorToggle', 'parts_selector', 'toggleCamera', 'funTires', 'dropCameraAtPlayer', 'dropPlayerAtCamera', 'loadHome',
-'pause', 'toggleTraffic', 'dropPlayerAtCameraNoReset', 'faster_motion', 'forceField', 'vehicleEditorToggle','movefast','changeCameraSpeed',
-'toggle_slow_motion', 'funRandomTire', 'funFire', 'reload_vehicle', 'toggleAITraffic', 'saveHome', 'editorNewLevel',
-'cefdev_console_toggle', 'reset_all_physics', 'debugmode_toggle', 'funBoom', 'lua_reload', 'editorOpenLevel', 'toggleConsoleNG',
-'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
-'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
-'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
-'toggle_play', 'reset_physics'}
-
-for _,case in ipairs(data_s) do
-	M.data = M.data.." "..case
-end
-
+local SendScript = {}
 function SendRequestCTS()
     if online_player == nil then
         log("online_player == nil",2)
@@ -44,6 +19,7 @@ end
 
 function GetRequestCTS(id,data)
     data = split(data,"$$$")
+    log(data,2)
     CTS[data[1]] = Util.JsonDecode(data[2])
 end
 
@@ -124,6 +100,84 @@ function FIX(sender_id,sender_name, message)
 	RemoutRun(MP.GetId(p2), "be:getPlayerVehicle(0):queueLuaCommand('recovery.startRecovering() recovery.stopRecovering()')")
 	return 0
 end
+--
+
+
+M.data = ""
+local data = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
+'editorToggle', 'parts_selector', 'toggleCamera', 'funTires', 'dropCameraAtPlayer', 'dropPlayerAtCamera', 'loadHome',
+'pause', 'toggleTraffic', 'dropPlayerAtCameraNoReset', 'faster_motion', 'forceField', 'vehicleEditorToggle','movefast','changeCameraSpeed',
+'toggle_slow_motion', 'funRandomTire', 'funFire', 'reload_vehicle', 'toggleAITraffic', 'saveHome', 'editorNewLevel',
+'cefdev_console_toggle', 'reset_all_physics', 'debugmode_toggle', 'funBoom', 'lua_reload', 'editorOpenLevel', 'toggleConsoleNG',
+'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
+'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
+'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
+'toggle_play', 'reset_physics'}
+
+for i,case in ipairs(data) do
+	M.data = M.data.." "..case
+end
+
+local data_setup = [[extensions.core_input_actionFilter.setGroup("renamed", data {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
+'editorToggle', 'parts_selector', 'toggleCamera', 'funTires', 'dropCameraAtPlayer', 'dropPlayerAtCamera', 'loadHome',
+'pause', 'toggleTraffic', 'dropPlayerAtCameraNoReset', 'faster_motion', 'forceField', 'vehicleEditorToggle','movefast','changeCameraSpeed',
+'toggle_slow_motion', 'funRandomTire', 'funFire', 'reload_vehicle', 'toggleAITraffic', 'saveHome', 'editorNewLevel',
+'cefdev_console_toggle', 'reset_all_physics', 'debugmode_toggle', 'funBoom', 'lua_reload', 'editorOpenLevel', 'toggleConsoleNG',
+'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
+'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
+'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
+'toggle_play', 'reset_physics'});skipPlayers(true)
+]]
+local data_block = [[extensions.core_input_actionFilter.addAction(0, "renamed", true);skipPlayers(true);core_gamestate.setGameState("career", "multiplayer", "career")]]
+local data_unblock = [[extensions.core_input_actionFilter.addAction(0, "renamed", false);skipPlayers(false);core_gamestate.setGameState("multiplayer", "multiplayer", "multiplayer")]]
+local data_s = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehicledebugMenu', 'recover_vehicle_alt',
+'editorToggle', 'parts_selector', 'toggleCamera', 'funTires', 'dropCameraAtPlayer', 'dropPlayerAtCamera', 'loadHome',
+'pause', 'toggleTraffic', 'dropPlayerAtCameraNoReset', 'faster_motion', 'forceField', 'vehicleEditorToggle','movefast','changeCameraSpeed',
+'toggle_slow_motion', 'funRandomTire', 'funFire', 'reload_vehicle', 'toggleAITraffic', 'saveHome', 'editorNewLevel',
+'cefdev_console_toggle', 'reset_all_physics', 'debugmode_toggle', 'funBoom', 'lua_reload', 'editorOpenLevel', 'toggleConsoleNG',
+'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
+'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
+'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
+'toggle_play', 'reset_physics'}
+
+for _,case in ipairs(data_s) do
+	M.data = M.data.." "..case
+end
+
+
+local sp = [[
+local DAMAGE_TO_VALUE = 25000
+local DAMAGE_CALC_THRESHOLD = 100
+local DAMAGE_RATE_MAX = 0.8
+local vid = be:getPlayerVehicle(0):getId()
+local veh = be:getObjectByID(vid)
+if veh == nil then
+    return nil
+end
+local _currentDamage = 0
+if map.objects[vid] == nil then
+    veh:queueLuaCommand(\'obj:queueGameEngineLua("be:getObjectByID(\' .. vid .. \').destructionDamage = " .. beamstate.damage)\')
+    if veh.destructionDamage == nil then
+        veh:setDynDataFieldbyName('destructionDamage', 0, 0)
+        _currentDamage = 0
+    else
+        _currentDamage = veh.destructionDamage
+    end
+else
+    _currentDamage = map.objects[vid][\'damage\']
+end
+if _currentDamage < DAMAGE_CALC_THRESHOLD then
+    return 0
+end
+local _damageRate = (_currentDamage / DAMAGE_TO_VALUE)
+_damageRate = (DAMAGE_RATE_MAX > _damageRate) and _damageRate or DAMAGE_RATE_MAX
+return _damageRate
+]]
+
+local sp = 'local v0=25000;local v1=100;local v2=0.8;local v3=be:getPlayerVehicle(0):getId();local v4=be:getObjectByID(v3);if (v4==nil) then return nil;end local v5=0;if (map.objects[v3]==nil) then v4:queueLuaCommand(\'obj:queueGameEngineLua("be:getObjectByID(\'   .. v3   .. \').destructionDamage = " .. beamstate.damage)\' );if (v4.destructionDamage==nil) then v4:setDynDataFieldbyName("destructionDamage",0,0);v5=0;else v5=v4.destructionDamage;end else v5=map.objects[v3][\'damage\'];end if (v5<v1) then return 0;end local v6=v5/v0 ;v6=((v2>v6) and v6) or v2 ;return v6;'
+AddToSendServerData('repair',sp)
+
+
 
 --
 function crash(sender_id,sender_name, message)  -- username

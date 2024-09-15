@@ -64,7 +64,7 @@ function CarPlate()
         return letter
     end
     -- Формат номера: X000XX00, где X - буква, 0 - цифра, 7 - цифра
-    local carNumber = randomLetter()..""..tostring(math.random(0,9))..""..tostring(math.random(0,9))..""..tostring(math.random(0,9))..""..randomLetter()..""..randomLetter().."91"
+    local carNumber = randomLetter()..""..tostring(math.random(0,9))..""..tostring(math.random(0,9))..""..tostring(math.random(0,9))..""..randomLetter()..""..randomLetter().."91"  -- todo уточнить по поводуномера
     if lisPlate[carNumber] then
         carNumber = CarPlate()
     else
@@ -85,10 +85,13 @@ end
 
 extended(Cars, DB)
 
-function Cars:new(owner,ret)
+function Cars:new(owner,ret,coast)
+    if coast == nil then
+        coast = CarCoast[ret.ret.jbm]
+    end
     self.database = self.database or {}
     self.database[owner] = self.database[owner] or {}
-    self.database[owner][Gen.uuid()] = {licenss_plate = CarPlate(),engine = ret.ret.engine,
+    self.database[owner][Gen.uuid()] = {licenss_plate = CarPlate(),coast = coast,engine = ret.ret.engine,
         transmission = ret.ret.transmission, transfer_case = ret.ret.transfer_case,
         configuration = ret.config,body = ret.ret.body,color = ret.ret.color_name,confiscation = false,
 		former_owners = {},name = cars_name[ret.ret.jbm] or ret.ret.mainPartName,
@@ -311,11 +314,13 @@ function Cars:is_doesnt(owner,data)
             log("Differences found:", 4)
             for _, v in ipairs(t) do
                 log("Difference: " .. v, 4)
-                local case = split(v, '.')
-                if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "licensetext" and case[#case] ~= "mainpartname" then
-                    log("Non-allowed difference: " .. case[#case], 4)
-                    ts = false
-                    break
+                if v ~= ".partconfigfilename" or v ~= ".vars "then
+                    local case = split(v, '.')
+                    if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "vars" and case[#case] ~= ".part" then
+                        log("Non-allowed difference: " .. case[#case], 4)
+                        ts = false
+                        break
+                    end
                 end
             end
             return ts
@@ -350,21 +355,24 @@ end
 function CarsBuy(sender_id, sender_name, message)
     if not lastCar[sender_name] then
         SendMessage(sender_id, "Ошибка: не удалось найти данные о последней машине.")
+        print("Ошибка: lastCar[sender_name] не существует")
         return
     end
     
     local coast = lastCar[sender_name].price
     if not coast then
         SendMessage(sender_id, "Ошибка: цена машины не установлена.")
+        print("Ошибка: lastCar[sender_name].price не существует")
         return
     end
     
     if eco:value(sender_name, "money") >= coast then
         eco:add(sender_name, "money", -coast)
-        local num = cars:new(sender_name, lastCar[sender_name])
-        SendMessage(sender_id, "Вы купили машину "..lastCar[sender_name].name..".")
+        local num = cars:new(sender_name, lastCar[sender_name],coast)
+        SendMessage(sender_id, "Вы купили машину "..lastCar[sender_name].name.." за "..coast .. " "..config.currency)
     else
         SendMessage(sender_id, "У вас недостаточно денег")
+        print("Ошибка: недостаточно денег у " .. sender_name)
         return
     end
 end
@@ -539,7 +547,34 @@ function CarsSellDecline(sender_id,sender_name, message)
     carSellQuore[sender_name] = nil
 end
 
+function CarsTeleportToRepair(sender_id,sender_name, message)
+    RemoutRun(sender_id,"extensions.core_input_actionFilter.setGroup('FREEZ', {'accelerate','brake','accelerate_brake','shiftUp','activateStarterMotor','switch_previous_vehicle','switch_next_vehicle','switch_next_vehicle_multiseat','nodegrabberRender','toggleWalkingMode'});extensions.core_input_actionFilter.addAction(0, 'FREEZ', true)") -- freez
+    HeventTimer.Createtask((60*1+1),CarsTeleport,sender_id.."UnTeleport",sender_id)
+end
 
+function CarsTeleport(user_id)
+    RemoutRun(user_id,"")
+    RemoutRun(user_id,"extensions.core_input_actionFilter.addAction(0, 'FREEZ', false)") -- unfreez
+end
+
+function UncarFix(user_id)
+    RemoutRun(user_id, "be:getPlayerVehicle(0):queueLuaCommand('recovery.startRecovering() recovery.stopRecovering()')")
+    RemoutRun(user_id,"extensions.core_input_actionFilter.addAction(0, 'FREEZ', false)") -- unfreez
+end
+
+function CarsFix(sender_id,sender_name, message)
+    local id = cars:getidbynickname(sender_name,message)
+    local price = cars.database[sender_name][id].coast
+    price = math.floor(CTS[sender_name].custom.repair*price)
+    if eco:value(sender_name,"money")-price < 0 then
+        SendMessage(sender_id,"У вас не хватает денег, чтобы ремонтировать машину.\n Текущая стоимость ремонта: "..price.." "..config.currency)
+        return
+    end
+    eco:add(sender_name,"money",-price)
+    SendMessage(sender_id,"Ваша машина ремонтируется. С вашего счёта было списанно: "..price.." "..config.currency)
+    RemoutRun(sender_id,"extensions.core_input_actionFilter.setGroup('FREEZ', {'accelerate','brake','accelerate_brake','shiftUp','activateStarterMotor','switch_previous_vehicle','switch_next_vehicle','switch_next_vehicle_multiseat','nodegrabberRender','toggleWalkingMode'});extensions.core_input_actionFilter.addAction(0, 'FREEZ', true)") -- freez
+    HeventTimer.Createtask(150,UncarFix,sender_id.."Unfreez",sender_id)
+end
 
 -- Заспавнить машину
 
@@ -565,7 +600,9 @@ function CarsUpdate(sender_id,sender_name, message)
     local case = split(message," ")
     local name = erors(case[1],2)
     local id = cars:getidbynickname(name,case[2])
+    local money = tonumber(case[3])
     cars.database[name][id].configuration = lastCar[name].config or "UNKNOWN"
+    cars.database[name][id].coast = cars.database[name][id].coast + (money/4) or cars.database[name][id].coast+ (cars.database[name][id].coast/10)
     cars.database[name][id].engine = lastCar[name].ret.engine or "UNKNOWN"
     cars.database[name][id].transmission = lastCar[name].ret.transmission or "UNKNOWN"
     cars.database[name][id].transfer_case = lastCar[name].ret.transfer_case or "UNKNOWN"
@@ -636,14 +673,18 @@ function CarsSpawn(sender_id, sender_name, message)
             end
         end
 
-        if adata.mainPartName == nil then
-            adata.mainPartName = adata.model
+        if adata.mainPartName == nil and adata.model == nil then
+            SendMessage(sender_id,"Car Error: mainPartName and model is missing. Обратитесь к администратору.")
         end
-        if adata.model == nil then
+
+        if adata.model == nil and adata.mainPartName ~= nil then
             adata.model = adata.mainPartName
         end
 
         cars.configuration = Util.JsonEncode(adata)
+        --adata.vehicleName = id
+        --adata.vars = adata.vars or {}
+        --adata.vars["$fuel"] = 20
 
         local send_data = {
             data = {
@@ -661,7 +702,7 @@ function CarsSpawn(sender_id, sender_name, message)
                 send_data.cmd = send_data.cmd .. "be:getObjectByID(ids):setPosition(vec3("..posCar[carg.licenss_plate].x..", "..posCar[carg.licenss_plate].y..", "..posCar[carg.licenss_plate].z.."))"
             end
         else
-            cars.database[sender_name][id].licenss_plate = CarPlate()
+            cars.database[sender_name][id].licenss_plate = CarPlate() -- TODO Переделать из за системы номеров
             SendMessage(sender_id, "При спавне машины была обнаружена ошибка выдачи номера. Вам выдан номер "..cars.database[sender_name][id].licenss_plate)
             CarsSpawn(sender_id, sender_name, message)
             return
@@ -764,7 +805,7 @@ function CarsCheckCreate(player_id,vehicle_id,data)
 	local isd = cars:is_doesnt(name,lastCar[name].config)
 
     if isd==false and lastCar[name].price~= nil and ret.jbm ~= "unicycle" then
-        SendMessage(player_id,"Стоимость машины в диллерском центре. "..CarCoast[adata.partConfigFilename]..""..config.currency)
+        SendMessage(player_id,"Стоимость машины в диллерском центре. "..lastCar[name].price or CarCoast[adata.partConfigFilename]..""..config.currency)
     end
 	if isd == true then
 		return 0
@@ -860,12 +901,12 @@ end
 
 cars = Cars:init("cars.ixt")
 
-local prefix = config.prefix
 M.command = {
-    { category = "car", command = "list", help = "Показать все машины.", func = "ShowAllCars"},
-    { category = "car", command = "buy", help = "Купить машину из дилер центра для покупки нужен администратор!", func = "CarsBuy"},
-    { category = "car", command = "setnick", help = "Установить ник машины.", args = "[nickname_car] [new nickname_car]", func = "SetNickname",},
-    { category = "car", command = "transfer", help = "Передать машину. ", args = "[new_owner_name] [nickname_car]", func = "CarsGive"},
+    {category = "car", command = "repair", help = "Показать стоимость ремонта.", func = "CarsFix", args = "[nickname_car]"},
+    {category = "car", command = "list", help = "Показать все машины.", func = "ShowAllCars"},
+    {category = "car", command = "buy", help = "Купить машину из дилер центра для покупки нужен администратор!", func = "CarsBuy"},
+    {category = "car", command = "setnick", help = "Установить ник машины.", args = "[nickname_car] [new nickname_car]", func = "SetNickname",},
+    {category = "car", command = "transfer", help = "Передать машину. ", args = "[new_owner_name] [nickname_car]", func = "CarsGive"},
     {category = "car",command = "allforuser", help = "Показать все машины определенного игрока. ",args = "[имя игрока]", func = "CarsGetAll",roles = {"moderator","admin"}},
     {category = "car",command = "update", help = "Обновить машину. ",args = "[игрок] [nickname_car]" , func = "CarsUpdate", roles = {"moderator","admin"}},
     {category = "car",command = "viewedit", help = "Показать изменения машины. ",args = "[игрок] [nickname_car]", func = "CarsChekEdit"},

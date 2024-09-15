@@ -287,9 +287,7 @@ function CarsCheckCreate(player_id,vehicle_id,data)
 	end
 end
 
-function CarsCheckUpdate(player_id,vehicle_id,data)
-    re
-    local name = MP.GetPlayerName(player_id)
+function CarsCheckUpdate(player_id,vehicle_id,data)    local name = MP.GetPlayerName(player_id)
     log({name,vehicle_id,data},4)
 	local data = UDV(data)
 	local ret = vehicle_parser(data)

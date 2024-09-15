@@ -1,11 +1,14 @@
 local M = {logs = true, debugs = true}
 -- Фикс русского языка
 os.execute( "chcp 65001 > nul" )
+--os.execute("apt-get install lua-sql-mysql")
+
+--sql = require "lib/sql"
 inspect = require "lib/inspect"
 M.pluginName = "Economic_Plugin"
 function log(message, weight)
 	if message == nil or message == "" then goto zcontinue end
-	local message = inspect(message)
+	message = inspect(message)
     weight = weight or 1 -- если вес не указан, используем 0
     
     -- таблица цветов
@@ -314,10 +317,37 @@ M.command = {
 
 function OPTIMIZATOR()
 	local c1 = collectgarbage("count") -- получаем текущий размер памяти
+	local c2 = collectgarbage("count")
+	local alpha = ((c1-c2))
 	collectgarbage("collect") -- выполняем сбор мусора
 	local count2 = collectgarbage("count") -- получаем размер памяти после сбора
-	log("Освобождено памяти: " .. (round(((c1 - count2)),2)).. " кб",5)
+	log("Освобождено памяти: " .. (round(((c1 - count2)-(alpha*3)),2)).. " кб",5)
 end
+
+--[[
+local function load_module(name)
+	local data, error = pcall(require, name)
+	if not data then
+		log(error, 5)
+		local data_install, exit_code = os.execute("luarocks install luasql-sqlite3 SQLITE_DIR="..M.pluginPath.." --local")
+		if data_install then
+			local data, error = pcall(require, "library."..name)
+			if not data then
+				log("Failed to load module even after installation: " .. error, 5)
+				return nil
+			else
+				return data
+			end
+		else
+			log("Failed to install module with exit code: " .. tostring(exit_code), 5)
+			return nil
+		end
+	else
+		return data
+	end
+end
+--]]
+--load_module("luasql-sqlite3")
 
 function onInit()
     log("base.lua",2)
@@ -335,14 +365,14 @@ function onInit()
 	Sblocker = import("S2C",true,true)  --Назввание файла, Добавлять ли команды в хелп, Оповестить о импорте
 	RolePlay = import("RolePlay")
     EnvSync = import("EnvSync")
-	CheakCheaters = import("CheckCheater")
+	--CheakCheaters = import("CheckCheater")
 	HeventTimer.addFunc(check_request_save_database, 5) -- 10 секунд иногда слишком долго
 	HeventTimer.addFunc(OPTIMIZATOR,600) -- раз в 10 минут
 	HeventTimer.addFunc(SaveCarEveryXsec, 1) --, MP.CallStrategy.Precise
 
 	MP.RegisterEvent("onChatMessage", "MyChatMessageHandler")
 	MP.RegisterEvent("onConsoleInput", "MyCmdHandler")
-	MP.RegisterEvent("onShutdown", "STOP")
+	--MP.RegisterEvent("onShutdown", "STOP")
 end
 
 function onShutdown()

@@ -82,6 +82,7 @@ function Working:init()
 		if eco.database[name]["work"]["money"] ~= 0 then
 			privat.working[name] = timer:get()
 			eco.database[name]["work"]["is_working"] = true
+			local work = eco.database[name]["work"]["name"]
 			--SpawnWorkCar(name, work)
 			block_ignore[name] = true
 			return eco.database[name]["work"]["name"], eco.database[name]["work"]["money"], false
@@ -265,7 +266,7 @@ function SpawnWorkCar(name, workname)
 	if work.workcars[workname] == nil then
 		return
 	end
-	local car = work.workcars[workname][Util.RandomIntRange(1, #work.workcars[workname])]
+	local car = work.workcars[workname][math.random(1, #work.workcars[workname])]
 	local car_model = car.model
 	local car_config = car.config
 

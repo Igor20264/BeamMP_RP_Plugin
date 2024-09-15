@@ -120,6 +120,9 @@ end
 playdtimeexmp = PlaydTime:init()
 
 function AddPlayTime()
+    if online_player == nil then
+        return
+    end
     for _, player in pairs(MP.GetPlayers()) do
         playdtimeexmp:add(player, 10*60)
         local ret = playdtimeexmp:get(sender_name) or 0

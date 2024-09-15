@@ -119,7 +119,6 @@ function Permissions:init()
     return public
 end
 
-
 --[[
 local function test_permission()
     print(perm:get_roles("Igor20264"))
@@ -144,7 +143,6 @@ onlyPlayer(sag, 1, "HHg", 3)
 onlyPlayer(sag, 1, "Igor20264", 3)
 onlyPlayer(sag, 1, "admin", 3)
 onlyPlayer(sag, 1, "CMD", 3)
-
 --]]
 
 -- Декоратор

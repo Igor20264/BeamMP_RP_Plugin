@@ -1,0 +1,41 @@
+
+<div ng-controller="PhoneInit" id="PhoneInit" ng-init="init()">
+    <link type="text/css" rel="stylesheet" href="/ui/modules/apps/Phone/styles.css">
+    <div class="phone">
+        <button class="open_phone"></button>
+        <div class="phone-image">
+            <div class="phone_content">
+                <div class="home_content">
+                    <div style="width: 334px; height: 30px; position: relative">
+                        <div style="width: 334px; height: 30px; left: 0px; top: 0px; position: absolute; background: rgba(62.69, 62.69, 62.69, 0.69)"></div>
+                        <div style="width: 47px; height: 16px; left: 279px; top: 5px; position: absolute; color: white; font-size: 17px; font-family: Inter; font-weight: 400; word-wrap: break-word">18:56</div>
+                        <div style="width: 36px; height: 24px; left: 230px; top: 2px; position: absolute">
+                            <div style="width: 6px; height: 16px; left: 30px; top: 8px; position: absolute; background: white; border-radius: 5px"></div>
+                            <div style="width: 6px; height: 10px; left: 20px; top: 14px; position: absolute; background: white; border-radius: 5px"></div>
+                            <div style="width: 6px; height: 8px; left: 0px; top: 16px; position: absolute; background: white; border-radius: 5px"></div>
+                            <div style="width: 6px; height: 6px; left: 30px; top: 0px; position: absolute; background: white; border-radius: 3px"></div>
+                            <div style="width: 6px; height: 13px; left: 10px; top: 11px; position: absolute; background: white; border-radius: 5px"></div>
+                        </div>
+                    </div>
+                    <div class="apps_buttons">
+                        <div ng-repeat="button in buttons">
+                            <button class="bank_app_button"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="global_buttons">
+                <div class="home_back_btn"><button class="back_btn"></button></div>
+                <div class="home_back_btn"><button class="home_btn"></button></div>
+            </div>
+        </div>
+        <button class="close_phone"></button>
+    </div>
+    <script src="/ui/modules/apps/Phone/scripts.js"></script>
+</div>
+
+
+
+
+
+

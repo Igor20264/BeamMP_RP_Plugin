@@ -1,0 +1,3 @@
+{
+	"toggleCKGraphics":{"cat":"debug", "order": 128, "ctx": "tlua", "onDown"  :"extensions.SetHome.toggle()", "actionMap": "Global", "title": "SetHome"}
+}

@@ -1,0 +1,2 @@
+load("RolePlaySub")
+registerCoreModule("RolePlaySub")

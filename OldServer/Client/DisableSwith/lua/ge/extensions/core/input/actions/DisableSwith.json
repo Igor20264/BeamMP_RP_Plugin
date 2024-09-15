@@ -1,0 +1,3 @@
+{
+    "repair_car_rp": {"cat":"vehicle","order": 7.1,"ctx":"tlua","onDown"  :"extensions.DisableSwith.arepairs()", "title": "Запросить Ремонт", "desc": "Вызывает ремонт и абаба"}
+}

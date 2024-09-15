@@ -1,0 +1,2 @@
+load("SubModeration")
+registerCoreModule("SubModeration")

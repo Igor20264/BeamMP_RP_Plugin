@@ -1,0 +1,17 @@
+{
+    "domElement": "<roleplayjobs></roleplayjobs>",
+    "name": "RolePlay Jobs",
+    "types": [
+      "ui.apps.categories.roleplayjobs"
+    ],
+    "css": {
+        "left": "50%",
+        "top": "40px",
+        "width": "200px",
+        "height": "130px"
+    },
+    "description": "Интерфейс для профессий",
+    "author": "SubterraniaTeam",
+    "version": "0.1",
+    "directive": "roleplayjobs"
+  }

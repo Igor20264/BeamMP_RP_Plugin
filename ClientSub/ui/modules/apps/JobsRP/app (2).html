@@ -1,0 +1,16 @@
+<div ng-controller="JobsInit" id="JobsInit" ng-init="init()">
+    <div style="width: 200px; height: 130px; position: relative; background: rgba(255, 255, 255, 0)">
+        <div style="width: 200px; height: 130px; left: 0px; top: 0px; position: absolute; background: #1F1F1F; border-radius: 8px"></div>
+        <div id="BalanceBlok" style="width: 200px;padding: 10px 1px 10px 0px; height: 49px; left: 0px; top: 0px; position: absolute; text-align: center; color: white; font-size: 25px; font-family: Montserrat; font-weight: 700; word-wrap: break-word">
+            <div style="color: #8f8f8f; font: 400 25px system-ui;">
+                <span>Профессия:</span>
+            </div>
+            <div style="font: 400 25px system-ui;"><span id="RP-Jobs-name">Безработный</span></div>
+
+            <div>
+                <button type="button" ng-click="startwork()" style="margin-top: 10px;border-color: #ffffff; font-size: 16px; padding: 8px 16px; color: #fff; background: #646464; border-radius: 5px; border: 0;appearance: none;" id="startwork-button" name="button" class="buttons">
+                    <span id="RP-Jobs-button-name">Начать работу</span></button>
+            </div>
+        </div>
+    </div>
+</div>

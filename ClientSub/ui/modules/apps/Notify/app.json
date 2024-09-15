@@ -1,0 +1,17 @@
+{
+    "domElement": "<roleplaynot></roleplaynot>",
+    "name": "RolePlay Notify",
+    "types": [
+      "ui.apps.categories.roleplaynot"
+    ],
+    "css": {
+        "left": "50%",
+        "top": "90px",
+        "width": "420px",
+        "height": "90px"
+    },
+    "description": "Интерфейс для оповещений",
+    "author": "SubterraniaTeam",
+    "version": "0.1",
+    "directive": "roleplaynot"
+  }
