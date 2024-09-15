@@ -1,3 +1,0 @@
-{
-    "carp_mission_button"           :{"cat":"gameplay", "order":  1, "ctx": "tlua", "onDown"  :"carp.sendMissionRequest()", "title": "Carp Mission Button", "desc": "Used for accepting or completing missions." }
-}

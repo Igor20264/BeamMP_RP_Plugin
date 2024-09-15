@@ -1,8 +1,0 @@
-{
-  "bindings":[
-    {
-      "action":"toggleCKGraphics",
-      "control":"-"
-    }
-  ]
-}
