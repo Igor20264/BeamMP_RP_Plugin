@@ -10,7 +10,9 @@ function foriin()
         M.curcle = M.curcle+1
         start = os.time()
         M.data[M.curcle] = load_database("test.test")
+        collectgarbage("collect") -- выполняем сбор мусора
         files.verify("test.test",M.data)
+        collectgarbage("collect") -- выполняем сбор мусора
         log({"На 1 проверку",os.time() - start,"сек. | ",M.curcle,"цикл"},4)
     end
 end
