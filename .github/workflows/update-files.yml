@@ -30,6 +30,9 @@ jobs:
           cd Client
           zip -r ../Client.zip .
           cd ..
+          mkdir -p ./tempZip
+          cp -r ./Client.zip ./tempZip
+          cd ./tempZip
           ls
 
       - name: SFTP Plugin uploader
@@ -48,10 +51,11 @@ jobs:
           host: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localDir: ./
+          localDir: ./tempZip
           remoteDir: /root/server_dev/client-mods/
-          forceUpload: true
-          exclude: .git/**,.github/**,.gitignore,Server/**,Client/**,PogoniVa582/**,RolePlaySub/**,BeamMP_RP_PluginServer/**,BeamMP_RP_PluginClient/**
+          forceUpload: false
+          exclude: .git/**,.github/**,.gitignore
+
 
       - name: Update Database
         uses: appleboy/ssh-action@v1.0.3

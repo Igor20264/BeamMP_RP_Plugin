@@ -133,5 +133,6 @@ function save_config(namefile,data)
 	end
 end
 
+M.verify = verify
 
 return M

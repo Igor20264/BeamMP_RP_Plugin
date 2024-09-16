@@ -1,0 +1,3 @@
+{
+    "toggleCKGraphics"     :{"cat":"BeamMP_RP_Plugin", "order": 1, "ctx": "tlua", "onDown"  :"extensions.core_ckgraphics.toggle()", "actionMap": "Global", "title": "Toggle Graphics Settings", "desc": "Runs Graphics Settings made by Car_Killer" }
+}

@@ -365,9 +365,10 @@ function onInit()
 	Sblocker = import("S2C",true,true)  --Назввание файла, Добавлять ли команды в хелп, Оповестить о импорте
 	RolePlay = import("RolePlay")
     EnvSync = import("EnvSync")
+	TEST = import("Test")
 	--CheakCheaters = import("CheckCheater")
 	HeventTimer.addFunc(check_request_save_database, 5) -- 10 секунд иногда слишком долго
-	HeventTimer.addFunc(OPTIMIZATOR,600) -- раз в 10 минут
+	HeventTimer.addFunc(OPTIMIZATOR,5) -- раз в 10 минут
 	HeventTimer.addFunc(SaveCarEveryXsec, 1) --, MP.CallStrategy.Precise
 
 	MP.RegisterEvent("onChatMessage", "MyChatMessageHandler")
