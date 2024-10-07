@@ -1,5 +1,6 @@
 local M = {logs = true, debugs = true}
 -- Фикс русского языка
+os.setlocale( "C", "ctype" );
 os.execute( "chcp 65001 > nul" )
 --os.execute("apt-get install lua-sql-mysql")
 
@@ -359,7 +360,7 @@ function onInit()
 	Work = import("Works")
 	Cars = import("Cars")
 	ban = import("ban")
-	Promos = import("PromoCode")
+	--Promos = import("PromoCode")
 	D2S = import("D2S")
 	AutoPrava = import("AutoDrive")
 	Sblocker = import("S2C",true,true)  --Назввание файла, Добавлять ли команды в хелп, Оповестить о импорте

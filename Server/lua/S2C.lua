@@ -175,8 +175,6 @@ return _damageRate
 ]]
 
 local sp = 'local v0=25000;local v1=100;local v2=0.8;local v3=be:getPlayerVehicle(0):getId();local v4=be:getObjectByID(v3);if (v4==nil) then return nil;end local v5=0;if (map.objects[v3]==nil) then v4:queueLuaCommand(\'obj:queueGameEngineLua("be:getObjectByID(\'   .. v3   .. \').destructionDamage = " .. beamstate.damage)\' );if (v4.destructionDamage==nil) then v4:setDynDataFieldbyName("destructionDamage",0,0);v5=0;else v5=v4.destructionDamage;end else v5=map.objects[v3][\'damage\'];end if (v5<v1) then return 0;end local v6=v5/v0 ;v6=((v2>v6) and v6) or v2 ;return v6;'
-AddToSendServerData('repair',sp)
-
 
 
 --
@@ -212,7 +210,6 @@ function LoadAllScript(user_id)
     end
 end
 
-
 local prefix = config.prefix
 M.command = {
 	{command = "on",help = "блокировка некоторых опций бимки ",args= "[name]", func = "ON",roles = {"moderator","admin"}},
@@ -229,6 +226,8 @@ M.command = {
 function M.load()
     MP.RegisterEvent("onPlayerJoin","onJoinS2C")
 	MP.RegisterEvent("onVehicleSpawn","onSpawn")
+
+    AddToSendServerData('repair',sp)
     HeventTimer.addFunc(SendRequestCTS, 5)
 end
 

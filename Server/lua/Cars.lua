@@ -10,7 +10,7 @@ off = off or {}
 local lastCar = {}
 local CarCoast =  CarCoast or load_database("cars_coast.ixt") or {}
 local lisPlate = load_database("lisPlate.ixt") or {}
-local transfered = {}
+local perBuy = {}
 local carSellQuore = {}
 local posCar = load_database("position_on_lic_plate.ixt") or {}
 local testDriveCars = load_database("testDriveCars.ixt") or {} -- Загружаем данные о машинах на тест-драйве
@@ -85,17 +85,23 @@ end
 
 extended(Cars, DB)
 
-function Cars:new(owner,ret,coast)
-    if coast == nil then
-        coast = CarCoast[ret.ret.jbm]
-    end
+function Cars:new(owner,perBuy) --perBuy[sender_name]
+    local coast = perBuy.coast
+    local config = files.try_read_config(perBuy.path)
+    config.vars = perBuy.vars
+    config.paints = perBuy.color
+    config = Util.JsonEncode(config)
+    local udv = UDV(config)
+    print(udv)
+
     self.database = self.database or {}
     self.database[owner] = self.database[owner] or {}
-    self.database[owner][Gen.uuid()] = {licenss_plate = CarPlate(),coast = coast,engine = ret.ret.engine,
-        transmission = ret.ret.transmission, transfer_case = ret.ret.transfer_case,
-        configuration = ret.config,body = ret.ret.body,color = ret.ret.color_name,confiscation = false,
-		former_owners = {},name = cars_name[ret.ret.jbm] or ret.ret.mainPartName,
-        nickname=(ret.ret.jbm or ret.ret.mainPartName):sub(0,math.min(#(ret.ret.jbm or ret.ret.mainPartName)-1,3))..""..Gen.generateRandomData(3)}
+    self.database[owner][Gen.uuid()] = {
+        licenss_plate = CarPlate(),coast = coast, configuration = config,confiscation = false,
+		former_owners = {},name = perBuy.model,category = cars_category[udv.jbm],engine=udv.engine,transmission=udv.transmission,transfer_case=udv.transfer_case,body=udv.body,
+        path = perBuy.path,jbm = udv.jbm,
+        nickname=(perBuy.model):sub(0,math.min(#(perBuy.model)-1,3))..""..Gen.generateRandomData(3)}
+    print(self.database[owner][Gen.uuid()].nickname)
     self:save()
     return #self.database[owner]+1
 end
@@ -348,32 +354,6 @@ function ShowAllCars(sender_id,sender_name, message)
         SendMessage(sender_id,"У вас нет машин")
     end
     SendMessage(sender_id,ret)
-    end
-end
-
--- Купить машину
-function CarsBuy(sender_id, sender_name, message)
-    if not lastCar[sender_name] then
-        SendMessage(sender_id, "Ошибка: не удалось найти данные о последней машине.")
-        print("Ошибка: lastCar[sender_name] не существует")
-        return
-    end
-    
-    local coast = lastCar[sender_name].price
-    if not coast then
-        SendMessage(sender_id, "Ошибка: цена машины не установлена.")
-        print("Ошибка: lastCar[sender_name].price не существует")
-        return
-    end
-    
-    if eco:value(sender_name, "money") >= coast then
-        eco:add(sender_name, "money", -coast)
-        local num = cars:new(sender_name, lastCar[sender_name],coast)
-        SendMessage(sender_id, "Вы купили машину "..lastCar[sender_name].name.." за "..coast .. " "..config.currency)
-    else
-        SendMessage(sender_id, "У вас недостаточно денег")
-        print("Ошибка: недостаточно денег у " .. sender_name)
-        return
     end
 end
 
@@ -711,7 +691,6 @@ function CarsSpawn(sender_id, sender_name, message)
     end
 end
 
-
 function CarsSellGos(sender_id, sender_name, message)
     local case = split(message, " ")
     local yes = case[1]
@@ -773,11 +752,45 @@ function CarsSetPrice(sender_id, sender_name, message)
     SendMessage(sender_id, "Вы установили стоимость " .. price .. " " .. config.currency)
 end
 
-local function runs(data)
-	local res = assert(load(data))()
+-- конец основых функций
+
+-- Функции вызываемые при тригере
+
+function InfoBuy(sender_id, sender_name, message)
+    if not perBuy[sender_name] then
+        SendMessage(sender_id, "Ошибка: не удалось найти данные о последней машине.")
+        print("Ошибка: perBuy[sender_name] не существует")
+        return
+    end
+    if not perBuy[sender_name].price then
+        SendMessage(sender_id, "Ошибка: не удалось найти данные о стоймости машины.")
+        print("Ошибка: CarCoast[perBuy[sender_name].path] не существует")
+        return
+    end
+    local send_message = "Модель машины: "..perBuy[sender_name].model.."\nСтоймость машины: "..perBuy[sender_name].price.." "..config.currency.."\nКонфигурация: "..perBuy[sender_name].path
+    SendMessage(sender_id, send_message)
+    perBuy[sender_name].view = true
 end
 
--- конец основых функций
+
+function BuyCar(sender_id, sender_name, message)
+    if perBuy[sender_name] then
+        if not perBuy[sender_name].view then
+            SendMessage(sender_id,"Перед покупкой машины необходимо просмотреть информацию. !car buyinfo")
+        else
+            local coast = perBuy[sender_name].price
+            if eco:value(sender_name, "money") >= coast then
+                eco:add(sender_name, "money", -coast)
+                local num = cars:new(sender_name, perBuy[sender_name])
+                SendMessage(sender_id, "Вы купили машину "..perBuy[sender_name].model.." за "..coast .. " "..config.currency)
+            else
+                SendMessage(sender_id, "У вас недостаточно денег")
+                return
+            end
+        end
+    end
+end
+
 function CarsCheckCreate(player_id,vehicle_id,data)
     local name = MP.GetPlayerName(player_id)
     if block_ignore[name] == true then
@@ -787,12 +800,14 @@ function CarsCheckCreate(player_id,vehicle_id,data)
 	if ret.jbm == "unicycle" then
 	    return 0
 	end
-	local data = UDV(data)
+    data = UDV(data)
 	local status, adata = pcall(Util.JsonDecode,data)
 	if adata == nil then
 		return 1
 	end
-	local adata = adata.config.vcf 
+	adata = adata.config.vcf
+    local price = CarCoast[adata.partConfigFilename]
+
 	lastCar[name] = {}
 	lastCar[name].config = Util.JsonEncode(adata)
 	lastCar[name].price = CarCoast[adata.partConfigFilename]
@@ -803,13 +818,13 @@ function CarsCheckCreate(player_id,vehicle_id,data)
     lastCar[name].licenss_plate = adata.licenseText or adata.licenss_plate or cars_name[ret.jbm] or ret.mainPartName
     
 	local isd = cars:is_doesnt(name,lastCar[name].config)
-
-    if isd==false and lastCar[name].price~= nil and ret.jbm ~= "unicycle" then
-        SendMessage(player_id,"Стоимость машины в диллерском центре. "..lastCar[name].price or CarCoast[adata.partConfigFilename]..""..config.currency)
+    if isd==false and price ~= nil and ret.jbm ~= "unicycle" then
+        perBuy[name] = {path = adata.partConfigFilename, price=CarCoast[adata.partConfigFilename],color = adata.paints,vars = adata.vars,model = adata.model or adata.mainPartName}
+        SendMessage(player_id,"Стоимость машины в диллерском центре. "..price..""..config.currency)
     end
+
 	if isd == true then
 		return 0
-
 	elseif block_ignore[name] == true then
 		block_ignore[name] = false
 		return 0
@@ -850,6 +865,9 @@ function CarsCheckUpdate(player_id,vehicle_id,data)
 	--cars:set(name,id,"configuration",adata)
 	--MP.TriggerClientEvent(player_id,"SPAWNCAR",Util.JsonEncode(adata))
 end
+
+-- Cucle every Function sec
+
 function SaveCarEveryXsec()
     for i, name in pairs(MP.GetPlayers()) do
         if lastCar[name] ~= nil and lastCar[name].ret.jbm ~= "unicycle" and lastCar[name].licenss_plate ~= nil then
@@ -896,7 +914,6 @@ end
 
 function CarDeleted(...)
     print(...)
-
 end
 
 cars = Cars:init("cars.ixt")
@@ -904,7 +921,8 @@ cars = Cars:init("cars.ixt")
 M.command = {
     {category = "car", command = "repair", help = "Показать стоимость ремонта.", func = "CarsFix", args = "[nickname_car]"},
     {category = "car", command = "list", help = "Показать все машины.", func = "ShowAllCars"},
-    {category = "car", command = "buy", help = "Купить машину из дилер центра для покупки нужен администратор!", func = "CarsBuy"},
+    {category = "car", command = "buy", help = "Купить машину из дилер центра для покупки нужен администратор!", func = "BuyCar"},
+    {category = "car", command = "buyinfo", help = "Показать информацию перед покупкой машины.", func = "InfoBuy"},
     {category = "car", command = "setnick", help = "Установить ник машины.", args = "[nickname_car] [new nickname_car]", func = "SetNickname",},
     {category = "car", command = "transfer", help = "Передать машину. ", args = "[new_owner_name] [nickname_car]", func = "CarsGive"},
     {category = "car",command = "allforuser", help = "Показать все машины определенного игрока. ",args = "[имя игрока]", func = "CarsGetAll",roles = {"moderator","admin"}},
