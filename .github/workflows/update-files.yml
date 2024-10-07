@@ -3,10 +3,11 @@ name: Deploy to FTP
 on:
   push:
     branches:
-      - dev_work
+      - "*"
 
 jobs:
   update-files:
+    if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
