@@ -1,14 +1,23 @@
 local M = {logs = true, debugs = true}
 -- Фикс русского языка
+os.setlocale( "C", "ctype" );
 os.execute( "chcp 65001 > nul" )
 --os.execute("apt-get install lua-sql-mysql")
 
 --sql = require "lib/sql"
 inspect = require "lib/inspect"
 M.pluginName = "Economic_Plugin"
-function log(message, weight)
+function log(message, ...)
+	local unpack = table.unpack(...)
+	local weight = 3
+	if #unpack > 1 then
+		weight = unpack[#unpack]
+		table.remove(unpack, #unpack)
+	else
+		weight = unpack[1]
+	end
 	if message == nil or message == "" then goto zcontinue end
-	message = inspect(message)
+	message = inspect(message,unpack)
     weight = weight or 1 -- если вес не указан, используем 0
     
     -- таблица цветов
@@ -359,7 +368,7 @@ function onInit()
 	Work = import("Works")
 	Cars = import("Cars")
 	ban = import("ban")
-	Promos = import("PromoCode")
+	--Promos = import("PromoCode")
 	D2S = import("D2S")
 	AutoPrava = import("AutoDrive")
 	Sblocker = import("S2C",true,true)  --Назввание файла, Добавлять ли команды в хелп, Оповестить о импорте

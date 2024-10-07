@@ -3,10 +3,11 @@ name: Deploy to FTP
 on:
   push:
     branches:
-      - dev_work
+      - "*"
 
 jobs:
   update-files:
+    if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -43,7 +44,16 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           localDir: ./Server/
           remoteDir: /root/server_dev/server-mods/BeamMP_RP_Plugin
-          exclude: database/**,its_not_work/**,pattern/**,docs/**
+          exclude: its_not_work/**,pattern/**,docs/**
+
+      - name: Clear Old Code and update database
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: |
+            cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin
 
       - name: SFTP mod uploader
         uses: wangyucode/sftp-upload-action@v2.0.2

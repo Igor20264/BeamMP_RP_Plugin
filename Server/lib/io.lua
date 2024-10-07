@@ -77,6 +77,19 @@ function check_request_save_database()
     return true
 end
 
+local function try_read_config(path)
+    path = FS.ConcatPaths(M.pluginPath, "database",path)
+    log(namefile,3)
+	local file, err = io.open(path,"r")
+	if file==nil then log("Couldn't open file: "..err,5)
+	else
+		local read = file:read("*all")
+		file:close()
+		local result = Util.JsonDecode(read)
+		return result
+	end
+end
+
 function load_database(namefile)
 	log(namefile,3)
 	local file, err = io.open (M.pluginPath.."/database/"..namefile,"r")
@@ -117,8 +130,9 @@ function load_config(namefile)
 	local file, err = io.open(M.pluginPath..'/'..namefile..'.json',"r")
 	if file==nil then log("Couldn't open file: "..err,5) 
 	else	
-		local result = Util.JsonDecode(file:read("*all"))
+		local read = file:read("*all")
 		file:close()
+		local result = Util.JsonDecode(read)
 		return result
 	end
 end
@@ -128,11 +142,12 @@ function save_config(namefile,data)
 	local file, err = io.open(M.pluginPath..'/'..namefile..'.json',"w")
 	if file==nil then log("Couldn't open file: "..err,5)
 	else
-		file:write(Util.JsonEncode(data))
+		local jdata = Util.JsonEncode(data)
+		file:write(jdata)
 		file:close()
 	end
 end
-
+M.try_read_config = try_read_config
 M.verify = verify
 
 return M

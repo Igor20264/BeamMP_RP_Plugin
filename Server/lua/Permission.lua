@@ -93,6 +93,8 @@ function Permissions:init()
         local str_command_roles =table.concat(command_roles)
         if private.cache[user] ~= nil and private.cache[user][str_command_roles] == true then
             return true
+        elseif private.cache[user] == nil then
+            private.cache[user] = {}
         end
         if user == nil then
             return false
