@@ -7,9 +7,22 @@ os.execute( "chcp 65001 > nul" )
 --sql = require "lib/sql"
 inspect = require "lib/inspect"
 M.pluginName = "Economic_Plugin"
-function log(message, weight)
+function log(message, ...)
+	local unpack = table.unpack(...)
+	local weight = 3
+	if type(...) == "number" then
+		weight = ...
+	else
+		if #unpack > 1 then
+		weight = unpack[#unpack]
+		table.remove(unpack, #unpack)
+	else
+		weight = unpack[1]
+	end
+	end
+
 	if message == nil or message == "" then goto zcontinue end
-	message = inspect(message)
+	message = inspect(message,unpack)
     weight = weight or 1 -- если вес не указан, используем 0
     
     -- таблица цветов

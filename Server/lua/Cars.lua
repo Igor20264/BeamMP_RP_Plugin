@@ -90,6 +90,7 @@ function Cars:new(owner,perBuy) --perBuy[sender_name]
     local config = files.try_read_config(perBuy.path)
     config.vars = perBuy.vars
     config.paints = perBuy.color
+    config.partConfigFilename = perBuy.path
     config = Util.JsonEncode(config)
     local udv = UDV(config)
     print(udv)
@@ -101,7 +102,6 @@ function Cars:new(owner,perBuy) --perBuy[sender_name]
 		former_owners = {},name = perBuy.model,category = cars_category[udv.jbm],engine=udv.engine,transmission=udv.transmission,transfer_case=udv.transfer_case,body=udv.body,
         path = perBuy.path,jbm = udv.jbm,
         nickname=(perBuy.model):sub(0,math.min(#(perBuy.model)-1,3))..""..Gen.generateRandomData(3)}
-    print(self.database[owner][Gen.uuid()].nickname)
     self:save()
     return #self.database[owner]+1
 end
@@ -319,11 +319,11 @@ function Cars:is_doesnt(owner,data)
             local ts = true
             log("Differences found:", 4)
             for _, v in ipairs(t) do
-                log("Difference: " .. v, 4)
+                log({"Difference: ",v}, 4)
                 if v ~= ".partconfigfilename" or v ~= ".vars "then
                     local case = split(v, '.')
                     if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "vars" and case[#case] ~= ".part" then
-                        log("Non-allowed difference: " .. case[#case], 4)
+                        log({"Non-allowed difference: ",case[#case]}, 4)
                         ts = false
                         break
                     end
