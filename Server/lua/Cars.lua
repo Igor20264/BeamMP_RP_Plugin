@@ -90,6 +90,7 @@ function Cars:new(owner,perBuy) --perBuy[sender_name]
     local config = files.try_read_config(perBuy.path)
     config.vars = perBuy.vars
     config.paints = perBuy.color
+    config.partConfigFilename = perBuy.path
     config = Util.JsonEncode(config)
     local udv = UDV(config)
     print(udv)
