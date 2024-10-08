@@ -86,7 +86,7 @@ end
 extended(Cars, DB)
 
 function Cars:new(owner,perBuy) --perBuy[sender_name]
-    local coast = perBuy.coast
+    local coast = perBuy.price
     local config = files.try_read_config(perBuy.path)
     config.vars = perBuy.vars
     config.paints = perBuy.color
@@ -97,7 +97,17 @@ function Cars:new(owner,perBuy) --perBuy[sender_name]
 
     self.database = self.database or {}
     self.database[owner] = self.database[owner] or {}
-    self.database[owner][Gen.uuid()] = {
+    local s = true
+    local uuid = Gen.uuid()
+    while s do
+        if self.database[owner][uuid] == nil then
+            s = false
+        else
+            uuid = Gen.uuid()
+        end
+    end
+
+    self.database[owner][uuid] = {
         licenss_plate = CarPlate(),coast = coast, configuration = config,confiscation = false,
 		former_owners = {},name = perBuy.model,category = cars_category[udv.jbm],engine=udv.engine,transmission=udv.transmission,transfer_case=udv.transfer_case,body=udv.body,
         path = perBuy.path,jbm = udv.jbm,
@@ -233,7 +243,7 @@ function Cars:is_newdoesnt(owner,data)
         for _, change in ipairs(changed) do
             local path = change.path
             local case = split(path, '.')
-            if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "licensetext" and case[#case] ~= "mainpartname" then
+            if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "licensetext" and case[#case] ~= "licenseplate" and case[#case] ~= "mainpartname" then
                 log("Недопустимое изменение: " .. path, 4)
                 return false
             end
@@ -243,7 +253,7 @@ function Cars:is_newdoesnt(owner,data)
         for _, add in ipairs(added) do
             local path = add.path
             local case = split(path, '.')
-            if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "licensetext" and case[#case] ~= "mainpartname" then
+            if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "licensetext" and case[#case] ~= "licenseplate" and case[#case] ~= "mainpartname" then
                 log("Недопустимое добавление: " .. path, 4)
                 return false
             end
@@ -272,9 +282,6 @@ Util.CompareJson = function(original, modified)
     else
         if modified.model == nil or modified.mainpartname == nil then
             log({"model or mainpartname is nil",modified},4)
-        else
-        log("model: "..modified.model)
-        log("mainpartname: "..modified.mainpartname )
         end
 
     end
@@ -314,20 +321,21 @@ function Cars:is_doesnt(owner,data)
         if t == true then
             return true  
         end
-        log(t,4)
-        if t and #t <= 10 then
+
+        if t and #t <= 20 then
             local ts = true
-            log("Differences found:", 4)
             for _, v in ipairs(t) do
-                log({"Difference: ",v}, 4)
-                if v ~= ".partconfigfilename" or v ~= ".vars "then
-                    local case = split(v, '.')
+                if v.path ~= ".partconfigfilename" or v.path ~= ".vars "then
+                    local case = split(v.path, '.')
                     if case[1] ~= "paints" and case[#case] ~= "licenseText" and case[#case] ~= "vars" and case[#case] ~= ".part" then
-                        log({"Non-allowed difference: ",case[#case]}, 4)
+                        log({"Non-allowed difference: ",case[#case],v}, 4)
                         ts = false
                         break
                     end
                 end
+            end
+            if ts == false then
+                log(t,4)
             end
             return ts
         end
@@ -545,7 +553,12 @@ end
 function CarsFix(sender_id,sender_name, message)
     local id = cars:getidbynickname(sender_name,message)
     local price = cars.database[sender_name][id].coast
-    price = math.floor(CTS[sender_name].custom.repair*price)
+    if CTS[sender_name].custom ~= nil and CTS[sender_name].custom.repair ~= nil then
+        price = math.floor(CTS[sender_name].custom.repair*price)
+    else
+        SendMessage(sender_id,"Ошибка. Не удалось получить стоймость ремонта машины.")
+        return
+    end
     if eco:value(sender_name,"money")-price < 0 then
         SendMessage(sender_id,"У вас не хватает денег, чтобы ремонтировать машину.\n Текущая стоимость ремонта: "..price.." "..config.currency)
         return
@@ -676,7 +689,7 @@ function CarsSpawn(sender_id, sender_name, message)
             cmd = "dump('vehicle not loaded')"
         }
         if carg.licenss_plate then
-            send_data.run_queue = "beamstate.load('settings\\BeamMP\\Server\\BeamMP_RP_Plugin\\"..(carg.licenss_plate)..".save.json'); dump('settings\\BeamMP\\Server\\BeamMP_RP_Plugin\\" .. carg.licenss_plate .. ".save.json LOADED')"
+            send_data.run_queue = "beamstate.load('\\\\settings\\\\BeamMP\\\\Server\\\\BeamMP_RP_Plugin\\\\"..(carg.licenss_plate)..".save.json'); dump('settings\\\\BeamMP\\\\Server\\\\BeamMP_RP_Plugin\\\\" .. carg.licenss_plate .. ".save.json LOADED')"
             send_data.cmd = "core_vehicles.setPlateText('"..(carg.licenss_plate).."', ids);"
             if posCar[carg.licenss_plate] then
                 send_data.cmd = send_data.cmd .. "be:getObjectByID(ids):setPosition(vec3("..posCar[carg.licenss_plate].x..", "..posCar[carg.licenss_plate].y..", "..posCar[carg.licenss_plate].z.."))"
@@ -756,7 +769,7 @@ end
 
 -- Функции вызываемые при тригере
 
-function InfoBuy(sender_id, sender_name, message)
+function BuyCar(sender_id, sender_name, message)
     if not perBuy[sender_name] then
         SendMessage(sender_id, "Ошибка: не удалось найти данные о последней машине.")
         print("Ошибка: perBuy[sender_name] не существует")
@@ -767,28 +780,27 @@ function InfoBuy(sender_id, sender_name, message)
         print("Ошибка: CarCoast[perBuy[sender_name].path] не существует")
         return
     end
-    local send_message = "Модель машины: "..perBuy[sender_name].model.."\nСтоймость машины: "..perBuy[sender_name].price.." "..config.currency.."\nКонфигурация: "..perBuy[sender_name].path
-    SendMessage(sender_id, send_message)
-    perBuy[sender_name].view = true
-end
-
-
-function BuyCar(sender_id, sender_name, message)
-    if perBuy[sender_name] then
-        if not perBuy[sender_name].view then
-            SendMessage(sender_id,"Перед покупкой машины необходимо просмотреть информацию. !car buyinfo")
+    if not perBuy[sender_name].view then
+        local send_message = "Модель машины: "..perBuy[sender_name].model.."\nСтоймость машины: "..perBuy[sender_name].price.." "..config.currency.."\nКонфигурация: "..perBuy[sender_name].path
+        send_message = send_message.."\n\nДля покупки введите команду !car buy еще раз"
+        perBuy[sender_name].view = true
+        SendMessage(sender_id, send_message)
+        return
+    else
+        local coast = perBuy[sender_name].price
+        if eco:value(sender_name, "money") >= coast then
+            eco:add(sender_name, "money", -coast)
+            local num = cars:new(sender_name, perBuy[sender_name])
+            SendMessage(sender_id, "Вы купили машину "..perBuy[sender_name].model.." за "..coast .. " "..config.currency)
         else
-            local coast = perBuy[sender_name].price
-            if eco:value(sender_name, "money") >= coast then
-                eco:add(sender_name, "money", -coast)
-                local num = cars:new(sender_name, perBuy[sender_name])
-                SendMessage(sender_id, "Вы купили машину "..perBuy[sender_name].model.." за "..coast .. " "..config.currency)
-            else
-                SendMessage(sender_id, "У вас недостаточно денег")
-                return
-            end
+            SendMessage(sender_id, "У вас недостаточно денег")
+            return
         end
     end
+
+
+
+
 end
 
 function CarsCheckCreate(player_id,vehicle_id,data)
@@ -868,6 +880,11 @@ end
 
 -- Cucle every Function sec
 
+local function add_number_info(number)
+    local sl = [[if be:getPlayerVehicle(0):getJBeamFilename() ~= 'unicycle' then be:getPlayerVehicle(0):queueLuaCommand("beamstate.save('\\\\settings\\\\BeamMP\\\\Server\\\\BeamMP_RP_Plugin\\\\]]..number..[[.save.json')"); end;]]
+    return sl
+end
+
 function SaveCarEveryXsec()
     for i, name in pairs(MP.GetPlayers()) do
         if lastCar[name] ~= nil and lastCar[name].ret.jbm ~= "unicycle" and lastCar[name].licenss_plate ~= nil then
@@ -877,7 +894,8 @@ function SaveCarEveryXsec()
                     if posCar ~= nil and CTS[name] ~= nil and CTS[name].pos ~= nil then
                         posCar[lastCar[name].licenss_plate] = CTS[name].pos
                     end
-                    RemoutRun(MP.GetId(name), "if be:getPlayerVehicle(0):getJBeamFilename() ~= 'unicycle' then be:getPlayerVehicle(0):queueLuaCommand(\"settings\\BeamMP\\Server\\BeamMP_RP_Plugin\\beamstate.save(\'".. lastCar[name].licenss_plate ..".save.json\')\"); end")
+
+                    RemoutRun(MP.GetId(name), add_number_info(lastCar[name].licenss_plate))
                 else
                     log("Error. Player: "..tostring(name).." has no license-plate",4)
                 end
@@ -922,7 +940,6 @@ M.command = {
     {category = "car", command = "repair", help = "Показать стоимость ремонта.", func = "CarsFix", args = "[nickname_car]"},
     {category = "car", command = "list", help = "Показать все машины.", func = "ShowAllCars"},
     {category = "car", command = "buy", help = "Купить машину из дилер центра для покупки нужен администратор!", func = "BuyCar"},
-    {category = "car", command = "buyinfo", help = "Показать информацию перед покупкой машины.", func = "InfoBuy"},
     {category = "car", command = "setnick", help = "Установить ник машины.", args = "[nickname_car] [new nickname_car]", func = "SetNickname",},
     {category = "car", command = "transfer", help = "Передать машину. ", args = "[new_owner_name] [nickname_car]", func = "CarsGive"},
     {category = "car",command = "allforuser", help = "Показать все машины определенного игрока. ",args = "[имя игрока]", func = "CarsGetAll",roles = {"moderator","admin"}},

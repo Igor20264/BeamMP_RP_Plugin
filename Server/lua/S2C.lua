@@ -38,13 +38,13 @@ function RemoutRun(player, data)
     MP.TriggerClientEvent(player, "REMRUN", data)
 end
 
+--[[
 function ServerHorClient(player,trigger,data)
     if type(player) == "string" then
         player = MP.GetId(player)
     end
     return MP.TriggerClientEvent(player,"SRV2CLN",emessage(trigger.."###"..Util.JsonEncode(data),player.."keySHC"))
 end
-
 function ClientHorServer(data)
     data = split(data,"###")
     local username = data[1]
@@ -54,6 +54,7 @@ function ClientHorServer(data)
     data = Util.JsonDecode(data[2])
     MP.TriggerLocalEvent(trigger,data)
 end
+--]]
 
 function RetRun(data)
     local case = split(data,"###")
@@ -67,7 +68,7 @@ function RetRun(data)
 end
 
 function onSpawn(player_id, vehicle_id, data)
-    RemoutRun(MP.GetId(p2), data_block)
+    --RemoutRun(MP.GetId(p2), data_block)
 	MP.TriggerClientEvent(player_id, "ECOBLOC", M.data)
 	return 0
 end
@@ -75,7 +76,7 @@ end
 function ON(sender_id,sender_name, message)
 	p2,case = MessageParser(message," ",2)
 	block_ignore[p2] = false
-    RemoutRun(MP.GetId(p2), data_block)
+    --RemoutRun(MP.GetId(p2), data_block)
 	-- Подробнее см. E:\SteamLibrary\steamapps\common\BeamNG.drive\lua\ge\extensions\core\input\actionFilter.lua
     -- E:\SteamLibrary\steamapps\common\BeamNG.drive\lua\ge\extensions\core\input\actions
 	MP.TriggerClientEvent(MP.GetId(p2), "ECOBLOC", M.data)
@@ -89,7 +90,7 @@ function OFF(sender_id,sender_name, message)
        return
     end
 	block_ignore[p2] = true
-    RemoutRun(MP.GetId(p2), data_unblock)
+    --RemoutRun(MP.GetId(p2), data_unblock)
 	MP.TriggerClientEvent(MP.GetId(p2), "ECOUNBLOCK", "SA")
 	return 0
 end
@@ -174,9 +175,13 @@ _damageRate = (DAMAGE_RATE_MAX > _damageRate) and _damageRate or DAMAGE_RATE_MAX
 return _damageRate
 ]]
 
-local sp = 'local v0=25000;local v1=100;local v2=0.8;local v3=be:getPlayerVehicle(0):getId();local v4=be:getObjectByID(v3);if (v4==nil) then return nil;end local v5=0;if (map.objects[v3]==nil) then v4:queueLuaCommand(\'obj:queueGameEngineLua("be:getObjectByID(\'   .. v3   .. \').destructionDamage = " .. beamstate.damage)\' );if (v4.destructionDamage==nil) then v4:setDynDataFieldbyName("destructionDamage",0,0);v5=0;else v5=v4.destructionDamage;end else v5=map.objects[v3][\'damage\'];end if (v5<v1) then return 0;end local v6=v5/v0 ;v6=((v2>v6) and v6) or v2 ;return v6;'
-
-
+local function split(s, delimiter)
+    result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match)
+    end
+    return result
+end
 --
 function crash(sender_id,sender_name, message)  -- username
     local user = error(message)
@@ -195,18 +200,22 @@ function unhack(sender_id,sender_name, message)
 end
 
 function onJoinS2C(user_id)
-     HeventTimer.Createtask(30,LoadAllScript,user_id.."LoadScripts",user_id)
+     HeventTimer.Createtask(5,LoadAllScript,user_id.."LoadScripts",user_id)
 end
 
-function AddToSendServerData(tag,data)
-    SendScript[#SendScript+1] = 'AddDataToSendServerData([['..tag..'$$$'..data..']])'
+function AddToSendServerData(tag,datsa)
+    SendScript[#SendScript+1] = 'AddDataToSendServerData([['..tag..'$$$'..datsa..']])'
 end
+
+local sp = [[local v0=25000;local v1=100;local v2=0.8;local v3=be:getPlayerVehicle(0):getId();local v4=be:getObjectByID(v3);if (v4==nil) then return nil;end local v5=0;if (map.objects[v3]==nil) then v4:queueLuaCommand('obj:queueGameEngineLua("be:getObjectByID('   .. v3   .. ').destructionDamage = " .. beamstate.damage)' );if (v4.destructionDamage==nil) then v4:setDynDataFieldbyName("destructionDamage",0,0);v5=0;else v5=v4.destructionDamage;end else v5=map.objects[v3]['damage'];end if (v5<v1) then return 0;end local v6=v5/v0 ;v6=((v2>v6) and v6) or v2 ;return v6;]]
+AddToSendServerData('repair',sp)
 
 function LoadAllScript(user_id)
-    RemoutRun(user_id,data_setup)
-    RemoutRun(user_id,data_block)
-    for i,data in pairs(SendScript) do
-        RemoutRun(user_id,data)
+    --RemoutRun(user_id,data_setup)
+    --RemoutRun(user_id,data_block)
+    for _,code in pairs(SendScript) do
+        print(_,code)
+        RemoutRun(user_id,code)
     end
 end
 
@@ -226,8 +235,6 @@ M.command = {
 function M.load()
     MP.RegisterEvent("onPlayerJoin","onJoinS2C")
 	MP.RegisterEvent("onVehicleSpawn","onSpawn")
-
-    AddToSendServerData('repair',sp)
     HeventTimer.addFunc(SendRequestCTS, 5)
 end
 

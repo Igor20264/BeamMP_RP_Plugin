@@ -81,7 +81,7 @@ end
 function Gen.uuid()
     local seed={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'}
     local tb={}
-    math.randomseed(os.time())
+    math.randomseed(os.clock()*os.clock())
     for i=1,32 do
         table.insert(tb,seed[Util.RandomIntRange(1,16)])
     end

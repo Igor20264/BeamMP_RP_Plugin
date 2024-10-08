@@ -64,6 +64,12 @@ function Permissions:init()
     end
     function public:role_in_roles(role,roles)
         private.cache.role = private.cache.role or {}
+        if private.cache.role == nil then
+            private.cache.role = {}
+        end
+        if private.cache.role[role] == nil then
+            private.cache.role[role] = {}
+        end
         local str_roles = table.concat(roles)
         if private.cache.role[role][str_roles] ~= true then
             return private.cache.role[role][str_roles]

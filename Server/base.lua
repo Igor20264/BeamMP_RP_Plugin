@@ -3,16 +3,18 @@ local M = {logs = true, debugs = true}
 os.setlocale( "C", "ctype" );
 os.execute( "chcp 65001 > nul" )
 --os.execute("apt-get install lua-sql-mysql")
-
+math.randomseed(os.clock()*os.clock())
 --sql = require "lib/sql"
 inspect = require "lib/inspect"
 M.pluginName = "Economic_Plugin"
-function log(message, ...)
+function log(message, weight)
+	--[[
 	local weight = 3
+	local unpack = {}
 	if type(...) == "number" then
 		weight = ...
 	else
-		local unpack = table.unpack(...)
+		unpack = table.unpack(...)
 		if #unpack > 1 then
 			weight = unpack[#unpack]
 			table.remove(unpack, #unpack)
@@ -20,7 +22,7 @@ function log(message, ...)
 			weight = unpack[1]
 		end
 	end
-
+	--]]
 	if message == nil or message == "" then goto zcontinue end
 	message = inspect(message,unpack)
     weight = weight or 1 -- если вес не указан, используем 0
@@ -270,6 +272,7 @@ function HELP(sender_id, sender_name, message)
 		if page == 10 then
 			text_message = text_message.."\n!help [Название категории] | Для просмотра всех комманд по категориям (car,eco,roles,time,geo,work,prava,whitelist,env)\n"
 		end
+		text_message = text_message.."-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n"
 	end
 	page = page/10
 	if text_message == "" and page < 20 then
@@ -331,11 +334,9 @@ M.command = {
 
 function OPTIMIZATOR()
 	local c1 = collectgarbage("count") -- получаем текущий размер памяти
-	local c2 = collectgarbage("count")
-	local alpha = ((c1-c2))
 	collectgarbage("collect") -- выполняем сбор мусора
 	local count2 = collectgarbage("count") -- получаем размер памяти после сбора
-	log("Освобождено памяти: " .. (round(((c1 - count2)-(alpha*3)),2)).. " кб",5)
+	log("Освобождено памяти: " .. round((c1 - count2), 2) .. " кб", 5)
 end
 
 --[[
@@ -382,7 +383,7 @@ function onInit()
 	--TEST = import("Test")
 	--CheakCheaters = import("CheckCheater")
 	HeventTimer.addFunc(check_request_save_database, 5) -- 10 секунд иногда слишком долго
-	HeventTimer.addFunc(OPTIMIZATOR,5) -- раз в 10 минут
+	HeventTimer.addFunc(OPTIMIZATOR,60) -- раз в 10 минут
 	HeventTimer.addFunc(SaveCarEveryXsec, 1) --, MP.CallStrategy.Precise
 
 	MP.RegisterEvent("onChatMessage", "MyChatMessageHandler")
