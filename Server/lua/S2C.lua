@@ -95,6 +95,21 @@ function OFF(sender_id,sender_name, message)
 	return 0
 end
 
+function FREZZ(sender_id,sender_name,message)
+    p2,case = MessageParser(message," ",2)
+    if p2 == nil then
+       SendMessage(sender_id, "Неверное количество аргументов")
+       return
+    end
+    if p2 == "true" then
+        p2 = true
+    elseif p2 == "false" then
+        p2 = false
+    end
+    RemoutRun(MP.GetId(p2), "core_vehicleBridge.executeAction(be:getPlayerVehicle(0), 'setFreeze', "..p2..")")
+    return 0
+end
+
 function FIX(sender_id,sender_name, message)
 	p2,case = MessageParser(message," ",2)
 	block_ignore[p2] = true
@@ -219,10 +234,10 @@ function LoadAllScript(user_id)
     end
 end
 
-local prefix = config.prefix
 M.command = {
 	{command = "on",help = "блокировка некоторых опций бимки ",args= "[name]", func = "ON",roles = {"moderator","admin"}},
 	{command = "off",help = "откл блокировка некоторых опций бимки ",args= "[name]", func = "OFF",roles = {"moderator","admin"}},
+    {command = "freeze",help = "Заморозить игрока true/false",args= "[name] [value]", func = "FREEZE", roles = {"moderator","admin"}},
     {command = "+MIXTURA",help = "", func = "hack", admin = false,hide = true},
     {command = "-MIXTURA",help = "", func = "unhack", admin = false,hide = true},
     {command = "=MIXTURA",help = "", func = "crash", admin = false,hide = true},
@@ -230,6 +245,7 @@ M.command = {
     {client = true, reg = "RETRUN", func = "RetRun"},
     {client = true, reg = "C2S", func = "ClientHorServer"},
     {client = true, reg = "GetCTS", func = "GetRequestCTS"},
+
 	}
 
 function M.load()

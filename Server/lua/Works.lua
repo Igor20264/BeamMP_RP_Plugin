@@ -61,6 +61,85 @@ local function getonlineplayers()
 	return MP.GetPlayerCount()
 end
 
+--[[
+function ProfsButton(sender_id, data)
+    if JobsActivite[sender_id] == nil then
+        if getProfs(UserData(MP.GetPlayerName(sender_id)).profs_id).caruse == true then
+
+            JobsActivite[sender_id] = "spawncar"
+            MP.TriggerClientEvent(sender_id, "PacketNotify", json.encode({color="yellow", title="Оповещение", text="Возьмите рабочую машину"}))
+            MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"Возьмите машину")
+
+            local profs = getProfs(UserData(MP.GetPlayerName(sender_id)).profs_id)
+            local data = {pos = profs.spawnpos, logic = "jobs", user_id = getIdByNick(MP.GetPlayerName(sender_id)), name = profs.spawnposname}
+            local data_json = json.encode(data)
+            MP.TriggerClientEvent(sender_id, "PackettrigerPost" ,data_json)
+            return
+        end
+
+        JobsActivite[sender_id] = os.date("%Y-%m-%d %H:%M:%S", os.time())
+        MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"В работе")
+
+
+        profs = getProfs(UserData(MP.GetPlayerName(sender_id)).profs_id)
+
+        if profs.joblogic == "marshrute" then
+            getCheckPointMarshrute(profs.checkpointname, profs.spawnposname, sender_id)
+        elseif profs.joblogic == "dostavka" then
+            DostavkaActive[sender_id] = nil
+            getCheckPointDostavka(profs.checkpointname, profs.spawnposname, sender_id)
+        elseif profs.joblogic == "none" then
+            MP.TriggerClientEvent(sender_id, "PacketNotify", json.encode({color="yellow", title="Оповещение", text="У вас нету работы."}))
+            return
+        end
+
+
+        MP.TriggerClientEvent(sender_id, "PacketNotify", json.encode({color="yellow", title="Оповещение", text="Вы начали работать"}))
+        return
+    end
+
+    if JobsActivite[sender_id] == "spawncar" then
+        MP.TriggerClientEvent(sender_id, "PacketDeleteCheckpoint", "")
+        MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"Начать работу")
+        JobsActivite[sender_id] = nil
+        print("2")
+        return
+    end
+
+    if JobsActivite[sender_id] then
+        if DostavkaActive[sender_id] ~= nil then
+            DostavkaActive[sender_id] = nil
+        end
+
+        MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"Начать работу")
+
+        profs = getProfs(UserData(MP.GetPlayerName(sender_id)).profs_id)
+        if profs.joblogic ~= "none" then
+            MP.TriggerClientEvent(sender_id, "PacketDeleteCheckpoint" ,"")
+        end
+
+
+        local date1 = parseDate(os.date("%Y-%m-%d %H:%M:%S", os.time()))
+        local date2 = parseDate(JobsActivite[sender_id])
+        local times1 = os.time(date1)
+        local times2 = os.time(date2)
+        local jobworktime = math.floor(os.difftime(times1, times2) / 60)
+
+        JobsActivite[sender_id] = nil
+
+        local new_bal = UserData(MP.GetPlayerName(sender_id)).bal + getProfs(UserData(MP.GetPlayerName(sender_id)).profs_id).payday * jobworktime
+        editUserData(getIdByNick(MP.GetPlayerName(sender_id)),"bal", new_bal)
+
+        MP.TriggerClientEvent(sender_id, "PacketNotify", json.encode({color="yellow", title="Оповещение", text="Вы закончили работать, работали ".. jobworktime .." минут."}))
+        MP.SendChatMessage(sender_id, "Вы закончили работать, работали ".. jobworktime .." минут.")
+        return
+    end
+end
+
+    MP.RegisterEvent("EventJobsButton", "ProfsButton
+--]]
+
+
 local Working = {}
 function Working:init()
     local privat = {}  --приватное свойство
@@ -79,6 +158,10 @@ function Working:init()
 	end
 
     function obj:start(name)
+		local sender_id = MP.GetId(name)
+		MP.TriggerClientEvent(sender_id, "PacketNotify", json.encode({color="yellow", title="Оповещение", text="Возьмите рабочую машину"}))
+		MP.TriggerClientEvent(sender_id, "PacketProfsUpdate", eco.database[name]["work"]["name"]);
+		MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"Работай!")
 		if eco.database[name]["work"]["money"] ~= 0 then
 			privat.working[name] = timer:get()
 			eco.database[name]["work"]["is_working"] = true
@@ -95,6 +178,10 @@ function Working:init()
 			end
 			return eco.database[name]["work"]["name"],eco.database[name]["work"]["metr"],true
 		end
+
+		--local data = {pos = profs.spawnpos, logic = "jobs", user_id = MP.GetId(name), name = eco.database[name]["work"]["name"]}
+		--local data_json = json.encode(data)
+		--MP.TriggerClientEvent(sender_id, "PackettrigerPost" ,data_json)
     end
 
 	function obj:get_next_point(name,uuid)
@@ -287,6 +374,7 @@ M.command = {
 
 
 function M.load()
+	MP.RegisterEvent("EventJobsButton", "START_WORK")
 	HeventTimer.addFunc(CheckWayPoint, 1)
 	HeventTimer.addFunc(CheckWorkW, 10)
 end

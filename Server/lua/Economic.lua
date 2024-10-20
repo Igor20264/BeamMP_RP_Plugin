@@ -7,8 +7,8 @@ M.ver = "2.0"
 online_player = {}
 
 local Eco = {}
-extended(Eco,DB)
-
+--extended(Eco,DB)
+Eco:extended(DB)
 function Eco:getOnline()
     local ret = {}
     for i,data in pairs(database_player) do
@@ -170,14 +170,15 @@ end
 function WIPE(sender_id,sender_name, message)
     eco.database[message] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence)}
     eco.database[message]["drivelicence"]["A"] = true
-    eco:set(message, "roles", {"player"})
+    permissions:set_roles(message, {"player"})
     local carss = cars:get_all(sender_name)
     if carss ~= nil then
-        for i,v in pairs(carss) do
+        for i,_ in pairs(carss) do
             cars:transfer(message,"CMD",i)
         end
     end
     SendMessage(sender_id, "Вы вайпнули игрока "..message)
+    SendMessage(message, "Администратор "..sender_name.." вайпнул вас")
     eco:save()
 end
 
@@ -291,6 +292,11 @@ function COINFLIP(sender_id, sender_name, message)
         return
     end
 
+    if opponent_name == sender_name then
+        SendMessage(sender_id, "Нельзя вызывать самого себя.")
+        return
+    end
+
     if bet_amount <= 0 then
         SendMessage(sender_id, "Неверная ставка.")
         return
@@ -302,7 +308,7 @@ function COINFLIP(sender_id, sender_name, message)
     end
 
     local opponent_id = MP.GetId(opponent_name)
-    SendMessage(opponent_id, "Игрок " .. sender_name .. " вызывает вас на бросок монетки на сумму " .. bet_amount .. " " .. currency .. ". Примите вызов с помощью команды /accept " .. sender_name)
+    SendMessage(opponent_id, "Игрок " .. sender_name .. " вызывает вас на бросок монетки на сумму " .. bet_amount .. " " .. currency .. ". Примите вызов с помощью команды !accept " .. sender_name)
     SendMessage(sender_id, "Вызов игрока " .. opponent_name .. " на бросок монетки на сумму " .. bet_amount .. " " .. currency .. " отправлен.")
 
     -- Store the coin flip challenge in a table

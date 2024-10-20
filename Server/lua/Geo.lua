@@ -106,17 +106,25 @@ function geo:set_random_path(player,work_type)
     return GEO.Distance(x,y,database[uuid].geo[1].x,database[uuid].geo[1].y)*1.5,uuid
 end
 
+function geo:set_path(player_id,x,y,z)
+    local data = Util.JsonEncode({x=95.737,y=-298,z=133})
+    MP.TriggerClientEvent(user_id, 'packetgpsset', data)
+end
+
 function geo:update_active_path(player,uuid)
     local database = self.database or gps.database
     local x,y,z = midPoint(database[uuid].geo[1].x,database[uuid].geo[1].y,database[uuid].geo[1].z or 0,database[uuid].geo[2].x,database[uuid].geo[2].y,database[uuid].geo[2].z or 0)
-    RemoutRun(player,"core_groundMarkers.setFocus(vec3("..x..","..y..","..z.."))")
+    self:set_path(MP.GetId(player),x,y,z)
+    --RemoutRun(player,"core_groundMarkers.setFocus(vec3("..x..","..y..","..z.."))")
 end
 
 function geo:set_active_path(player,uuid)
     local database = self.database or gps.database
     local x,y,z = GEO.midPoint(database[uuid].geo[1].x,database[uuid].geo[1].y,database[uuid].geo[1].z,database[uuid].geo[2].x,database[uuid].geo[2].y,database[uuid].geo[2].z)
-    RemoutRun(player,"core_groundMarkers.setFocus(vec3("..x..","..y..","..z.."))")
+    --RemoutRun(player,"core_groundMarkers.setFocus(vec3("..x..","..y..","..z.."))")
+    self:set_path(MP.GetId(player),x,y,z)
 end
+
 
 function geo:remove_active_path(player)
     RemoutRun(player,"core_groundMarkers.resetAll()")
@@ -149,7 +157,8 @@ function geo:get_public_points()
     temp = sort_by_distancse(temp)
     return temp
 end
-extended(geo,DB)
+--extended(geo,DB)
+geo:extended(DB)
 --[[
 type_gep = круг, квадрад
 uuid = {nickname= str, type = {work = bool, cam = bool}, geo = {0={x=float,y=float,z=float},2={x=float,y=float,z=float}}}

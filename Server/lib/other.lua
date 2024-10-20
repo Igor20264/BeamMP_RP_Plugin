@@ -8,7 +8,7 @@ function lev_iter(strA,strB) -- Creates a 2D matrix
     end
 
     local M = matrix(#strA+1,#strB+1)
-    local i,j,cost
+    local cost
     local row,col = #M,#M[1]
     for i = 1,row do M[i][1] = i-1 end
     for j = 1,col do M[1][j] = j-1 end
@@ -29,12 +29,30 @@ end
 Gen = Gen or {}
 Color = Color or {}
 
+-- "2023-10-05 14:30:00"
+function parseDate(dateString)
+    local pattern = "(%d+)%-(%d+)%-(%d+) (%d+):(%d+):(%d+)"
+    local year, month, day, hour, min, sec = dateString:match(pattern)
+    return { year = year, month = month, day = day, hour = hour, min = min, sec = sec }
+end
+
 
 function split(inputstr, sep) 
 	if sep == nil then sep = "%s" end 
 	local t={}
 	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do table.insert(t, str) end
 	return t
+end
+
+function string:split(sep)
+    if sep == nil then sep = "%s" end
+    local t={}
+    for str in string.gmatch(self, "([^"..sep.."]+)") do table.insert(t, str) end
+    return t
+end
+
+function table:extended(parent)
+    setmetatable(self,{__index = parent})
 end
 
 function extended(child, parent)
@@ -66,15 +84,6 @@ function RegEvent(KRF)
 	end
 	return cmd
 end
-
-function Color.purple(text)
-    return "^c"..text.."^f"
-end
-
-function Color.cyan(text)
-    return "^6"..text.."^f"
-end
-
 
 -- Generator
 
@@ -109,17 +118,12 @@ function Gen.generateRandomData(size)
 end
 
 -- Color
-
-function Util:hex2rgb(hex)
-    hex = hex:gsub("#","")
-    return tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
-end
-
-function Util:rgb2hex(r,g,b)
-    return string.format("#%02x%02x%02x",
-        math.floor(r),
-        math.floor(g),
-        math.floor(b))
+function string:is_integer()
+	local status, result = pcall(tonumber,self)
+	if not status or result == nil then
+		return false
+	end
+	return self == tostring(math.floor(result))
 end
 
 function levi(name,list,len_iter)
@@ -156,104 +160,6 @@ function concat(...)
     return result
 end
 
-local function off_checkForUpdates()
-
-    -- Récupérer la version actuelle de votre script local à partir de version.txt
-    local oldversion = io.open(VERSIONPATH, "r")
-    local localVersion = oldversion:read()
-    oldversion:close()
-
-    --retire les deux premier caractères de localVersion (--)
-    localVersion = string.sub(localVersion, 3)
-
-
-
-    --this go to this https://api.github.com/repos/boubouleuh/Nickel-BeamMP-Plugin/releases/latest
-
-    local response = Util.JsonDecode(httpRequest("https://nickel.martadash.fr/version.txt"))
-
-    if response == nil then
-        log("Get remote version failed to check update !",5)
-        return
-    end
-    -- Récupérer la version distante à partir de la réponse
-
-    local remoteVersion = response.tag_name
-
-    if remoteVersion == nil then
-        log("Get remote version failed to check update (Check server probably down) ! Try again later ! If it keep happening ask for help in the discord : https://discord.gg/h5P84FFw7B",5)
-        return
-    end
-
-    -- Comparer les versions locales et distantes
-    if remoteVersion > localVersion then
-        -- Effectuer la mise à jour
-        if getConfigValue("AUTOUPDATE") == "false" then
-
-            log("An update is available ! " .. localVersion .. " -> " .. remoteVersion .. "\nAUTOUPDATE is deactivated in " .. CONFIGPATH .. " if you want to update automatically, set it to true",4)
-
-            return
-        else
-            local url = "https://raw.githubusercontent.com/boubouleuh/Nickel-BeamMP-Plugin/" .. remoteVersion .. "/main.lua"
-            local response = httpRequest(url)
-            --if download fail
-            if response == nil then
-                log("Update failed !",5)
-                return
-            else
-                log("Update downloaded !",3)
-            end
-            -- Écrire la réponse dans un fichier pour mettre à jour votre script
-            local main = io.open(script_path() .. "main.lua", "w")
-            main:write(response)
-            main:close()
-
-            -- Mettre à jour la version locale dans version.txt
-            local newversion = io.open(VERSIONPATH, "w")
-            newversion:write("--" .. remoteVersion)
-            newversion:close()
-
-            log("Update done !",3)
-        end
-
-    end
-
-end
-
-function file_exists(name)
-    local f = io.open(name, "r")
-    return f ~= nil and io.close(f)
-end
-
-local function off_httpRequest(url)
-    if MP.GetOSName() == "Windows" then
-        local cmd = 'powershell -Command "Invoke-WebRequest -Uri ' .. url .. ' -OutFile temp.txt"'
-        local response = os.execute(cmd)
-
-        if response then
-            local file = io.open("temp.txt", "r")
-            local content = file:read("*all")
-            file:close()
-            os.remove("temp.txt")
-            return content
-        else
-            return ""
-        end
-    else
-        -- Utiliser une méthode non-Windows (par exemple, wget)
-        local response = os.execute("wget -q -O temp.txt " .. url)
-        if response then
-            local file = io.open("temp.txt", "r")
-            local content = file:read("*all")
-            file:close()
-            os.remove("temp.txt")
-            return content
-        else
-            return ""
-        end
-    end
-end
-
 function try_exept(func,...)
     local status, result = pcall(func,...)
     if not status then
@@ -265,73 +171,21 @@ function try_exept(func,...)
     return result
 end
 
-
-function emessage(message,key)
-    local function bxor(a, b)
-        local r = 0
-        for i = 0, 31 do
-            local x = a / 2 + b / 2
-            if x ~= math.floor (x) then
-                r = r + 2^i
-            end
-            a = math.floor (a / 2)
-            b = math.floor (b / 2)
-        end
-        return r
+function func:try_exept(func,...)
+    local status, result = pcall(func,...)
+    if not status then
+        --local s = split(debug.getinfo(func).source,"\\")
+        --log({"file: "..s[#s].." "..result},4)
+        log({"file: "..result},4)
+        return falselu
     end
-
-    local function xor(message, key)
-        if type(message) ~= "string" then
-            error("bad argument #1 to 'xor' (string expected, got "..type(message)..")")
-        end
-        if type(key) ~= "string" then
-            error("bad argument #2 to 'xor' (string expected, got "..type(key)..")")
-        end
-        nKey =''
-        for i=1, #key do
-            nKey = nKey..key:byte(i)
-        end
-        math.randomseed(tonumber(nKey) % 0x100000000)
-
-        tKey = {}
-        sNewKey = ''
-        for j = 1, #message do
-            tKey[j] = ''
-            while string.len(tKey[j]) ~= string.len(message.byte(j)) do
-                tKey[j] = tKey[j]..math.random(0, 9) -- создаем рандомный код для ключа
-            end
-            sNewKey = sNewKey..string.char(bxor(message:byte(j), tKey[j])) -- записваем результат
-        end
-        return sNewKey
-    end
-    return xor(message,key)
+    return result
 end
 
-function print_color(message, color)
-	local colors = {
-		black = "\27[30m",
-		red = "\27[31m",
-		green = "\27[32m",
-		yellow = "\27[33m",
-		blue = "\27[34m",
-		magenta = "\27[35m",
-		cyan = "\27[36m",
-		white = "\27[37m",
-		gray = "\27[90m",
-	}
-    if not colors[color] then
-      color = "white"
-    end
-    return colors[color] .. message .. "\27[0m"
-end
-
-function decimalToHex(decimal)
-    return string.format("%X", decimal)
-end
-
-function hexToDecimal(hex)
-	print(type(hex),hex)
-    return tonumber(hex, 16)
+function number:round(p)
+    p = p or 2
+    return tonumber(string.format("%."..p.."f",self))
+    
 end
 
 function round(numder,p)
@@ -431,25 +285,6 @@ function MP.check_in_online(player_name)
 	end
 	return false
 	end
-
--- Server Config
-
-function Util.ServerConfigToml_Get()
-	local function getMapName(s)
-		local c = s:match( "^%s*Map%s*=%s*(.-)%s*$" )
-		if not c then return nil end
-		c =c:sub(2,#c-1) 
-		c = c:match( "^/-levels/(.+)/" )
-		return c
-	end 
-	for line in io.lines("ServerConfig.toml") do
-		print(line)
-		if getMapName(line) then
-			mapName = getMapName(line)
-			break
-		end
-	end
-end
 
 -- обработчик сообщений
 function MessageParser(message, sep, levenhtein) -- return Name:str, message:table

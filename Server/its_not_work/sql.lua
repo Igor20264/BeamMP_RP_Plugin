@@ -1,5 +1,35 @@
 local mysql = require "luasql.mysql"
 
+--os.execute("apt-get install lua-sql-mysql")
+--sql = require "lib/sql"
+
+--[[
+local function load_module(name)
+	local data, error = pcall(require, name)
+	if not data then
+		log(error, 5)
+		local data_install, exit_code = os.execute("luarocks install luasql-sqlite3 SQLITE_DIR="..M.pluginPath.." --local")
+		if data_install then
+			local data, error = pcall(require, "library."..name)
+			if not data then
+				log("Failed to load module even after installation: " .. error, 5)
+				return nil
+			else
+				return data
+			end
+		else
+			log("Failed to install module with exit code: " .. tostring(exit_code), 5)
+			return nil
+		end
+	else
+		return data
+	end
+end
+--]]
+--load_module("luasql-sqlite3")
+
+
+
 -- Define the CacheManager class
 CacheManager = {}
 CacheManager.__index = CacheManager

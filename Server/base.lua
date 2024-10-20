@@ -2,11 +2,10 @@ local M = {logs = true, debugs = true}
 -- Фикс русского языка
 os.setlocale( "C", "ctype" );
 os.execute( "chcp 65001 > nul" )
---os.execute("apt-get install lua-sql-mysql")
+
 math.randomseed(os.clock()*os.clock())
---sql = require "lib/sql"
+
 inspect = require "lib/inspect"
-M.pluginName = "Economic_Plugin"
 function log(message, weight)
 	--[[
 	local weight = 3
@@ -57,11 +56,14 @@ function log(message, weight)
     end
 
 local pluginPath = debug.getinfo(1).source:gsub("\\","/")
-local pluginPath = pluginPath:sub(1,(pluginPath:find("base.lua"))-2)
+pluginPath = pluginPath:sub(1,(pluginPath:find("base.lua"))-2)
 package.path = package.path .. ";;" .. pluginPath .. "/?.lua;;".. pluginPath .. "/lua/?.lua"
 package.cpath = package.cpath .. ";;" .. pluginPath .. "/?.dll;;" .. pluginPath .. "/lib/?.dll"
 package.cpath = package.cpath .. ";;" .. pluginPath .. "/?.so;;" .. pluginPath .. "/lib/?.so"
+M.pluginName = "Economic_Plugin"
 M.pluginPath = pluginPath
+M.onShut = {}
+
 log(pluginPath,4)
 smallfunc = require "lib/other"
 HeventTimer = require("lib/EventTimer")
@@ -71,21 +73,6 @@ notify = require "lib/notify"
 timer = require "lib/timer"
 config = load_config("settings/base")
 log("Время сервера с учётом коррекции: "..get_hour().." ч. | Коррекция: "..config.corrector.." ч.",4)
---permission = require "lib/permission"
-M.onShut = {}
-
-
-
-function uptime(sender_id, sender_name, message)
-    local EGG = timer.runnig()
-	if EGG/3600> 1 then
-        SendMessage(sender_id,"Время работы сервера: "..tostring(round(EGG/3600,2)).." ч.")
-    elseif EGG/60 > 2 then --Если минуты
-        SendMessage(sender_id,"Время работы сервера: "..tostring(round(EGG/60,0)).." мин.")
-    else
-        SendMessage(sender_id,"Время работы сервера: "..tostring(EGG).." сек.")
-    end
-end
 
 -- Чат + Консолька
 
@@ -97,7 +84,7 @@ function MyCmdHandler(message)
 	return handlers(-2,"CMD",message)
 end
 
-function SendMessage(id,message)
+function SendMessage(id,message) --todo add support notification by offline
 	if message == nil then
 		message = id
 		id = -2
@@ -108,29 +95,39 @@ function SendMessage(id,message)
 	if id == -2 or id == "CMD" then -- консолька
 		printRaw("["..M.pluginName.."] Message to Console: "..message)
 	else
-		if type(id) == "string" then
-			id = tonumber(id)
-		end
 		if type(message) ~= "string" then
 			message = tostring(message)
 		end
+
+		if id:is_integer() then
+			id = tonumber(id)
+		elseif MP.GetId(id) == nil then
+			-- SaveOffline
+			notify:addNotification(id,message)
+			return
+		end
+		if #message <= 200 then
+			SendNotify(id, "yellow", "Оповещение", message)
+		end
+
 		message = split(message,"\n")
         for _,messages in ipairs(message) do
             MP.SendChatMessage(id, messages)
         end
+
 	end
 end
 
 MP.SendMessage = SendMessage
 
 function run(case,sender_id,sender_name,message)
-	local message = message or ""
+	message = message or ""
 	log(case.command.." "..case.func.." "..message.." "..sender_name,2)
 	if sender_name ~= "CMD" then
 		local permms = permission.decorator(case.roles)
-		ret = permms(MP.TriggerLocalEvent,case.reg,sender_id,sender_name,message)
+		permms(MP.TriggerLocalEvent,case.reg,sender_id,sender_name,message)
 	else
-		local ret = MP.TriggerLocalEvent(case.reg,sender_id,sender_name,message)
+		MP.TriggerLocalEvent(case.reg,sender_id,sender_name,message)
 	end
 	return
 end
@@ -195,143 +192,6 @@ function import(NameModule, com, adver)
 	end
 end
 
-function ProxyRun(sender_id, sender_name, message)
-	local name = split(message," ")[1]
-	message = message:sub(#name+2,#message)
-	log(message,3)
-	handlers(-2, name, message)
-end
-
-function string:is_integer()
-	local status, result = pcall(tonumber,self)
-	if not status or result == nil then
-		return false
-	end
-	return self == tostring(math.floor(result))
-end
-
-function HELP(sender_id, sender_name, message)
-	local page = 0
-	local line = 10
-	local category_target = ""
-	local text_message = ""
-	if message == "" then
-		page = 10
-	elseif message:is_integer() then
-		page = tonumber(message)*line
-	else
-		local all_category = {}
-		local cleared = {}
-		for _,case in ipairs(M.command) do
-			if case.category ~= nil then
-				all_category[case.category] = true
-			end
-		end
-		for i,case in ipairs(all_category) do
-			if case.category == message then
-				cleared[i] = case
-			end
-		end
-		message = levi(message,cleared,2)
-		category_target = message
-	end
-
-	if category_target ~= "" then
-		for _,case in ipairs(M.command) do
-			if case.category == category_target and (case.hide == false or case.hide == nil) then
-				text_message = text_message..(permissions:role_in_roles('admin',case.roles) and "[A]" or "")..config.prefix..""..case.category.." "..case.command.." "..case.args.." |\t "..case.help.."\n"
-			end
-		end
-	else
-		local trues = {}
-		for i,case in ipairs(M.command) do
-			if (page-10 < i and i <= page) and case.hide == false then
-				if trues[case.roles] == true or permissions:roles_in_roles(case.roles,sender_name) then
-					trues[case.roles] = true
-					if permissions:role_in_roles('admin',case.roles) then
-						if case.category == nil then
-							text_message = text_message.. '[A]'..config.prefix..""..case.command.." "..case.args.." |\t "..case.help.."\n"
-						else
-							text_message = text_message.. '[A]'..config.prefix..""..case.category.." "..case.command.." "..case.args.." |\t "..case.help.."\n"
-						end
-					else
-						if case.category == nil then
-							text_message = text_message..config.prefix..""..case.command.." "..case.args.." |\t "..case.help.."\n"
-						else
-							text_message = text_message..config.prefix..""..case.category.." "..case.command.." "..case.args.." |\t "..case.help.."\n"
-						end
-					end
-				end
-			end
-		end
-	end
-
-	if text_message ~= "" and category_target == "" then
-		text_message = text_message.."-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n"
-		text_message = text_message.."!help "..round((page/10)+1,0).." | Для просмотра следующей страницы напишите"
-		if page == 10 then
-			text_message = text_message.."\n!help [Название категории] | Для просмотра всех комманд по категориям (car,eco,roles,time,geo,work,prava,whitelist,env)\n"
-		end
-		text_message = text_message.."-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n"
-	end
-	page = page/10
-	if text_message == "" and page < 20 then
-		text_message = "Дальше ничего нет :("
-	elseif text_message == "" and page == 314 then
-		text_message = "Думаешь ты самый умный?"
-	elseif text_message == "" and page == 777 then
-		text_message = "Ого пасхалка, но где?"
-	elseif text_message == "" and page == 666 then
-		text_message = "А мы не ангелы, парень!\nНет, мы не ангелы\nТёмные твари, и сорваны планки нам\nЕсли нас спросят\nЧего мы хотели бы?\nМы бы взлетели\nМы бы взлетели\nМы не ангелы, парень!"
-	elseif text_message == "" and page == 1488 then
-		text_message = "Мы сообщим в соответствующие органы!\nА может и не сообщаем :)"
-	elseif text_message == "" and page < 100 and page >= 20 then
-		text_message = "Ничего нет :("
-	elseif text_message == "" and page < 1000 and page >= 100 then
-		text_message = "Ты думаешь я вру ??"
-	elseif text_message == "" and page < 10000 and page >= 1000 then
-		text_message = "Ну ну"
-	elseif text_message == "" and page < 100000 and page >= 10000 then
-		text_message = "Пусто"
-	elseif text_message == "" and page < 100000 and page >= 10000 then
-		text_message = "Ну тут реально ничего нету :("
-	elseif text_message == "" and page < 1000000 and page >= 100000 then
-		text_message = "Интересно когда тебе надоест"
-	elseif text_message == "" and page < 10000000 and page >= 1000000 then
-		text_message = "Ну ладно ищи дальше"
-	elseif text_message == "" and page < 100000000 and page >= 10000000 then
-		text_message = "."
-	elseif text_message == "" and page < 1000000000 and page >= 100000000 then
-		text_message = ".."
-	elseif text_message == "" and page < 10000000000 and page >= 100000000 then
-		text_message = "..."
-	elseif text_message == "" and page < 100000000000 and page >= 1000000000 then
-		text_message = "."
-	elseif text_message == "" and page < 1000000000000 and page >= 10000000000 then
-		text_message = ".."
-	elseif text_message == "" and page < 10000000000000 and page >= 10000000000 then
-		text_message = "ДАЛЬШЕ НИЧЕГО НЕТУ"
-	elseif text_message == "" and page < 100000000000000 and page >= 100000000000 then
-		text_message = "..."
-	elseif text_message == "" and page < 1000000000000000 and page >= 1000000000000 then
-		text_message = "ТЕБЕ НАСТОЛЬКО НЕХЕР ДЕЛАТЬ? НУ ИДИ ДОЕБИСЬ ДО БЛИЖАЙШЕГО ИГРОКА"
-	elseif text_message == "" and page < 10000000000000000 and page >= 10000000000000 then
-		text_message = "Ты доказал свою верность!\nДавай поиграем в игру.\nОставь хештег в nrp '#ЯНЕЛОХ'\nСмысл игры прост, узнать как скоро большинство на сервере узнает о этой игре.\nПравил всего 3\n 1) Кто первый расскажет откуда узнал о этой штуке получит обнуление аккаунта. \n 2) Не давай намёков другим что знаешь!\n 3) Не порть интерес другим игрокам, не будь сукой :)\n Ну что игра началась? :)\nП.С. Можно не играть,просто не отправляй сообщение"
-	elseif text_message == "" then
-		text_message = "НИКОМУ НЕ РАССКАЗЫВАЙ ;)"
-	end
-	SendMessage(sender_id,text_message)
-	return "pass"
-end
-
--- End Import
-M.config = config.prefix
-M.command = {
-{command = "help",help = "Показать команды.",func = "HELP"},
-{command = "uptime",help = "Получить время работы сервера.",func = "uptime"},
-{command = "PROXY",help = "", args = "[от чьего лица] [args1] [args2] [argsN]",func = "ProxyRun",roles = {"admin"}},
-}
-
 function OPTIMIZATOR()
 	local c1 = collectgarbage("count") -- получаем текущий размер памяти
 	collectgarbage("collect") -- выполняем сбор мусора
@@ -339,40 +199,16 @@ function OPTIMIZATOR()
 	log("Освобождено памяти: " .. round((c1 - count2), 2) .. " кб", 5)
 end
 
---[[
-local function load_module(name)
-	local data, error = pcall(require, name)
-	if not data then
-		log(error, 5)
-		local data_install, exit_code = os.execute("luarocks install luasql-sqlite3 SQLITE_DIR="..M.pluginPath.." --local")
-		if data_install then
-			local data, error = pcall(require, "library."..name)
-			if not data then
-				log("Failed to load module even after installation: " .. error, 5)
-				return nil
-			else
-				return data
-			end
-		else
-			log("Failed to install module with exit code: " .. tostring(exit_code), 5)
-			return nil
-		end
-	else
-		return data
-	end
-end
---]]
---load_module("luasql-sqlite3")
-
 function onInit()
     log("base.lua",2)
-	M.command = RegEvent(M.command)
+	CoreCommands = import("Core_Commands")--M.command = RegEvent(M.command)
 	Economic = import("Economic")
 	permission = import "Permission"
 	TimeCounter = import("CountPlaydTime")
 	Gps = import("Geo")
 	Work = import("Works")
 	Cars = import("Cars")
+	--testDrive = import("TestDrive")
 	ban = import("ban")
 	--Promos = import("PromoCode")
 	D2S = import("D2S")
@@ -383,7 +219,7 @@ function onInit()
 	--TEST = import("Test")
 	--CheakCheaters = import("CheckCheater")
 	HeventTimer.addFunc(check_request_save_database, 5) -- 10 секунд иногда слишком долго
-	HeventTimer.addFunc(OPTIMIZATOR,60) -- раз в 10 минут
+	HeventTimer.addFunc(OPTIMIZATOR,60*60) -- раз в 10 минут
 	HeventTimer.addFunc(SaveCarEveryXsec, 1) --, MP.CallStrategy.Precise
 
 	MP.RegisterEvent("onChatMessage", "MyChatMessageHandler")

@@ -4,8 +4,8 @@ M.info = "Система для Полиции"
 M.ver = "2.0"
 --
 local Police = {}
-extended(Police,DB)
-
+--extended(Police,DB)
+Police:extended(DB)
 --[[
 Система Полиции
 1. Звания (Другой плагин)
@@ -125,6 +125,62 @@ function Police:GetFines(name,active)
     return ret
 end
 
+local triggerPlaces = {
+    [1] = "Западная улица 1-Мкр",
+    [2] = "Западная улица 1-Мкр",
+    [3] = "Окружная улица 2-Мкр",
+    [4] = "Окружная улица 2-Мкр",
+    [5] = "Автострада",
+    [6] = "Автострада",
+    [7] = "Highway в деревне",
+    [8] = "Highway в деревне",
+    [9] = "Солнечные панели",
+    [10] = "Солнечные панели",
+    [11] = "Окружная улица 4-Мкр",
+    [12] = "Окружная улица 4-Мкр",
+    [13] = "Центральная улица 5-Мкр",
+    [14] = "Центральная улица 5-Мкр"
+}
+
+working = {}
+
+function speedTrap(player_id, data)
+    local speedTrapData = Util.JsonDecode(data)
+    local triggerName = speedTrapData.triggerName
+    local triggerNumber = tonumber(string.match(triggerName, "%d+"))
+    local triggerPlace = triggerPlaces[triggerNumber] or "Неизвестно"
+
+    local penalty = string.format("%.1f км/ч в зоне %.0f км/ч. Превышение на: %.1f км/ч. Место: %s. Транспортное средство: %s. Номер: %s",
+        speedTrapData.playerSpeed * 3.6, speedTrapData.speedLimit * 3.6, speedTrapData.overSpeed * 3.6, triggerPlace, speedTrapData.vehicleModel, speedTrapData.licensePlate)
+
+    local penalty_time = os.date("%H:%M:%S")  -- Запоминаем время штрафа
+
+    table.insert(penalties, {penalty = penalty, time = penalty_time})  -- Добавляем штраф в переменную
+
+    if #penalties > 10 then  -- Если количество штрафов превышает 10, удаляем старые штрафы
+        for i = 1, #penalties - 10 do
+            table.remove(penalties, 1)  -- Удаляем старые штрафы
+        end
+    end
+    -- Отправить сообщение о штрафе всем полицейским, если игрок работает
+    MP.SendChatMessage(-1, "Нарушение: " .. penalty)
+end
+
+function ShowPenalties(sender_id, sender_name, message)
+    local penalties_found = false
+    for i, penalty_data in ipairs(penalties) do -- TODO: replace to economica
+        penalties_found = true
+        SendMessage(sender_id, "[" .. penalty_data.time .. "] " .. penalty_data.penalty)
+    end
+    if not penalties_found then
+        SendMessage(sender_id, "Нет штрафов с камер.")
+    end
+
+    return 0
+end
+
+
+
 -- ADMIN COMMAND
 
 -- System Commands [[
@@ -141,6 +197,8 @@ M.command = {
 }
 
 function M.load()
+    MP.RegisterEvent("speedTrap", "speedTrap")
+    MP.RegisterEvent("redLight", "redLight")
 end
 
 function M.unload()

@@ -1,6 +1,10 @@
 local M = {}
 local DB = require "lib.database"
 
+testDriveCars = testDriveCars or load_database("testDriveCars.ixt") or {} -- Загружаем данные о машинах на тест-драйве
+testDriveRequests = testDriveRequests or  {} -- Таблица для хранения запросов на тест-драйв
+rentalRequests = rentalRequests or {} -- Таблица для хранения запросов на аренду
+
 M.info = "Система владения машинами"
 M.ver = "0.9 Beta"
 local cars_name = load_config("settings/car_name")
@@ -11,11 +15,7 @@ local lastCar = {}
 local CarCoast =  CarCoast or load_database("cars_coast.ixt") or {}
 local lisPlate = load_database("lisPlate.ixt") or {}
 local perBuy = {}
-local carSellQuore = {}
 local posCar = load_database("position_on_lic_plate.ixt") or {}
-local testDriveCars = load_database("testDriveCars.ixt") or {} -- Загружаем данные о машинах на тест-драйве
-local testDriveRequests = {} -- Таблица для хранения запросов на тест-драйв
-local freeTestDriveTime = 604800 -- 7 дней в секундах
 
 local function UDV(data)
     local data = string.gsub(data,'(%a+):(.-):(%d+)-(%d+)','{"config"',1)
@@ -82,18 +82,17 @@ end
 Уйти из работы по команде
 Закончить работу если более N минут
 --]]
-
-extended(Cars, DB)
+Cars:extended(DB)
+--extended(Cars, DB)
 
 function Cars:new(owner,perBuy) --perBuy[sender_name]
-    local coast = perBuy.price
     local config = files.try_read_config(perBuy.path)
     config.vars = perBuy.vars
     config.paints = perBuy.color
     config.partConfigFilename = perBuy.path
     config = Util.JsonEncode(config)
     local udv = UDV(config)
-    print(udv)
+    log(udv)
 
     self.database = self.database or {}
     self.database[owner] = self.database[owner] or {}
@@ -108,7 +107,7 @@ function Cars:new(owner,perBuy) --perBuy[sender_name]
     end
 
     self.database[owner][uuid] = {
-        licenss_plate = CarPlate(),coast = coast, configuration = config,confiscation = false,
+        licenss_plate = CarPlate(),coast = perBuy.price, configuration = config,confiscation = false,
 		former_owners = {},name = perBuy.model,category = cars_category[udv.jbm],engine=udv.engine,transmission=udv.transmission,transfer_case=udv.transfer_case,body=udv.body,
         path = perBuy.path,jbm = udv.jbm,
         nickname=(perBuy.model):sub(0,math.min(#(perBuy.model)-1,3))..""..Gen.generateRandomData(3)}
@@ -136,7 +135,7 @@ function Cars:transfer(owner,new_owner,id, isTestDrive)
             testDriveCars[id] = {
                 owner = owner,
                 tester = new_owner,
-                endTime = os.time() + freeTestDriveTime -- Время окончания тест-драйва (7 дней)
+                endTime = os.time() + (testDriveRequests[new_owner].timed or rentalRequests[new_owner].timed or config.freeTestDriveTime) -- Время окончания тест-драйва (7 дней)
             }
         end
 
@@ -397,75 +396,6 @@ function CarsGive(sender_id,sender_name, message)
 
 end
 
--- Функция для передачи машины на тест-драйв
-function CarsTestDrive(sender_id, sender_name, message)
-    local case = split(message, " ")
-    local name = erors(case[1], 2)
-    local timed = case[3] or "2h"
-    timed = timeConverter(timed)
-    if timed == nil then
-        SendMessage(sender_id, "Вы указали некорректно время. Попробуйте ещё раз.")
-        return
-    end
-
-    local id = cars:getidbynickname(sender_name, case[2])
-    if id == nil then
-        SendMessage(sender_id, "Такой машины у вас нет. (Проверте написание никнейма)")
-        return
-    end
-
-    -- Проверяем, доступна ли машина для тест-драйва
-    if testDriveCars[id] ~= nil then
-        SendMessage(sender_id, "Эта машина уже на тест-драйве.")
-        return
-    end
-
-    -- Просим пользователя подтвердить тест-драйв
-    local requestData = {
-        owner = sender_name,
-        tester = name,
-        carId = id,
-        timed = timed
-    }
-    testDriveRequests[name] = requestData
-    local totime = sectotime(timed)
-    SendMessage(MP.GetId(name), "Вам предлагают тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м.")
-    SendMessage(MP.GetId(name), "Чтобы принять тест-драйв, введите команду /testdrive accept. Для отказа введите /testdrive decline.")
-    SendMessage(sender_id, "Вы отправили запрос на тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " игроку " .. name .. ". Сроком на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м. ")
-end
-
--- Функция для обработки запроса на тест-драйв
-function CarsTestDriveAccept(sender_id, sender_name, message)
-    local requestData = testDriveRequests[sender_name]
-    if requestData == nil then
-        SendMessage(sender_id, "Нет активных запросов на тест-драйв.")
-        return
-    end
-
-    -- Передаем машину на тест-драйв
-    local success = cars:transfer(requestData.owner, requestData.tester, requestData.carId, true)
-    if success then
-        local totime = sectotime(requestData.timed)
-        SendMessage(MP.GetId(requestData.owner), "Игрок " .. requestData.tester .. " принял запрос на тест-драйв. Машина " .. cars:value(requestData.owner, requestData.carId, "nickname") .. " передана на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м.")
-        SendMessage(sender_id, "Вы приняли тест-драйв машины " .. cars:value(requestData.owner, requestData.carId, "nickname") .. " на" .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м.")
-        testDriveRequests[sender_name] = nil -- Удаляем запрос
-    else
-        SendMessage(sender_id, "Ошибка при передаче машины на тест-драйв.")
-    end
-end
-
-function CarsTestDriveDecline(sender_id, sender_name, message)
-    local requestData = testDriveRequests[sender_name]
-    if requestData == nil then
-        SendMessage(sender_id, "Нет активных запросов на тест-драйв.")
-        return
-    end
-    SendMessage(MP.GetId(requestData.owner), "Игрок " .. requestData.tester .. " отклонил запрос на тест-драйв.")
-    SendMessage(sender_id, "Вы отказались от тест-драйва.")
-    testDriveRequests[sender_name] = nil -- Удаляем запрос
-end
-
-
 function RegenerateNick(sender_id,sender_name,message)
     local case = split(message," ")
     for nick, uuid in pairs(cars.database) do
@@ -479,69 +409,14 @@ function RegenerateNick(sender_id,sender_name,message)
     end
 end
 
--- Продать машину другому игроку
-function CarsSell(sender_id,sender_name, message)
-    local case = split(message," ")
-    if case[1] == nil or case[2] == nil or case[3] == nil then
-        SendMessage(sender_id,"Использование: /cars sell <никнейм_игрока> <ник машины> <цена>")
-        return
-    end
-    local name = erors(case[1],2)
-    local id = cars:getidbynickname(sender_name,case[2])
-    if id == nil then
-        SendMessage(sender_id,"Такого никнейма нет")
-        return
-    end
-    local coast = tonumber(case[3]) or 0
-    carSellQuore[name] = {owner=sender_name, coast = coast,nickname = case[2], id = id}
-    local data = cars.database[id]
-    SendMessage(sender_id,"Вы отправили предложение о покупке своей машины игроку "..name)
-    SendMessage(MP.GetId(name),"Вам отправили предложение о покупке машины: Игрок: "..data.nickname.." | car: "..(data.name or "None")..(data['engine'] or 'None').." "..(data['transmission'] or "None").." "..(data['transfer_case'] or "None").." За "..coast.." "..config.currency)
-end
-
--- Принять предложение о продаже машины
-function CarsSellAccept(sender_id,sender_name, message)
-    if carSellQuore[sender_name] ~= nil then
-        if eco:value(sender_name,"money") >= math.abs(carSellQuore[sender_name].coast) then
-            local owner = carSellQuore[sender_name].owner
-            local id = carSellQuore[sender_name].id
-            cars:transfer(owner,sender_name,id)
-            SendMessage(sender_id,"Вы приняли предложение о покупке машины "..carSellQuore[sender_name].owner)
-            SendMessage(MP.GetId(carSellQuore[sender_name].owner),"Предложение о продаже машины принято. Вам заплатили "..carSellQuore[sender_name].coast.." "..config.currency)
-            eco:add(sender_name,"money",-math.abs(carSellQuore[sender_name].coast))
-            eco:add(carSellQuore[sender_name].owner,"money",math.abs(carSellQuore[sender_name].coast))
-            carSellQuore[sender_name] = nil
-        end
-    end
-end
-
--- Показать все предложение о покупке
-function CarsSellShow(sender_id,sender_name, message)
-    if carSellQuore[sender_name] == nil then
-        SendMessage(sender_id,"Нет предложений о покупке")
-        return
-    else
-        local data = carSellQuore[sender_name]
-        SendMessage(sender_id,"Предложение о покупке машины от "..data.owner.." | Машину: "..data.nickname.." "..(data['engine'] or 'None').." "..(data['transmission'] or "None").." "..(data['transfer_case'] or "None").." | За:"..data.coast.." "..config.currency)
-        SendMessage(sender_id,"Для принятия предложения введите команду "..config.prefix.."car sellaccept")
-
-    end
-end
-
--- Отказать всем предложение о покупке
-function CarsSellDecline(sender_id,sender_name, message)
-    SendMessage(MP.GetId(carSellQuore.owner), "Предложение о покупке машины было отклонено")
-    SendMessage(sender_id, "Вы отказались от предложения о покупке машины")
-    carSellQuore[sender_name] = nil
-end
-
 function CarsTeleportToRepair(sender_id,sender_name, message)
     RemoutRun(sender_id,"extensions.core_input_actionFilter.setGroup('FREEZ', {'accelerate','brake','accelerate_brake','shiftUp','activateStarterMotor','switch_previous_vehicle','switch_next_vehicle','switch_next_vehicle_multiseat','nodegrabberRender','toggleWalkingMode'});extensions.core_input_actionFilter.addAction(0, 'FREEZ', true)") -- freez
     HeventTimer.Createtask((60*1+1),CarsTeleport,sender_id.."UnTeleport",sender_id)
 end
 
 function CarsTeleport(user_id)
-    RemoutRun(user_id,"")
+     --RemoutRun(user_id,"local rot = be:getPlayerVehicle(0):getRotation(); spawn.safeTeleport(be:getPlayerVehicle(0), vec3(-7, 6.8, -22), rot, nil, nil, nil, nil, false))")
+    RemoutRun(user_id,"spawn.safeTeleport(be:getPlayerVehicle(0), vec3(550, 669, -17), quat(0,0,0.7,-0.5), nil, nil, nil, nil, false)")
     RemoutRun(user_id,"extensions.core_input_actionFilter.addAction(0, 'FREEZ', false)") -- unfreez
 end
 
@@ -554,7 +429,7 @@ function CarsFix(sender_id,sender_name, message)
     local id = cars:getidbynickname(sender_name,message)
     local price = cars.database[sender_name][id].coast
     if CTS[sender_name].custom ~= nil and CTS[sender_name].custom.repair ~= nil then
-        price = math.floor(CTS[sender_name].custom.repair*price)
+        price = ((CTS[sender_name].custom.repair/config.percent_repair)*price):round(1)
     else
         SendMessage(sender_id,"Ошибка. Не удалось получить стоймость ремонта машины.")
         return
@@ -564,7 +439,7 @@ function CarsFix(sender_id,sender_name, message)
         return
     end
     eco:add(sender_name,"money",-price)
-    SendMessage(sender_id,"Ваша машина ремонтируется. С вашего счёта было списанно: "..price.." "..config.currency)
+    SendMessage(sender_id,"Ваша машина ремонтируется. С вашего счёта было списанно: "..price.." "..config.currency.." | Ремонт будет завершится через 150 секунд.")
     RemoutRun(sender_id,"extensions.core_input_actionFilter.setGroup('FREEZ', {'accelerate','brake','accelerate_brake','shiftUp','activateStarterMotor','switch_previous_vehicle','switch_next_vehicle','switch_next_vehicle_multiseat','nodegrabberRender','toggleWalkingMode'});extensions.core_input_actionFilter.addAction(0, 'FREEZ', true)") -- freez
     HeventTimer.Createtask(150,UncarFix,sender_id.."Unfreez",sender_id)
 end
@@ -765,10 +640,6 @@ function CarsSetPrice(sender_id, sender_name, message)
     SendMessage(sender_id, "Вы установили стоимость " .. price .. " " .. config.currency)
 end
 
--- конец основых функций
-
--- Функции вызываемые при тригере
-
 function BuyCar(sender_id, sender_name, message)
     if not perBuy[sender_name] then
         SendMessage(sender_id, "Ошибка: не удалось найти данные о последней машине.")
@@ -780,6 +651,12 @@ function BuyCar(sender_id, sender_name, message)
         print("Ошибка: CarCoast[perBuy[sender_name].path] не существует")
         return
     end
+    if files.try_read_config(perBuy.path) == nil then
+        SendMessage(sender_id, "Ошибка: Данная модель машины не существует. Свяжитесь с администратором. Код ошибки: '"..perBuy.path.." is nil'")
+        print("Ошибка: files.try_read_config(perBuy.path) == nil")
+        return
+    end
+
     if not perBuy[sender_name].view then
         local send_message = "Модель машины: "..perBuy[sender_name].model.."\nСтоймость машины: "..perBuy[sender_name].price.." "..config.currency.."\nКонфигурация: "..perBuy[sender_name].path
         send_message = send_message.."\n\nДля покупки введите команду !car buy еще раз"
@@ -797,11 +674,9 @@ function BuyCar(sender_id, sender_name, message)
             return
         end
     end
-
-
-
-
 end
+
+-- Функции вызываемые при тригере
 
 function CarsCheckCreate(player_id,vehicle_id,data)
     local name = MP.GetPlayerName(player_id)
@@ -901,32 +776,10 @@ function SaveCarEveryXsec()
                 end
             end
         end
+    end
     if math.random(1,100) == 10 then
         forced_save_database("position_on_lic_plate.ixt",posCar)
     end
-    end
-
-    -- Проверяем время окончания тест-драйва
-    for id, data in pairs(testDriveCars) do
-        if os.time() >= data.endTime then
-            -- Возвращаем машину владельцу
-            cars:transfer(data.tester, data.owner, id)
-            if MP.check_in_online(data.owner) then
-                SendMessage(MP.GetId(data.owner), "Машина " .. cars:value(data.owner, id, "nickname") .. " вернулась с тест-драйва.")
-
-            end
-            if MP.check_in_online(data.tester) then
-                SendMessage(MP.GetId(data.tester), "Время тест-драйва машины " .. cars:value(data.tester, id, "nickname") .. " истекло.")
-            end
-            testDriveCars[id] = nil -- Удаляем информацию о тест-драйве
-        end
-    end
-    --if testDriveCars ~= nil and (old_testDriveCars == nil or testDriveCars ~= old_testDriveCars) then
-    -- Сохраняем данные о тест-драйве
-        -- TODO: вынести testDriveCars в отдельный класс!
-        --save_database("testDriveCars.ixt", testDriveCars)
-        --old_testDriveCars = table.shallow_copy(testDriveCars)
-    --end
     return true
 end
 
@@ -949,14 +802,7 @@ M.command = {
     {category = "car",command = "setprice", help = "Установить стоймость машины. ",args = "[игрок] [цена]", func = "CarsSetPrice", roles = {"admin"}},
     {category = "car",command = "spawn", help = "Создать машину по никнейму.",args="[nickcar]",func = "CarsSpawn"},
     {category = "car",command = "fixnick", help = "Востановить сломанные ники.",func = "RegenerateNick", roles = {"moderator","admin"}},
-	{category = "car",command = "sell", help = "Предложить покупку машины.",args = "[игрок] [nickname_car] [цена]", func = "CarsSell"},
-	{category = "car",command = "sellshow", help = "Показать все предложения о покупке.", func = "CarsSellShow"},
-    {category = "car",command = "selldecline", help = "Отказать в предложение о покупке. ", func = "CarsSellDecline"},
-    {category = "car",command = "sellaccept", help = "Принять предложение о покупке. ",args = "[имя игрока]", func = "CarsSellAccept"},
     {category = "car",command = "sellgos", help = "Отправить предложение о покупке. ",args = "yes [имя машины]", func = "CarsSellGos"},
-	{ category = "car", command = "testdrive", help = "Предложить тест-драйв машины.", args = "[игрок] [nickname_car] (7d or 1d or 1m or 1h default: 2h)", func = "CarsTestDrive"},
-    { category = "car", command = "testdrive", help = "Принять запрос на тест-драйв.", command = "accept", func = "CarsTestDriveAccept"},
-    { category = "car", command = "testdrive", help = "Отклонить запрос на тест-драйв.", command = "decline", func = "CarsTestDriveDecline"},
 }
 
 M.lastCar = lastCar

@@ -5,21 +5,21 @@ local M = {}
 local DB = require("lib.database")
 
 local Notifications = {}
+Notifications:extended(DB) --extended
+--extended(Notifications, DB)
 
-extended(Notifications, DB)
-
-function Notifications:addNotification(playerId, message)
-    self.database[playerId] = self.database[playerId] or {}
-    table.insert(self.database[playerId], message)
+function Notifications:addNotification(playerName, message)
+    self.database[playerName] = self.database[playerName] or {}
+    table.insert(self.database[playerName], message)
     self:save()
 end
 
-function Notifications:getNotifications(playerId)
-    return self.database[playerId] or {}
+function Notifications:getNotifications(playerName)
+    return self.database[playerName] or {}
 end
 
-function Notifications:clearNotifications(playerId)
-    self.database[playerId] = nil
+function Notifications:clearNotifications(playerName)
+    self.database[playerName] = nil
     self:save()
 end
 
@@ -34,16 +34,29 @@ function sendNotificationsDelayed(playerId, notifications)
     if text:sub(-1) == "\n" then
         text = text:sub(1, -2)
     end
-
     SendMessage(playerId, text)
 end
 
+function SendNotify(playerId, color, title, text)
+    --'yellow': notification.type === 'yellow',
+    -- 'red': notification.type === 'red',
+    -- 'green': notification.type === 'green'
+    if color == "yellow" then
+        MP.TriggerClientEvent(playerId, "PacketNotify", json.encode({color="yellow", title=title, text=text}))
+    elseif color == "red" then
+        MP.TriggerClientEvent(playerId, "PacketNotify", json.encode({color="red", title=title, text=text}))
+    elseif color == "green" then
+        MP.TriggerClientEvent(playerId, "PacketNotify", json.encode({color="green", title=title, text=text}))
+    else
+        log("Неизвестный цвет уведомления: " .. color,3)
+    end
+end
 
 local notifications = Notifications:init("notifications.ixt")
 
 function Notifications:onPlayerJoin(playerId)
     local playerName = MP.GetPlayerName(playerId)
-    local notify notifications:getNotifications(playerName)
+    local notify = notifications:getNotifications(playerName)
 
     if #notifications > 0 then
         -- Используем task для отправки уведомлений через 60 секунд

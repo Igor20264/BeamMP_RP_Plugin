@@ -10,6 +10,14 @@ end
 function request_save_database(namefile,data)
     log(namefile,3)
     req_save_database[namefile] = {data=data,time=gettime()+config.REQUEST_SAVE_DATABASE_TIME_SEC}
+	if online_player ~= nil then
+        for id,name in pairs(online_player) do
+			local bal = eco:value(name,"money")
+			if bal ~= nil then
+				MP.TriggerClientEvent(id, "PacketbalanceUpdate", bal);
+			end
+		end
+    end
 end
 
 -- public function

@@ -19,6 +19,8 @@
   "StopWork": 10,
   "DeleteCarWithAFK": 30,
   "withelist": true,
+  "freeTestDriveTime": 604800,
+  "percent_repair": 15
   "drivelicence": {
       "A" : true,
       "B" : false,

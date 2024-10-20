@@ -116,10 +116,14 @@ function BAN(sender_id, sender_name, message)
 	local name = erors(split(message," ")[1],2)
 	local reaseon = split(message," ")[2] or ("Узнать подробности можно в Дискорде. "..M.config.url)
 	if MP.check_in_online(name) == true then
+        local player_id = MP.GetId(name)
+        local player_ip = MP.GetIp(name)
         bans("name", name, reaseon)
-        bans("ip", MP.GetIp(name), reaseon)
-        temporaryBanIp[MP.GetIp(name)] = true
-		MP.DropPlayer(MP.GetId(name),reaseon)
+        bans("ip",player_ip, reaseon)
+        temporaryBanIp[player_ip] = true
+        MP.TriggerClientEvent(player_id, "PacketBannedSub" ,"")
+        HeventTimer.Createtask((60),NextBan,sender_id.."UnTeleport",{player_id,reason})
+		--MP.DropPlayer(player_id,reaseon)
 		local mess = name.." был забанен"
 		SendMessage(-1,mess)
 	else 
@@ -128,6 +132,11 @@ function BAN(sender_id, sender_name, message)
         SendMessage(sender_id, name.." был забанен")
 	end
 end
+
+function NextBan(player_id,reason)
+    MP.DropPlayer(player_id, reason)
+end
+
 
 M.config = config
 command = {
