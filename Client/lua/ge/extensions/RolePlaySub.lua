@@ -42,6 +42,9 @@ local function balanceUpdate(new_balance)
 	log('D', 'onBalanceUpdate', new_balance)
 	guihooks.trigger('setRP-Balance', new_balance)
 	new_balance = tonumber(new_balance)
+	if new_balance == nil then
+		return
+	end
 	if new_balance > balance then
 		playSound("monneyadd", 0.7)
 	end

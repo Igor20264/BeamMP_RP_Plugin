@@ -94,7 +94,7 @@ end
 function MyCmdHandler(message)
 	return handlers(-2,"CMD",message)
 end
-
+--MP.TriggerClientEvent(0, "PacketNotify", Util.JsonEncode({color="yellow", title="LOX", text="PIDOR"}))
 function SendNotify(playerId, color, title, text)
     --'yellow': notification.type === 'yellow',
     -- 'red': notification.type === 'red',
