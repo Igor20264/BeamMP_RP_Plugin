@@ -14,19 +14,7 @@ app.directive('roleplaynot', [function () {
 app.controller("NotifyInit", ['$scope', '$timeout', function ($scope, $timeout) {
     $scope.notifications = [];
 
-    $scope.init = function() {
-        // bngApi.engineLua('RolePlaySub.Sendpacket()');
-    };
-
-    $scope.reset = function() {
-        $scope.init();
-    };
-
-    $scope.select = function() {
-        bngApi.engineLua('setCEFFocus(true)');
-    };
-
-	$scope.showNotification = function(type, title, text, duration) {
+    $scope.showNotification = function(type, title, text, duration) {
         var width = (type === 'green' ? 65 : (type === 'yellow' ? 60 : 50)); // Example logic for width based on type
         var notification = {
             type: type,
@@ -38,20 +26,14 @@ app.controller("NotifyInit", ['$scope', '$timeout', function ($scope, $timeout) 
 
         $scope.notifications.push(notification);
 
-        // Удаление старых уведомлений, если их больше 5
-        if ($scope.notifications.length > 5) {
-            $scope.notifications.shift(); // Удаляет первое уведомление
-        }
-
-
+        // Устанавливаем таймер для исчезновения уведомления
         $timeout(function() {
-            notification.visible = false; // Уведомление исчезает через заданное время
-        }, duration || 5000); // Установите время исчезновения по умолчанию
+            notification.visible = false;
+        }, duration || 5000); // Уведомление исчезает через 5 секунд по умолчанию
     };
 
     $scope.$on('setNotify', function (event, color, title, text) {
-		$scope.showNotification( color, title, text, 5000);
-	});
-
-    // Example call for testing
+        $scope.showNotification(color, title, text, 5000);
+    });
 }]);
+
