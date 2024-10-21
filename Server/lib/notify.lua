@@ -5,8 +5,8 @@ local M = {}
 local DB = require("lib.database")
 
 local Notifications = {}
-Notifications:extended(DB) --extended
---extended(Notifications, DB)
+--Notifications:extended(DB)
+extended(Notifications, DB)
 
 function Notifications:addNotification(playerName, message)
     self.database[playerName] = self.database[playerName] or {}
@@ -35,21 +35,6 @@ function sendNotificationsDelayed(playerId, notifications)
         text = text:sub(1, -2)
     end
     SendMessage(playerId, text)
-end
-
-function SendNotify(playerId, color, title, text)
-    --'yellow': notification.type === 'yellow',
-    -- 'red': notification.type === 'red',
-    -- 'green': notification.type === 'green'
-    if color == "yellow" then
-        MP.TriggerClientEvent(playerId, "PacketNotify", json.encode({color="yellow", title=title, text=text}))
-    elseif color == "red" then
-        MP.TriggerClientEvent(playerId, "PacketNotify", json.encode({color="red", title=title, text=text}))
-    elseif color == "green" then
-        MP.TriggerClientEvent(playerId, "PacketNotify", json.encode({color="green", title=title, text=text}))
-    else
-        log("Неизвестный цвет уведомления: " .. color,3)
-    end
 end
 
 local notifications = Notifications:init("notifications.ixt")

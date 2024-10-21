@@ -7,8 +7,7 @@ M.ver = "2.0"
 online_player = {}
 
 local Eco = {}
---extended(Eco,DB)
-Eco:extended(DB)
+extended(Eco,DB)
 function Eco:getOnline()
     local ret = {}
     for i,data in pairs(database_player) do
@@ -29,8 +28,9 @@ end
 
 function Eco:joinOnServer(id)
     if self.database[MP.GetPlayerName(id)]["online"] == true and self.database[MP.GetPlayerName(id)]["work"]["on_works"] == true then
-        Eco:add(MP.GetPlayerName(id),"money",(self.database[MP.GetPlayerName(id)]["work"]["money"]/4))
+        self:add(MP.GetPlayerName(id),"money",(self.database[MP.GetPlayerName(id)]["work"]["money"]/4))
         SendMessage(id,"Вам начислена компенсация в размере"..(self.database[MP.GetPlayerName(id)]["work"]["money"]/4).." "..config.currency)
+        MP.TriggerClientEvent(id, "PacketbalanceUpdate", self.database[MP.GetPlayerName(id)]["money"]);
         self.database[MP.GetPlayerName(id)]["work"]["on_works"] = false
     end
     self.database[MP.GetPlayerName(id)]["online"] = true
@@ -45,7 +45,7 @@ function Eco:exit(id)
     self.database[MP.GetPlayerName(id)]["online"] = false
     if online_player[id] ~= nil then
         local name = online_player[id]
-        work:stop(name)
+        work:stop(name,id)
         online_player[id] = nil
         CTS[name] = nil
     end
@@ -133,7 +133,6 @@ function BAL(sender_id,sender_name, message)
     else
         SendMessage(sender_id, "Ваш Баланс💵: "..ret.." "..cur.." | Плата за километр 💸: "..(ret1*1000).." "..cur.." за работу💼 "..ret2)
     end
-
 	return 1
 end
 
@@ -163,7 +162,7 @@ function PAY(sender_id,sender_name, message) -- Перевод от одного
 		end
 	else 
 		SendMessage(sender_id, "Проверьте написание."..p2)
-	end 
+	end
 	return 1
 end
 

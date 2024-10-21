@@ -51,14 +51,6 @@ function string:split(sep)
     return t
 end
 
-function table:extended(parent)
-    setmetatable(self,{__index = parent})
-end
-
-function extended(child, parent)
-    setmetatable(child,{__index = parent})
-end
-
 local RegCaches = RegCaches or {}
 
 local function GenReg()
@@ -118,6 +110,17 @@ function Gen.generateRandomData(size)
 end
 
 -- Color
+function is_integer(data)
+    if type(data) == "number" then
+        return true
+    end
+    local status, result = pcall(tonumber,data)
+	if not status or result == nil then
+		return false
+	end
+	return data == tostring(math.floor(result))
+end
+
 function string:is_integer()
 	local status, result = pcall(tonumber,self)
 	if not status or result == nil then
@@ -170,23 +173,12 @@ function try_exept(func,...)
     end
     return result
 end
-
-function func:try_exept(func,...)
-    local status, result = pcall(func,...)
-    if not status then
-        --local s = split(debug.getinfo(func).source,"\\")
-        --log({"file: "..s[#s].." "..result},4)
-        log({"file: "..result},4)
-        return falselu
-    end
-    return result
-end
-
+--[[
 function number:round(p)
     p = p or 2
     return tonumber(string.format("%."..p.."f",self))
-    
 end
+--]]
 
 function round(numder,p)
 	local p = p or 2
@@ -201,11 +193,21 @@ function table.shallow_copy(self)
 		return t
 	end
 
-function table.merge(t1,t2)
-	for _,v in ipairs(t2) do 
-		table.insert(t1, v)
-	end
-	return t1
+function table.merge(t1, t2)
+    -- Проверяем, что t1 является таблицей
+    if type(t1) ~= "table" then
+        t1 = {}  -- Если нет, инициализируем t1 как пустую таблицу
+    end
+
+    -- Проверяем, что t2 является таблицей
+    if type(t2) ~= "table" then
+        return t1  -- Если t2 не таблица, просто возвращаем t1
+    end
+
+    for _, v in ipairs(t2) do
+        table.insert(t1, v)
+    end
+    return t1
 end
 
 function table.contains(table, element)

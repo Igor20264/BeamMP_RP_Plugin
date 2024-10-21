@@ -107,8 +107,8 @@ function geo:set_random_path(player,work_type)
 end
 
 function geo:set_path(player_id,x,y,z)
-    local data = Util.JsonEncode({x=95.737,y=-298,z=133})
-    MP.TriggerClientEvent(user_id, 'packetgpsset', data)
+    local data = Util.JsonEncode({x=x,y=y,z=z})
+    MP.TriggerClientEvent(player_id, 'packetgpsset', data)
 end
 
 function geo:update_active_path(player,uuid)
@@ -157,8 +157,8 @@ function geo:get_public_points()
     temp = sort_by_distancse(temp)
     return temp
 end
---extended(geo,DB)
-geo:extended(DB)
+extended(geo,DB)
+--geo:extended(DB)
 --[[
 type_gep = круг, квадрад
 uuid = {nickname= str, type = {work = bool, cam = bool}, geo = {0={x=float,y=float,z=float},2={x=float,y=float,z=float}}}

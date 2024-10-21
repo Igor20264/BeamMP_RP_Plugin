@@ -1,2 +1,0 @@
-load("SubModeration")
-registerCoreModule("SubModeration")

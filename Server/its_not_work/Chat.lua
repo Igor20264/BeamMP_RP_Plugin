@@ -36,8 +36,8 @@ local Cars = {}
 Уйти из работы по команде
 Закончить работу если более N минут
 --]]
-Cars:extended(DB)
---extended(Cars,DB)
+--Cars:extended(DB)
+extended(Cars,DB)
 
 function Cars:new(owner,ret)
     self.database = self.database or {}

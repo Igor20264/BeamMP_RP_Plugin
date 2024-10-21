@@ -1,109 +1,95 @@
-
 .not-block {
-	position: absolute;
-	top: 0;
+    position: fixed; /* Установлено на fixed */
+    bottom: 0; /* Уведомления появляются снизу */
     width: 100%;
     display: flex;
-	flex-direction: column;
-    justify-content: flex-end;
+    flex-direction: column; /* Уведомления располагаются вертикально */
     align-items: center;
-	
-}
-
-.animate-show-hide.ng-hide {
-opacity: 0;
-}
-
-.animate-show-hide.ng-hide-add,
-.animate-show-hide.ng-hide-remove {
-transition: all linear 0.5s;
-}
-
-.check-element {
-border: 1px solid black;
-opacity: 1;
-padding: 10px;
+    z-index: 1000; /* Убедитесь, что уведомления находятся поверх других элементов */
 }
 
 .notif {
-	width: 70%;
-	background: rgba(34, 33, 35, 0.8);
-	border-radius: 15px;
-	min-height: 6vh;
-	font-family: "TTNorms";
-	padding-left: 4vh;
-	padding-top: 1vh;
-	white-space: nowrap;
-	margin-top: 1vh;
-	position: relative;
-}
-.not-title {
-	text-transform: uppercase;
-	font-weight: bold;
-	color: white;
-
-	font-weight: 700;
-	font-size: 12px;
-	line-height: 19px;
-}
-.not-text {
-	font-weight:normal;
-	color: rgba(255, 255, 255, 0.8);
-	font-weight: 500;
-	font-size: 12px;
-	line-height: 17px;
-}
-.notification {
-	margin-left: 2.5vw;
+    width: 70%;
+    background: rgba(34, 33, 35, 0.8);
+    border-radius: 15px;
+    min-height: 6vh;
+    font-family: "TTNorms", sans-serif;
+    padding: 1vh 4vh;
+    white-space: nowrap;
+    margin-top: 1vh; /* Отступ между уведомлениями */
+    position: relative;
+    opacity: 1; /* Убедитесь, что уведомления видимы */
+    transition: opacity 0.5s ease; /* Плавный переход для появления */
 }
 
-
-.info-icon {
-	margin: 0;
-	left: 13px;
-	width: 30px;
-	height: 30px;
-	content: url("./svg/info.svg");
-}
-.no-icon {
-	margin: 5;
-	left: 12px;
-	width: 20px;
-	height: 20px;
-	content: url("./svg/no.svg");
-}
-.good-icon {
-	filter: drop-shadow(0px 0px 10px rgba(120, 158, 97, 0.5));
-	width: 30px;
-	height: 30px;
-	left: 10px;
-	content: url("./svg/good.svg");
-}
-.icon {
-	position: absolute;
-}
-@font-face {
-	font-family: "TTNorms";
-	src: url("./TTNormsThin.ttf");
-	font-style: normal; 
-	font-weight: normal; 
+.animate-show-hide.ng-hide {
+    opacity: 0; /* Уведомление скрывается с помощью изменения прозрачности */
+    transition: opacity 0.5s ease; /* Плавный переход для скрытия */
 }
 
 .loading {
-	position: absolute; 
-	white-space: nowrap;
-	left: 0;
-	top: 0;
-	height: 100%;
-	border-radius: 15px;
+    position: absolute;
+    white-space: nowrap;
+    left: 0;
+    top: 0;
+    height: 100%;
+    border-radius: 15px;
 }
+
 .green {
-	background: rgba(120, 158, 97, 0.2);
-	transform: matrix(1, 0, 0, -1, 0, 0);	
+    background: rgba(120, 158, 97, 0.2);
 }
+
 .red {
-	background: rgba(174, 52, 52, 0.2);
+    background: rgba(174, 52, 52, 0.2);
 }
+
 .yellow {
-	background: rgba(255, 185, 67, 0.2);
+    background: rgba(255, 185, 67, 0.2);
+}
+
+/* Иконки */
+.info-icon,
+.no-icon,
+.good-icon {
+    margin: 0;
+    position: absolute; /* Позиционирование иконок */
+}
+
+.animate-show-hide.ng-hide-add {
+    transform: translateY(20px); /* Сдвиг вниз при появлении */
+    opacity: 0; /* Начальная прозрачность */
+}
+
+.animate-show-hide.ng-hide-remove {
+    transform: translateY(0); /* Возвращение на место */
+    opacity: 1; /* Полная непрозрачность */
+}
+
+.info-icon {
+    left: 12px; /* Позиция иконки */
+    width: 30px;
+    height: 30px;
+    background-image: url("./svg/info.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.no-icon {
+    left: 12px; /* Позиция иконки */
+    width: 20px;
+    height: 20px;
+    background-image: url("./svg/no.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.good-icon {
+    left: 10px; /* Позиция иконки */
+    filter: drop-shadow(0px 0px 10px rgba(120, 158, 97, 0.5));
+    width: 30px;
+    height: 30px;
+    background-image: url("./svg/good.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
 }

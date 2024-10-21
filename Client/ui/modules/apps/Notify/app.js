@@ -35,12 +35,18 @@ app.controller("NotifyInit", ['$scope', '$timeout', function ($scope, $timeout) 
             width: width,
             visible: true
         };
-        
+
         $scope.notifications.push(notification);
 
+        // Удаление старых уведомлений, если их больше 5
+        if ($scope.notifications.length > 5) {
+            $scope.notifications.shift(); // Удаляет первое уведомление
+        }
+
+
         $timeout(function() {
-            notification.visible = false;
-        }, duration || 10000); // Notification disappears after 3 seconds by default
+            notification.visible = false; // Уведомление исчезает через заданное время
+        }, duration || 5000); // Установите время исчезновения по умолчанию
     };
 
     $scope.$on('setNotify', function (event, color, title, text) {

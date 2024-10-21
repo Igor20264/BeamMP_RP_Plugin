@@ -4,8 +4,8 @@ M.info = "Система для Полиции"
 M.ver = "2.0"
 --
 local Police = {}
---extended(Police,DB)
-Police:extended(DB)
+extended(Police,DB)
+--Police:extended(DB)
 --[[
 Система Полиции
 1. Звания (Другой плагин)

@@ -82,8 +82,8 @@ end
 Уйти из работы по команде
 Закончить работу если более N минут
 --]]
-Cars:extended(DB)
---extended(Cars, DB)
+--Cars:extended(DB)
+extended(Cars, DB)
 
 function Cars:new(owner,perBuy) --perBuy[sender_name]
     local config = files.try_read_config(perBuy.path)

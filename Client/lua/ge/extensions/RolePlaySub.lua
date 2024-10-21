@@ -15,7 +15,7 @@ end
 local function playSound(Name, volume)
 	sound = "audio/".. Name ..".ogg"
 	Engine.Audio.playOnce("AudioGui", sound, {volume = volume})
-	uihooks.trigger('ChangeState', 'menu-subrp-test')
+	--uihooks.trigger('ChangeState', 'menu-subrp-test')
 end
 
 local function onJoinServer(data)
@@ -52,12 +52,6 @@ local function gpsset(pos_json)
 	local pos = jsonDecode(pos_json) 
 	log('D', 'User GPS Clear', "")
 	setgps(pos.x, pos.y, pos.z)
-end
-
-local function clearFocus()
-	log('D', 'User GPS Clear', "")
-	core_groundMarkers.resetAll()
-	core_groundMarkers.sendToApp()
 end
 
 local function trigerPost(data_json)
@@ -111,8 +105,13 @@ local function onBeamNGTrigger(data)
 	if data.event == "enter" then
 		local data_json = jsonEncode(data)
 		TriggerServerEvent("TriggerEventSener", data_json)
-		
+
 	end
+end
+
+local function packetJobsUpdate()
+	log('D', 'packetJobsUpdate', dump(data))
+	TriggerEventSener("packetJobsUpdate")
 end
 
 local function CarReplace(data_json)
@@ -147,18 +146,14 @@ M.onExtensionLoaded = onExtensionLoaded
 M.profsUpdate = profsUpdate
 M.ProfsButtonUpdate = ProfsButtonUpdate
 M.startworkbutton = startworkbutton
-M.SendpacketBalanceUpdate = SendpacketBalanceUpdate
 M.balanceUpdate = balanceUpdate
 M.trigerJobsPost = trigerPost
 M.playSound = playSound
-M.onfreezeVehicle = onfreezeVehicle
 M.onJoinServer = onJoinServer
 M.gpsset = gpsset
-M.clearFocus = clearFocus
 M.Notify = Notify
 M.DeleteCheckpoint = DeleteCheckpoint
 M.CarReplace = CarReplace
-M.onExtensionLoaded = onExtensionLoaded
 M.onBeamNGTrigger = onBeamNGTrigger
-
+M.packetJobsUpdate = packetJobsUpdate
 return M;

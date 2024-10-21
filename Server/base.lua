@@ -55,6 +55,15 @@ function log(message, weight)
 	::zcontinue::
     end
 
+function table:extended(parent)
+    setmetatable(self,{__index = parent})
+end
+
+function extended(child, parent)
+    setmetatable(child,{__index = parent})
+end
+
+
 local pluginPath = debug.getinfo(1).source:gsub("\\","/")
 pluginPath = pluginPath:sub(1,(pluginPath:find("base.lua"))-2)
 package.path = package.path .. ";;" .. pluginPath .. "/?.lua;;".. pluginPath .. "/lua/?.lua"
@@ -63,6 +72,7 @@ package.cpath = package.cpath .. ";;" .. pluginPath .. "/?.so;;" .. pluginPath .
 M.pluginName = "Economic_Plugin"
 M.pluginPath = pluginPath
 M.onShut = {}
+M.command = {}
 
 log(pluginPath,4)
 smallfunc = require "lib/other"
@@ -77,6 +87,7 @@ log("Время сервера с учётом коррекции: "..get_hour()
 -- Чат + Консолька
 
 function MyChatMessageHandler(sender_id, sender_name, message)
+	log({ sender_id, sender_name, message },3)
 	return handlers(sender_id, sender_name, message)
 end
  
@@ -84,45 +95,69 @@ function MyCmdHandler(message)
 	return handlers(-2,"CMD",message)
 end
 
+function SendNotify(playerId, color, title, text)
+    --'yellow': notification.type === 'yellow',
+    -- 'red': notification.type === 'red',
+    -- 'green': notification.type === 'green'
+    if color == "yellow" then
+        MP.TriggerClientEvent(playerId, "PacketNotify", Util.JsonEncode({color="yellow", title=title, text=text}))
+    elseif color == "red" then
+        MP.TriggerClientEvent(playerId, "PacketNotify", Util.JsonEncode({color="red", title=title, text=text}))
+    elseif color == "green" then
+        MP.TriggerClientEvent(playerId, "PacketNotify", Util.JsonEncode({color="green", title=title, text=text}))
+    else
+        log("Неизвестный цвет уведомления: " .. color,3)
+    end
+end
+
 function SendMessage(id,message) --todo add support notification by offline
+	log({id,message},3)
 	if message == nil then
 		message = id
 		id = -2
 	end
+	log({id,message},3)
 	if id == nil then
 		return nil
 	end
+	log({id,message},3)
 	if id == -2 or id == "CMD" then -- консолька
 		printRaw("["..M.pluginName.."] Message to Console: "..message)
 	else
+		log({id,message},3)
 		if type(message) ~= "string" then
 			message = tostring(message)
 		end
-
-		if id:is_integer() then
+		log({id,message},3)
+		if is_integer(id) then
 			id = tonumber(id)
 		elseif MP.GetId(id) == nil then
 			-- SaveOffline
 			notify:addNotification(id,message)
 			return
 		end
+
 		if #message <= 200 then
 			SendNotify(id, "yellow", "Оповещение", message)
 		end
-
+		log({id,message},3)
 		message = split(message,"\n")
+		log({id,message},3)
         for _,messages in ipairs(message) do
             MP.SendChatMessage(id, messages)
         end
-
 	end
 end
 
 MP.SendMessage = SendMessage
 
 function run(case,sender_id,sender_name,message)
+	log({ case, sender_id, sender_name },3)
 	message = message or ""
 	log(case.command.." "..case.func.." "..message.." "..sender_name,2)
+	if sender_id ~= -1 then
+        MP.TriggerClientEvent(sender_id, "PacketbalanceUpdate", tostring(eco:value(sender_name,"money")))
+    end
 	if sender_name ~= "CMD" then
 		local permms = permission.decorator(case.roles)
 		permms(MP.TriggerLocalEvent,case.reg,sender_id,sender_name,message)
@@ -133,10 +168,12 @@ function run(case,sender_id,sender_name,message)
 end
 
 function handlers(sender_id, sender_name, message)
+	log({ sender_id, sender_name, message },3)
 	if message:sub(1,1) ~= "!" then return 0 end -- если сообщение не начинается с "!", возвращаем 0
 	local cmd, args = message:match("!([^%s]+)%s*(.*)") -- ищем команду и аргументы в сообщении
 	if not cmd then return 0 end -- если команда не найдена, возвращаем 0
-	local cmd = "!"..cmd -- bal -> !bal
+	cmd = "!"..cmd -- bal -> !bal
+	log({cmd,args},3)
 	for _, case in ipairs(M.command) do -- проходим по массиву команд
 	    cmd = cmd:gsub("!", "")
 	    if case.category == cmd then
@@ -174,7 +211,6 @@ function import(NameModule, com, adver)
 		end
 		M.onShut[#M.onShut+1] = Mods.unload
 		Mods.pluginPath = M.pluginPath
-		Mods.group = Group
 		Mods.parrent = M
 		Mods.load()
 		local data = RegEvent(Mods.command)

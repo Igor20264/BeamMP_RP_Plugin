@@ -36,7 +36,7 @@ function HELP(sender_id, sender_name, message)
 	else
 		local all_category = {}
 		local cleared = {}
-		for _,case in ipairs(M.command) do
+		for _,case in ipairs(M.parrent.command) do
 			if case.category ~= nil then
 				all_category[case.category] = true
 			end
@@ -51,14 +51,14 @@ function HELP(sender_id, sender_name, message)
 	end
 
 	if category_target ~= "" then
-		for _,case in ipairs(M.command) do
+		for _,case in ipairs(M.parrent.command) do
 			if case.category == category_target and (case.hide == false or case.hide == nil) then
 				text_message = text_message..(permissions:role_in_roles('admin',case.roles) and "[A]" or "")..config.prefix..""..case.category.." "..case.command.." "..case.args.." |\t "..case.help.."\n"
 			end
 		end
 	else
 		local trues = {}
-		for i,case in ipairs(M.command) do
+		for i,case in ipairs(M.parrent.command) do
 			if (page-10 < i and i <= page) and case.hide == false then
 				if trues[case.roles] == true or permissions:roles_in_roles(case.roles,sender_name) then
 					trues[case.roles] = true
