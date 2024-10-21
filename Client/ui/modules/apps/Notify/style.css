@@ -1,30 +1,31 @@
 .not-block {
-    position: fixed; /* Установлено на fixed */
-    bottom: 0; /* Уведомления появляются снизу */
+    position: fixed;
+    bottom: 0;
     width: 100%;
     display: flex;
-    flex-direction: column; /* Уведомления располагаются вертикально */
+    flex-direction: column;
     align-items: center;
-    z-index: 1000; /* Убедитесь, что уведомления находятся поверх других элементов */
+    z-index: 1000;
 }
 
 .notif {
     width: 70%;
-    background: rgba(34, 33, 35, 0.8);
-    border-radius: 15px;
-    min-height: 6vh;
+    background: rgba(34, 33, 35, 0.9);
+    border-radius: 10px;
+    min-height: 5vh;
     font-family: "TTNorms", sans-serif;
-    padding: 1vh 4vh;
+    padding: 0.5vh 2vh;
     white-space: nowrap;
-    margin-top: 1vh; /* Отступ между уведомлениями */
+    margin-top: 1vh;
     position: relative;
-    opacity: 1; /* Убедитесь, что уведомления видимы */
-    transition: opacity 0.5s ease; /* Плавный переход для появления */
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    overflow: hidden; /* Скрыть содержимое, выходящее за пределы */
 }
 
 .animate-show-hide.ng-hide {
-    opacity: 0; /* Уведомление скрывается с помощью изменения прозрачности */
-    transition: opacity 0.5s ease; /* Плавный переход для скрытия */
+    opacity: 0;
 }
 
 .loading {
@@ -33,19 +34,21 @@
     left: 0;
     top: 0;
     height: 100%;
-    border-radius: 15px;
+    border-radius: 10px;
+    transition: width 0.5s ease; /* Плавный переход для ширины */
+    width: 0; /* Начальная ширина 0 */
 }
 
 .green {
-    background: rgba(120, 158, 97, 0.2);
+    background: linear-gradient(135deg, rgba(120, 158, 97, 0.8), rgba(120, 158, 97, 0.5));
 }
 
 .red {
-    background: rgba(174, 52, 52, 0.2);
+    background: linear-gradient(135deg, rgba(174, 52, 52, 0.8), rgba(174, 52, 52, 0.5));
 }
 
 .yellow {
-    background: rgba(255, 185, 67, 0.2);
+    background: linear-gradient(135deg, rgba(255, 185, 67, 0.8), rgba(255, 185, 67, 0.5));
 }
 
 /* Иконки */
@@ -53,30 +56,27 @@
 .no-icon,
 .good-icon {
     margin: 0;
-    position: absolute; /* Позиционирование иконок */
+    position: absolute;
+    transition: transform 0.3s ease;
 }
 
-.animate-show-hide.ng-hide-add {
-    transform: translateY(20px); /* Сдвиг вниз при появлении */
-    opacity: 0; /* Начальная прозрачность */
-}
-
-.animate-show-hide.ng-hide-remove {
-    transform: translateY(0); /* Возвращение на место */
-    opacity: 1; /* Полная непрозрачность */
+.info-icon:hover,
+.no-icon:hover,
+.good-icon:hover {
+    transform: scale(1.1);
 }
 
 .info-icon {
-    left: 12px; /* Позиция иконки */
-    width: 30px;
-    height: 30px;
+    left: 12px;
+    width: 25px;
+    height: 25px;
     background-image: url("./svg/info.svg");
     background-size: contain;
     background-repeat: no-repeat;
 }
 
 .no-icon {
-    left: 12px; /* Позиция иконки */
+    left: 12px;
     width: 20px;
     height: 20px;
     background-image: url("./svg/no.svg");
@@ -85,11 +85,26 @@
 }
 
 .good-icon {
-    left: 10px; /* Позиция иконки */
+    left: 10px;
     filter: drop-shadow(0px 0px 10px rgba(120, 158, 97, 0.5));
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     background-image: url("./svg/good.svg");
     background-size: contain;
     background-repeat: no-repeat;
+}
+
+.notification {
+    padding-left: 40px;
+}
+
+.not-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #ffffff;
+}
+
+.not-text {
+    font-size: 0.9em;
+    color: #f0f0f0;
 }
