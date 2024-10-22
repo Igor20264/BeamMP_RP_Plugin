@@ -21,9 +21,9 @@ end
 function skipPlayers(egg)
 	settings.setValue("skipOtherPlayersVehicles", true)
 	settings.setValue("nameTagFadeEnabled", egg)
-	settings.setValue("nameTagFadeDistance", 5)
-	settings.setValue("hideNameTags", false)	
-	settings.setValue("simplifyRemoteVehicles", false)	
+	settings.setValue("nameTagFadeDistance", 20)
+	settings.setValue("hideNameTags", false)
+	settings.setValue("simplifyRemoteVehicles", false)
 	settings.requestSave()
 end
 

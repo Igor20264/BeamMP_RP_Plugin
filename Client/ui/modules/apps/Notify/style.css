@@ -1,5 +1,5 @@
 .not-block {
-    position: fixed; /* Установлено на fixed */
+    position: absolute; /* Установлено на fixed */
     bottom: 0; /* Уведомления появляются снизу */
     width: 100%;
     display: flex;
@@ -7,45 +7,73 @@
     align-items: center;
     z-index: 1000; /* Убедитесь, что уведомления находятся поверх других элементов */
 }
-
+.notification{
+    height: auto;
+    width: auto;
+}
 .notif {
-    width: 70%;
+    width: 80%;
     background: rgba(34, 33, 35, 0.8);
     border-radius: 15px;
-    min-height: 6vh;
-    font-family: "TTNorms", sans-serif;
-    padding: 1vh 4vh;
+    min-height: 8vh;
+    font-family: "TTNorms";
+    font-size: 1.1rem;
+    padding: 1.2vh 4vh;
     white-space: nowrap;
-    margin-top: 1vh; /* Отступ между уведомлениями */
+    margin-top: 1vh;
     position: relative;
-    opacity: 1; /* Убедитесь, что уведомления видимы */
-    transition: opacity 0.5s ease; /* Плавный переход для появления */
+    opacity: 0; /* Начальная прозрачность */
+    transform: translateY(40px); /* Начальное смещение */
+    transition: transform 1.5s 0.5s ease-in, opacity 1.8s ease ; /* Плавный переход для появления */
+    line-height: 1; /* Высота строки для лучшей читаемости */
 }
-
-.animate-show-hide.ng-hide {
-    opacity: 0; /* Уведомление скрывается с помощью изменения прозрачности */
-    transition: opacity 0.5s ease; /* Плавный переход для скрытия */
+.not-title {
+    color: white; /* Цвет заголовка */
+    font-weight: bold; /* Жирный шрифт для заголовка */
+    margin-bottom: 0.6vh; /* Отступ между заголовком и текстом */
 }
-
+.not-text {
+    color: rgb(204, 204, 204); /* Цвет основного текста */
+    line-height: 1.5; /* Высота строки для лучшей читаемости */
+    max-height: 4.5em; /* Максимальная высота для 3 строк (1.5em * 3) */
+    overflow: hidden; /* Скрывает текст, выходящий за пределы */
+    white-space: normal; /* Позволяет тексту переноситься на новую строку */
+    display: block; /* Убедитесь, что элемент блочный */
+}
+.notif.show {
+    opacity: 1; /* Полная непрозрачность при показе */
+    transform: translateY(0); /* Возвращение на место при показе */
+}
+@font-face {
+	font-family: "TTNorms";
+	src: url("./TTNormsThin.ttf");
+	font-style: normal;
+	font-weight: normal;
+}
 .loading {
     position: absolute;
     white-space: nowrap;
     left: 0;
     top: 0;
+    width: 1;
     height: 100%;
     border-radius: 15px;
+    transition: width 1.0s ease;
 }
 
 .green {
     background: rgba(120, 158, 97, 0.2);
+    color: azure;
 }
 
 .red {
     background: rgba(174, 52, 52, 0.2);
+    color: azure;
 }
 
 .yellow {
     background: rgba(255, 185, 67, 0.2);
+    color: azure;
 }
 
 /* Иконки */

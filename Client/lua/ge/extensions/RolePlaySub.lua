@@ -1,7 +1,7 @@
 local M = {}
 
 local CheckPoint
-local balance
+local balance = 0
 
 
 local function setgps(x,y,z)

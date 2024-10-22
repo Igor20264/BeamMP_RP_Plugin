@@ -11,7 +11,7 @@
         "height": "90px"
     },
     "description": "Интерфейс для оповещений",
-    "author": "SubterraniaTeam",
+    "author": "BeamMP_RP_Plugin",
     "version": "0.1",
     "directive": "roleplaynot"
   }

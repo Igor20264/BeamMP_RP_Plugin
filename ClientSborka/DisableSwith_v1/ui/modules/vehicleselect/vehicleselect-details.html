@@ -9,11 +9,9 @@
 
   <div class="container veh-list" bng-nav-scroll>
     <div ng-repeat="config in vehicle.shownData | orderObjectBy:'orderKey'">
-      <div class="veh-item" ng-class="{ selected: vehicle.selectedConfig && vehicle.selectedConfig.key === config.key }"
-        bng-sound-class="bng_click_hover_generic"
+      <div class="veh-item" ng-class="{ selected: vehicle.selectedConfig && vehicle.selectedConfig.key === config.key }" bng-sound-class="bng_click_hover_generic"
         bng-nav-item nav-item-enter-focus="{{ :: 0 === $index }}"
-        bng-all-clicks-no-nav single="vehicle.selectAction(config.key)" double="vehicle.launchConfig(false)"
-        ng-focus="vehicle.selectConfig(config.key, false)"
+        bng-all-clicks-no-nav single="vehicle.selectAction(config.key)" double="vehicle.launchConfig(false)" ng-focus="vehicle.selectConfig(config.key, false)"
       >
         <bng-box>
           <imageslider imageurls="config.preview" class="veh-image"></imageslider>

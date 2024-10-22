@@ -2,13 +2,13 @@ var app = angular.module('beamng.apps');
 
 
 app.directive('roleplaynot', [function () {
-	return {
-		templateUrl: '/ui/modules/apps/Notify/app.html',
-		replace: true,
-		restrict: 'EA',
-		scope: true,
-		controllerAs: 'ctrl'	
-	}
+    return {
+        templateUrl: '/ui/modules/apps/Notify/app.html',
+        replace: true,
+        restrict: 'EA',
+        scope: true,
+        controllerAs: 'ctrl'
+    }
 }]);
 
 app.controller("NotifyInit", ['$scope', '$timeout', function ($scope, $timeout) {
@@ -26,13 +26,12 @@ app.controller("NotifyInit", ['$scope', '$timeout', function ($scope, $timeout) 
         bngApi.engineLua('setCEFFocus(true)');
     };
 
-	$scope.showNotification = function(type, title, text, duration) {
-        var width = (type === 'green' ? 65 : (type === 'yellow' ? 60 : 50)); // Example logic for width based on type
+    $scope.showNotification = function(type, title, text, duration) {
         var notification = {
             type: type,
             title: title,
             text: text,
-            width: width,
+            width: 0,
             visible: true
         };
 
@@ -43,15 +42,15 @@ app.controller("NotifyInit", ['$scope', '$timeout', function ($scope, $timeout) 
             $scope.notifications.shift(); // Удаляет первое уведомление
         }
 
-
         $timeout(function() {
-            notification.visible = false; // Уведомление исчезает через заданное время
-        }, duration || 5000); // Установите время исчезновения по умолчанию
+            notification.width = 100; // Set width to 100 after a short delay
+        }, 1500); // Delay to allow the DOM to update
+
     };
 
-    $scope.$on('setNotify', function (event, color, title, text) {
-		$scope.showNotification( color, title, text, 5000);
-	});
+    $scope.$on('setNotify', function (event, color, title, text, duration) {
+        $scope.showNotification(color, title, text, duration);
+    });
 
     // Example call for testing
 }]);

@@ -22,10 +22,11 @@ local function split(inputstr, sep)
 	local t={}
 	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do table.insert(t, str) end
 	return t
-end 
+end
+
 --
 
-local function getCarpLightsGroup()
+local function getAllLightsGroup()
 	dataLights = {}
 	dataLightsBrightness = {}
 	
@@ -136,7 +137,7 @@ local function updateLightsTime()
     return
   end	
   if dataLights == nil then
-    getCarpLightsGroup()
+    getAllLightsGroup()
     return
   end
 	if setDistance == 0 then
@@ -232,14 +233,11 @@ local function SpawnCar(data)
 	if type(data) ~= "table" then
 		data = json.decode(data)
 	end
-
-	print("DEBUG CAR SPAWN")
-	dump(data)
-
 	local vih = core_vehicles.spawnNewVehicle(data["model"], data.data)
 	vih:queueLuaCommand(data.run_queue)
 	load("local ids = "..(vih:getId())..";"..data["cmd"])()
-	print("Vehicle spawned")
+	print("data.data: " .. data.data)
+	print("data.run_queue:" .. data.run_queue)
     return
 end
 
@@ -248,14 +246,14 @@ local function block(data)
 	--MPVehicleGE.nameTagFadeEnabled(true)
 	extensions.core_input_actionFilter.setGroup("restrictions", data)
 	extensions.core_input_actionFilter.addAction(0, "restrictions", true)
-	core_gamestate.setGameState("career", "multiplayer", "career")
+	core_gamestate.setGameState("career", "BeamMP_RP_Plugin", "career")
 	skipPlayers(true)
 end
 
 local function unblock(data)
 	extensions.core_input_actionFilter.addAction(0, "restrictions", false)
 	skipPlayers(false)
-	core_gamestate.setGameState("multiplayer", "multiplayer", "multiplayer")
+	core_gamestate.setGameState("multiplayer", "BeamMP_RP_Plugin", "multiplayer")
 end
 
 local function onUpdate(dtReal, dtSim, dtRaw)
@@ -264,12 +262,9 @@ local function onUpdate(dtReal, dtSim, dtRaw)
         currTime = 0
         updateLightsTime()
     end
-	
 	if true == editor_main.isEditorActive() then
 		RESETLIGHTCHANH()
 	end
-	
-	
 	MPVehicleGE.hideNicknames(false)
 end
 

@@ -11,7 +11,7 @@
         "height": "130px"
     },
     "description": "Интерфейс для профессий",
-    "author": "SubterraniaTeam",
+    "author": "BeamMP_RP_Plugin",
     "version": "0.1",
     "directive": "roleplayjobs"
   }

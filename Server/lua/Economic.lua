@@ -20,7 +20,7 @@ end
 
 function Eco:join(id)
     if self.database[MP.GetPlayerName(id)] == nil then
-        self.database[MP.GetPlayerName(id)] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence)}
+        self.database[MP.GetPlayerName(id)] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false,time_work = false, time_minute = 0}, drivelicence = table.shallow_copy(config.drivelicence)}
         eco.database[MP.GetPlayerName(id)]["drivelicence"]["A"] = true
         self:save()
     end
