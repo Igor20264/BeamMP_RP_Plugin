@@ -155,15 +155,15 @@ function run(case,sender_id,sender_name,message)
 	log({ case, sender_id, sender_name },3)
 	message = message or ""
 	log(case.command.." "..case.func.." "..message.." "..sender_name,2)
-	if sender_id ~= -1 then
-        MP.TriggerClientEvent(sender_id, "PacketbalanceUpdate", tostring(eco:value(sender_name,"money")))
-    end
 	if sender_name ~= "CMD" then
 		local permms = permission.decorator(case.roles)
 		permms(MP.TriggerLocalEvent,case.reg,sender_id,sender_name,message)
 	else
 		MP.TriggerLocalEvent(case.reg,sender_id,sender_name,message)
 	end
+	if sender_id ~= -2 then
+        MP.TriggerClientEvent(sender_id, "PacketbalanceUpdate", tostring(eco:value(sender_name,"money")))
+    end
 	return
 end
 
