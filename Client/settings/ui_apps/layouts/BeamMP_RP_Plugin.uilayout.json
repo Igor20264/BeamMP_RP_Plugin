@@ -46,18 +46,6 @@
       }
     },
     {
-      "appName":"multiplayerchat",
-      "placement":{
-        "bottom":"0px",
-        "height":"275px",
-        "left":"0px",
-        "position":"absolute",
-        "right":"",
-        "top":"",
-        "width":"580px"
-      }
-    },
-    {
       "appName":"messages",
       "placement":{
         "bottom":"",
@@ -118,12 +106,12 @@
     {
       "appName":"simpleTime",
       "placement":{
-        "bottom":"",
-        "height":"50px",
-        "left":"0px",
+        "bottom":"0px",
+        "height":"40px",
+        "left":"460px",
         "position":"absolute",
         "right":"",
-        "top":"0px",
+        "top":"",
         "width":"90px"
       }
     },
@@ -165,6 +153,30 @@
       },
       "settings":{
         "noCockpit":true
+      }
+    },
+    {
+      "appName":"roleplaybal",
+      "placement":{
+        "bottom":"0px",
+        "height":"40px",
+        "left":"255px",
+        "position":"absolute",
+        "right":"",
+        "top":"",
+        "width":"210px"
+      }
+    },
+    {
+      "appName":"multiplayerchat",
+      "placement":{
+        "bottom":"0px",
+        "height":"270px",
+        "left":"0px",
+        "position":"absolute",
+        "right":"",
+        "top":"",
+        "width":"580px"
       }
     }
   ],
