@@ -87,7 +87,6 @@ log("Время сервера с учётом коррекции: "..get_hour()
 -- Чат + Консолька
 
 function MyChatMessageHandler(sender_id, sender_name, message)
-	log({ sender_id, sender_name, message },3)
 	return handlers(sender_id, sender_name, message)
 end
  
@@ -111,24 +110,19 @@ function SendNotify(playerId, color, title, text)
 end
 
 function SendMessage(id,message) --todo add support notification by offline
-	log({id,message},3)
 	if message == nil then
 		message = id
 		id = -2
 	end
-	log({id,message},3)
 	if id == nil then
 		return nil
 	end
-	log({id,message},3)
 	if id == -2 or id == "CMD" then -- консолька
 		printRaw("["..M.pluginName.."] Message to Console: "..message)
 	else
-		log({id,message},3)
 		if type(message) ~= "string" then
 			message = tostring(message)
 		end
-		log({id,message},3)
 		if is_integer(id) then
 			id = tonumber(id)
 		elseif MP.GetId(id) == nil then
@@ -140,9 +134,7 @@ function SendMessage(id,message) --todo add support notification by offline
 		if #message <= 200 then
 			SendNotify(id, "yellow", "Оповещение", message)
 		end
-		log({id,message},3)
 		message = split(message,"\n")
-		log({id,message},3)
         for _,messages in ipairs(message) do
             MP.SendChatMessage(id, messages)
         end
@@ -152,7 +144,6 @@ end
 MP.SendMessage = SendMessage
 
 function run(case,sender_id,sender_name,message)
-	log({ case, sender_id, sender_name },3)
 	message = message or ""
 	log(case.command.." "..case.func.." "..message.." "..sender_name,2)
 	if sender_name ~= "CMD" then
@@ -168,12 +159,10 @@ function run(case,sender_id,sender_name,message)
 end
 
 function handlers(sender_id, sender_name, message)
-	log({ sender_id, sender_name, message },3)
 	if message:sub(1,1) ~= "!" then return 0 end -- если сообщение не начинается с "!", возвращаем 0
 	local cmd, args = message:match("!([^%s]+)%s*(.*)") -- ищем команду и аргументы в сообщении
 	if not cmd then return 0 end -- если команда не найдена, возвращаем 0
 	cmd = "!"..cmd -- bal -> !bal
-	log({cmd,args},3)
 	for _, case in ipairs(M.command) do -- проходим по массиву команд
 	    cmd = cmd:gsub("!", "")
 	    if case.category == cmd then

@@ -230,6 +230,7 @@ local function SendToServerData(name)
 end
 
 local function SpawnCar(data)
+	log('I', 'spawn', data)
 	if type(data) ~= "table" then
 		data = json.decode(data)
 	end
@@ -242,6 +243,7 @@ local function SpawnCar(data)
 end
 
 local function block(data)
+	log('I', 'Block', data)
 	local data = split(data," ")
 	--MPVehicleGE.nameTagFadeEnabled(true)
 	extensions.core_input_actionFilter.setGroup("restrictions", data)
@@ -251,6 +253,7 @@ local function block(data)
 end
 
 local function unblock(data)
+	log('I', 'unBlock', data)
 	extensions.core_input_actionFilter.addAction(0, "restrictions", false)
 	skipPlayers(false)
 	core_gamestate.setGameState("multiplayer", "BeamMP_RP_Plugin", "multiplayer")
