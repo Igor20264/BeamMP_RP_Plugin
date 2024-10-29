@@ -6,22 +6,8 @@ os.execute( "chcp 65001 > nul" )
 math.randomseed(os.clock()*os.clock())
 
 inspect = require "lib/inspect"
+
 function log(message, weight)
-	--[[
-	local weight = 3
-	local unpack = {}
-	if type(...) == "number" then
-		weight = ...
-	else
-		unpack = table.unpack(...)
-		if #unpack > 1 then
-			weight = unpack[#unpack]
-			table.remove(unpack, #unpack)
-		else
-			weight = unpack[1]
-		end
-	end
-	--]]
 	if message == nil or message == "" then goto zcontinue end
 	message = inspect(message,unpack)
     weight = weight or 1 -- если вес не указан, используем 0
@@ -53,7 +39,7 @@ function log(message, weight)
 		printRaw("["..M.pluginName.."] ["..type.."] ["..funcname.."] ".. color .. message .. "\27[0m")
 	end
 	::zcontinue::
-    end
+end
 
 function table:extended(parent)
     setmetatable(self,{__index = parent})
@@ -93,6 +79,21 @@ end
 function MyCmdHandler(message)
 	return handlers(-2,"CMD",message)
 end
+-- @param text string
+-- @param playerId number
+-- @param category string
+-- @param icon string
+--[[ maybi text
+ServerNotify(0,'lox','instability', "warning")
+ 5, "bullettime"
+ 0, 'MINIMAP_HELP'
+ 6, "refueling"
+ 5, "replay"
+]]
+function ServerNotify(playerId,text,category,icon)
+	MP.SendNotification(playerId, text, category, icon)
+end
+
 --MP.TriggerClientEvent(0, "PacketNotify", Util.JsonEncode({color="yellow", title="LOX", text="PIDOR"}))
 function SendNotify(playerId, color, title, text)
     --'yellow': notification.type === 'yellow',

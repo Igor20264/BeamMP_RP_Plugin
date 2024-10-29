@@ -234,7 +234,7 @@ function CarsRentAccept(sender_id, sender_name, message)
             eco:add(sender_name, "money", -math.abs(rentalRequests[sender_name].cost))
             eco:add(rentalRequests[sender_name].owner, "money", math.abs(rentalRequests[sender_name].cost))
             cars:transfer(owner, sender_name, id, true) -- Передаем машину в аренду
-            testDriveCars[requestData.tester] = requestData.shallow_copy()
+            testDriveCars[sender_name] = rentalRequests[sender_name].shallow_copy()
             rentalRequests[sender_name] = nil
         else
             SendMessage(sender_id, "У вас недостаточно денег для аренды.")
@@ -279,7 +279,6 @@ M.command = {
     { category = "carrent", command = "show", help = "Показать все предложения о аренде.", func = "CarsRentShow"},
 }
 
-M.lastCar = lastCar
 function M.load()
     HeventTimer.addFunc(CheckTestDrive, 30) --, MP.CallStrategy.Precise
     --[[

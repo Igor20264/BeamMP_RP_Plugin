@@ -761,6 +761,7 @@ local function add_number_info(number)
 end
 
 function SaveCarEveryXsec()
+    local olddata = table:shallow_copy(posCar)
     for i, name in pairs(MP.GetPlayers()) do
         if lastCar[name] ~= nil and lastCar[name].ret.jbm ~= "unicycle" and lastCar[name].licenss_plate ~= nil then
             local vehicles = MP.GetPlayerVehicles(tonumber(i))
@@ -777,7 +778,7 @@ function SaveCarEveryXsec()
             end
         end
     end
-    if math.random(1,100) == 10 then
+    if posCar ~= olddata and math.random(1,100) == 10 then
         forced_save_database("position_on_lic_plate.ixt",posCar)
     end
     return true
