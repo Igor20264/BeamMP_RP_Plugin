@@ -805,7 +805,7 @@ M.command = {
     {category = "car",command = "fixnick", help = "Востановить сломанные ники.",func = "RegenerateNick", roles = {"moderator","admin"}},
     {category = "car",command = "sellgos", help = "Отправить предложение о покупке. ",args = "yes [имя машины]", func = "CarsSellGos"},
 }
-
+--Fix 
 M.lastCar = lastCar
 function M.load()
     MP.RegisterEvent("onVehicleSpawn","CarsCheckCreate")
