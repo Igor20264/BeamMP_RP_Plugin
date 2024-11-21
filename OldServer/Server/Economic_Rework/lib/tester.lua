@@ -1,6 +1,6 @@
 local M = {}
 
-M.function generateRandomData(size)
+function M.generateRandomData(size)
   local chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ0123456789'
   local charTable = {}
   for c in chars:gmatch"." do

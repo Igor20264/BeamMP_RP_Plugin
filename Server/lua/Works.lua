@@ -112,7 +112,7 @@ function Working:init()
 			return money, true
 		end
     end
-
+-- вернул
     function obj:stats(name)
         return privat.working[name]
     end

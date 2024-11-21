@@ -242,6 +242,8 @@ local function SpawnCar(data)
     return
 end
 
+-- local blockedActions = core_input_actionFilter.createActionTemplate({"vehicleTeleporting", "vehicleMenues", "physicsControls", "aiControls", "vehicleSwitching", "funStuff"}, actionWhitelist)
+
 local function block(data)
 	log('I', 'Block', data)
 	local data = split(data," ")

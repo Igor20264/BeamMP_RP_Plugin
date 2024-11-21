@@ -125,7 +125,7 @@ function AddPlayTime()
     end
     for _, player in pairs(MP.GetPlayers()) do
         playdtimeexmp:add(player, 10*60)
-        local ret = playdtimeexmp:get(sender_name) or 0
+        local ret = playdtimeexmp:get(player) or 0
         if ret ~= nil then
             if type(ret) == "string" then
                 ret = tonumber(ret)
