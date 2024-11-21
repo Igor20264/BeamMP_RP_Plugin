@@ -85,11 +85,11 @@ end
 --Cars:extended(DB)
 extended(Cars, DB)
 
-function Cars:new(owner,perBuy) --perBuy[sender_name]
-    local config = files.try_read_config(perBuy.path)
-    config.vars = perBuy.vars
-    config.paints = perBuy.color
-    config.partConfigFilename = perBuy.path
+function Cars:new(owner,sperBuy) --perBuy[sender_name]
+    local config = files.try_read_config(sperBuy.path)
+    config.vars = sperBuy.vars
+    config.paints = sperBuy.color
+    config.partConfigFilename = sperBuy.path
     config = Util.JsonEncode(config)
     local udv = UDV(config)
     log(udv)
@@ -107,10 +107,10 @@ function Cars:new(owner,perBuy) --perBuy[sender_name]
     end
 
     self.database[owner][uuid] = {
-        licenss_plate = CarPlate(),coast = perBuy.price, configuration = config,confiscation = false,
-		former_owners = {},name = perBuy.model,category = cars_category[udv.jbm],engine=udv.engine,transmission=udv.transmission,transfer_case=udv.transfer_case,body=udv.body,
-        path = perBuy.path,jbm = udv.jbm,
-        nickname=(perBuy.model):sub(0,math.min(#(perBuy.model)-1,3))..""..Gen.generateRandomData(3)}
+        licenss_plate = CarPlate(),coast = sperBuy.price, configuration = config,confiscation = false,
+		former_owners = {},name = sperBuy.model,category = cars_category[udv.jbm],engine=udv.engine,transmission=udv.transmission,transfer_case=udv.transfer_case,body=udv.body,
+        path = sperBuy.path,jbm = udv.jbm,
+        nickname=(sperBuy.model):sub(0,math.min(#(sperBuy.model)-1,3))..""..Gen.generateRandomData(3)}
     self:save()
     return #self.database[owner]+1
 end
@@ -651,7 +651,12 @@ function BuyCar(sender_id, sender_name, message)
         print("Ошибка: CarCoast[perBuy[sender_name].path] не существует")
         return
     end
-    if files.try_read_config(perBuy.path) == nil then
+    if perBuy.path == nil then
+        SendMessage(sender_id, "Ошибка: не удалось найти данные о модели машины.")
+        print(perBuy)
+        return
+    end
+    if perBuy.path ~= nil and files.try_read_config(perBuy.path) == nil then
         SendMessage(sender_id, "Ошибка: Данная модель машины не существует. Свяжитесь с администратором. Код ошибки: '"..perBuy.path.." is nil'")
         print("Ошибка: files.try_read_config(perBuy.path) == nil")
         return
