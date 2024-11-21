@@ -428,8 +428,21 @@ end
 function CarsFix(sender_id,sender_name, message)
     local id = cars:getidbynickname(sender_name,message)
     local price = cars.database[sender_name][id].coast
+    if CTS[sender_name] == nil then
+        SendMessage(sender_id,"Ошибка. Не удалось получить пользователя.")
+    end
+    if CTS[sender_name].custom ~= nil and CTS[sender_name].custom.repair == nil then
+        SendMessage(sender_id,"Ошибка. Не удалось получить стоймость ремонта машины.")
+        return
+    end
+    if price == nil then
+        SendMessage(sender_id,"Ошибка. Не удалось получить стоимость машины из данных.")
+    end
     if CTS[sender_name].custom ~= nil and CTS[sender_name].custom.repair ~= nil then
-        price = ((CTS[sender_name].custom.repair/config.percent_repair)*price):round(1)
+        -- Получаем процент повреждения
+        local damage = CTS[sender_name].custom.repair/config.percent_repair
+        local price_damage = damage*price
+        price = round(price_damage,1)
     else
         SendMessage(sender_id,"Ошибка. Не удалось получить стоймость ремонта машины.")
         return
@@ -651,13 +664,13 @@ function BuyCar(sender_id, sender_name, message)
         print("Ошибка: CarCoast[perBuy[sender_name].path] не существует")
         return
     end
-    if perBuy.path == nil then
+    if perBuy[sender_name].path == nil then
         SendMessage(sender_id, "Ошибка: не удалось найти данные о модели машины.")
         print(perBuy)
         return
     end
-    if perBuy.path ~= nil and files.try_read_config(perBuy.path) == nil then
-        SendMessage(sender_id, "Ошибка: Данная модель машины не существует. Свяжитесь с администратором. Код ошибки: '"..perBuy.path.." is nil'")
+    if perBuy[sender_name].path ~= nil and files.try_read_config(perBuy[sender_name].path) == nil then
+        SendMessage(sender_id, "Ошибка: Данная модель машины не существует. Свяжитесь с администратором. Код ошибки: '"..perBuy[sender_name].path.." is nil'")
         print("Ошибка: files.try_read_config(perBuy.path) == nil")
         return
     end

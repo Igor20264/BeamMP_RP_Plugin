@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           script: |
-            docker stop server_beammp-server_dev1
+            docker stop server_dev_beammp-server_1
             rm -rf /root/server_dev/server-mods/BeamMP_RP_Plugin
             mkdir /root/server_dev/server-mods/BeamMP_RP_Plugin
             cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin
@@ -74,4 +74,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           script: |
-            docker start server_beammp-server_dev1
+            docker start server_dev_beammp-server_1
