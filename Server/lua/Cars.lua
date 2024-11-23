@@ -452,7 +452,7 @@ function CarsFix(sender_id,sender_name, message)
         return
     end
     eco:add(sender_name,"money",-price)
-    SendMessage(sender_id,"Ваша машина ремонтируется. С вашего счёта было списанно: "..price.." "..config.currency.." | Ремонт будет завершится через 150 секунд.")
+    SendMessage(sender_id,"Ваша машина ремонтируется. С вашего счёта было списанно: "..price.." "..config.currency.." | Ремонт завершится через 150 секунд.")
     RemoutRun(sender_id,"extensions.core_input_actionFilter.setGroup('FREEZ', {'accelerate','brake','accelerate_brake','shiftUp','activateStarterMotor','switch_previous_vehicle','switch_next_vehicle','switch_next_vehicle_multiseat','nodegrabberRender','toggleWalkingMode'});extensions.core_input_actionFilter.addAction(0, 'FREEZ', true)") -- freez
     HeventTimer.Createtask(150,UncarFix,sender_id.."Unfreez",sender_id)
 end

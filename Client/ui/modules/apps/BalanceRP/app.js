@@ -12,7 +12,7 @@ app.directive('roleplaybal', [function () {
 }]);
 
 app.controller("BalanceInit", ['$scope', function ($scope) {
-	$scope.init = function() {bngApi.engineLua('RolePlaySub.SendpacketBalanceUpdate()');};
+	$scope.init = function() {bngApi.engineLua('RolePlaySub.balanceUpdate()');};
 	$scope.reset = function() {$scope.init();};
 	$scope.select = function() {bngApi.engineLua('setCEFFocus(true)');};
 
