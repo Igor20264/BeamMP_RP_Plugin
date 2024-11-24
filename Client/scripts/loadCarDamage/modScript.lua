@@ -1,1 +1,0 @@
-extensions.load("loadCarDamage")

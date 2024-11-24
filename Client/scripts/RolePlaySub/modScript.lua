@@ -1,2 +1,0 @@
-load("RolePlaySub")
-registerCoreModule("RolePlaySub")
