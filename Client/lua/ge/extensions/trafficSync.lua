@@ -5,6 +5,7 @@
 --====================================================================================
 
 local M = {}
+--[[
 print("Loading trafficSync...")
 
 local function receiveTrafficSync(d)
@@ -15,7 +16,7 @@ local function receiveTrafficSync(d)
 	local controllers = core_trafficSignals.getControllers()
 	if not controllers then return end
 
-	local c = controllers[d[1]]
+	local c = controllers[d[1] ]
 	if not c then return end
 
 	core_trafficSignals.setActive(false)
@@ -40,4 +41,5 @@ M.onPreRender = onPreRender
 M.onExtensionLoaded = onExtensionLoaded
 
 print("trafficSync loaded")
+--]]
 return M

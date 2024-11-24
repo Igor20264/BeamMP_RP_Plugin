@@ -7,7 +7,6 @@ Please do not redistribute
 local M = {}
 
 local config
-local resource
 local timeElapsedReset = 0
 local timeElapsed = 0
 local tryResetOld
@@ -124,6 +123,19 @@ local function enableMotd()
     if config.motd.enabled then
         local description = config.motd.description:gsub("{serverTime}", os.date("!%I:%M %p", os.time() + config.timesync.offsetHours * 60 * 60) .. " UTC" .. getSign(config.timesync.offsetHours) .. config.timesync.offsetHours)
         guihooks.trigger('ScenarioChange', {name = config.motd.title, description = description, introType = config.motd.type})
+
+        --        guihooks.trigger('ChangeState', {state = 'scenario-start', params = {data = {name=config.motd.title,buttonText="УРА!",description=description,introType=config.motd.type,showDataImmediately=true}}})
+    end
+end
+local function onScenarioUIReady(state)
+    print({state = state,text = "onScenarioUIReady"})
+    if state == "start" then
+        enableMotd()
+    elseif state == "play" then
+        if not vehicleSpawned then
+            log("W", "Vehicle not spawned")
+            --spawnVehicle("pickup", {})
+        end
     end
 end
 
@@ -136,18 +148,8 @@ local function spawnVehicle(model, options)
     end
 end
 
-local function onScenarioUIReady(state)
-    if state == "start" then
-        enableMotd()
-    elseif state == "play" then
-        if not vehicleSpawned then
-            log("W", "Vehicle not spawned")
-            --spawnVehicle("pickup", {})
-        end
-    end
-end
-
 local function onVehicleSelected(vehicleData)
+    print({vehicleData = vehicleData,text = "onVehicleSelected"})
     if config.motd.type == "selectableVehicle" then
         --enableMotd()
         if vehicleData.model and vehicleData.config then
@@ -168,20 +170,19 @@ end
 
 local function onExtensionLoaded()
     config = require("settings/config")
-
+    log("W", "onExtensionLoaded")
     if config.motd.enabled then
         guihooks.trigger("ChangeState", {state = "scenario-start"})
     end
 
     if config.restrictMenu then
-        extensions.core_gamestate.setGameState("multiplayer", "multiplayer","uj_base")
+        extensions.core_gamestate.setGameState("scenario", "BeamMP_RP_Plugin","uj_base")
     end
     setInitialTime()
     setInitialWeather()
     replaceResetHook()
     disableActions()
-    resource = jsonReadFile("settings/resource.json")
-    log("I", resource.name,  "version " .. resource.version .. " loaded")
+    log("I", config.name,  "version " .. config.version .. " loaded")
 end
 
 local function onExtensionUnloaded()
@@ -189,7 +190,7 @@ local function onExtensionUnloaded()
 
     extensions.freeroam_freeroam.onResetGameplay = tryResetOld
     extensions.core_input_actionFilter.addAction(0, 'uj_base', false)
-    log("I", resource.name,  "version " .. resource.version .. " unloaded, goodbye!")
+    log("I", config.name,  "version " .. config.version .. " unloaded, goodbye!")
     Lua:requestReload()
 end
 

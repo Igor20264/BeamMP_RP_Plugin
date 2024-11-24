@@ -28,6 +28,35 @@ end
 
 Gen = Gen or {}
 Color = Color or {}
+Format = Format or {}
+--[[
+Добавляет деньги пока игроки не играют. А если денег много снимает
+function SaS(id,percent_cfg,limit_percent)
+	if eco.s[id][4] >= limit_percent then 
+		local procent = round(((eco.s[id][4]+1)/100)*percent_cfg)
+		eco.s[id][4] = eco.s[id][4]-procent
+	else	
+		local procent = round(((eco.s[id][4]+1)/100)*percent_cfg)
+		eco.s[id][4] = eco.s[id][4]+procent
+	end
+	return eco.s[id][3]
+end
+]]
+--
+
+function Format.Money(amount) -- str or int
+    local formatted = tostring(amount)
+    local data = split(formatted,'.')
+    if #data[2] > 2 then
+        formatted = data[1]..'.'..data[2]:sub(1,2)..' '..config.currency
+    elseif #data[2] <= 2 then
+        formatted = data[1]..'.'..data[2]..' '..config.currency
+    else
+        formatted = data[1]..' '..config.currency
+    end
+    return formatted
+end
+
 
 -- "2023-10-05 14:30:00"
 function parseDate(dateString)

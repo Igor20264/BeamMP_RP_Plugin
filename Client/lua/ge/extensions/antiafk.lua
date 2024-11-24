@@ -10,6 +10,8 @@ local function onUpdate(deltaTime)
   timer = timer + deltaTime
   if timer >= 1 then
     timer = 0
+
+
     for i = 0, be:getObjectCount() do
       local veh = getVehicleID
       if MPVehicleGE.isOwn(gameVehicleID) then
@@ -23,7 +25,7 @@ local function onUpdate(deltaTime)
         else
            afkTimer = afkTimer + deltaTime
           if afkTimer > 300 then
-
+            TriggerServerEvent('IMAFK')
           end
           -- if afkTimer > 300 then
           -- need to dissconect client from server on the server side and send kick message as afk
