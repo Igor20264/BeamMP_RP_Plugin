@@ -21,6 +21,7 @@ local LuaVec3 = {}
 LuaVec3.__index = LuaVec3
 
 local ffifound, ffi = pcall(require, 'ffi')
+print("FFI"..(ffifound and " найден" or " не найден"))
 if ffifound then
   -- FFI available, so use it
   ffi.cdef [[struct __luaVec3_t {double x,y,z;};

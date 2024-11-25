@@ -5,7 +5,6 @@
 --====================================================================================
 
 local M = {}
---[[
 print("Loading trafficSync...")
 
 local function receiveTrafficSync(d)
@@ -16,7 +15,7 @@ local function receiveTrafficSync(d)
 	local controllers = core_trafficSignals.getControllers()
 	if not controllers then return end
 
-	local c = controllers[d[1] ]
+	local c = controllers[d[1]]
 	if not c then return end
 
 	core_trafficSignals.setActive(false)
@@ -26,13 +25,12 @@ end
 local function onExtensionLoaded()
 	if MPGameNetwork then AddEventHandler("trafficSignalUpdate", receiveTrafficSync) end
 	if not core_trafficSignals then return end
-	--core_trafficSignals.setDebugMode('extra')
+	--core_trafficSignals.setDebugMode('extra') ЕБУЧАЯ ХУЙНЯ НЕ РАБОТАЕТ
 	core_trafficSignals.setActive(false)
 end
 
 local function onPreRender()
-	if not core_trafficSignals then return end
-	if core_trafficSignals.getValues().state == true then
+	if core_trafficSignals then
 		onExtensionLoaded()
 	end
 end
@@ -41,5 +39,4 @@ M.onPreRender = onPreRender
 M.onExtensionLoaded = onExtensionLoaded
 
 print("trafficSync loaded")
---]]
 return M

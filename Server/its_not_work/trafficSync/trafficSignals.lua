@@ -523,21 +523,25 @@ end
 function onInit()
 	local mapName
 	--get map name
-	for line in io.lines("ServerConfig.toml") do
-		if getMapName(line) then
-			mapName = getMapName(line)
-			break
-		end
-	end
+  mapName = "east_coast_usa"
+  --Map = "/levels/east_coast_usa/info.json"
+	--for line in io.lines("ServerConfig.toml") do
+		--if getMapName(line) then
+			--mapName = getMapName(line)
+			--break
+		--end
+	--end
 
 	if mapName then
-		if loadSignals(pluginPath .. '/'..mapName..'.json') then
-			log('PLUGIN LOADED')
-			RegisterEvent("updateTimer", "updateTimer")
-			CreateThread("updateTimer", 10)
-		else
-			log('failed to load plugin, (wrong path?)')
-		end
+		--if loadSignals(pluginPath .. '/'..mapName..'.json') then
+		log('PLUGIN LOADED')
+    MP.RegisterEvent("updateTimer", "updateTimer")
+    MP.CreateEventTimer("updateTimer", 10)
+		--else
+      --log(pluginPath .. '/'..mapName..'.json')
+			--log('failed to load plugin, (wrong path?)')
+      --log(filePath)
+		--end
 	else
 		log("oopsie map can't be parsed")
 	end
