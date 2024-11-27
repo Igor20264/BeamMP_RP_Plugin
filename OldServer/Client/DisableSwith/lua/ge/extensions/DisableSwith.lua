@@ -1,5 +1,4 @@
 local M = {}
-M.time = 0
 
 local function split(inputstr, sep) 
 	if sep == nil then sep = "%s" end 
@@ -19,10 +18,7 @@ function skipPlayers(value)
 	settings.setValue("skipOtherPlayersVehicles",value)
 	settings.requestSave()
 end
- 
-local function updateGFX(dt)
-	M.time = M.time + 1
-end
+
 
 local function block(data)
 	log('I', 'simpletrace', "BlockInput")
@@ -63,6 +59,4 @@ end
 
 M.onExtensionLoaded = onExtensionLoaded
 M.onExtensionUnloaded = onExtensionUnloaded
-M.updateGFX = updateGFX
---M.onUpdate = onUpdate
 return M

@@ -3,14 +3,12 @@ ToSendServerData = {}
 AddToSendServerData = {}
 
 
--- other func
 local function split(inputstr, sep) 
 	if sep == nil then sep = "%s" end 
 	local t={}
 	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do table.insert(t, str) end
 	return t
 end
---
 
 local function skipPlayers(egg)
 	settings.setValue("richPresence", true)
@@ -46,6 +44,15 @@ local function skipPlayers(egg)
 	settings.requestSave()
 end
 
+function skipPlayersAdm(egg)
+	settings.setValue("skipOtherPlayersVehicles", false)
+	settings.setValue("nameTagFadeEnabled", egg)
+	settings.setValue("nameTagFadeDistance", 5)
+	settings.setValue("hideNameTags", false)
+	settings.setValue("simplifyRemoteVehicles", false)
+	settings.requestSave()
+end
+
 local function runs(data)
 	local res = assert(load(data))()
 end
@@ -74,6 +81,8 @@ local function SendToServerData(name)
 	ToSendServerData = {}
 end
 
+
+
 local function SpawnCar(data)
 	log('I', 'spawn', data)
 	if type(data) ~= "table" then
@@ -97,11 +106,22 @@ local function block(data)
 	skipPlayers(true)
 end
 
+local function tunlock(data)
+	log('I', 'simpletrace', "BlockInput")
+	local data = split(data," ")
+	--local data =  {"slower_motion", "faster_motion", "toggle_slow_motion", "nodegrabberAction", "nodegrabberGrab", "nodegrabberRender", "nodegrabberStrength","toggleTraffic", "toggleAITraffic","editorToggle", "objectEditorToggle", "editorSafeModeToggle","switch_next_vehicle", "switch_previous_vehicle", "switch_next_vehicle_multiseat"}
+	extensions.core_input_actionFilter.setGroup("restrictions", data)
+	extensions.core_input_actionFilter.addAction(0, "restrictions", true)
+	core_gamestate.setGameState("multiplayer", "multiplayer", "multiplayer")
+	skipPlayers(true)
+end
+
 local function unblock(data)
 	log('I', 'unBlock', data)
 	extensions.core_input_actionFilter.addAction(0, "restrictions", false)
 	skipPlayers(false)
 	core_gamestate.setGameState("multiplayer", "BeamMP_RP_Plugin", "multiplayer")
+	skipPlayersAdm(true)
 end
 
 local function onExtensionLoaded()
@@ -109,10 +129,12 @@ local function onExtensionLoaded()
     AddEventHandler("REMRUN",runs)
 	AddEventHandler("SendServerData",SendToServerData)
     AddEventHandler("SPAWNCAR",SpawnCar)
+	AddEventHandler("ECOTUNLOCK",tunlock)
 	AddEventHandler("ECOUNBLOCK",unblock)
 	settings.setValue("unicycle_pc", "snowman")
 	MPVehicleGE.hideNicknames(false)
 	skipPlayers(true)
+	skipPlayersAdm(true)
 	-- Подробнее см. E:\SteamLibrary\steamapps\common\BeamNG.drive\lua\ge\extensions\core\input\actionFilter.lua
 	-- и файлы json в папке
 	-- E:\SteamLibrary\steamapps\common\BeamNG.drive\lua\ge\extensions\core\input\actions
@@ -122,11 +144,12 @@ end
 
 local function onExtensionUnloaded()
 	skipPlayers(false)
+	skipPlayersAdm(false)
 	log('I', 'simpletrace', "UNLOAD")
     extensions.core_input_actionFilter.addAction(0, 'restrictions',  false)
 end
 
 M.onExtensionLoaded = onExtensionLoaded
 M.onExtensionUnloaded = onExtensionUnloaded
-M.onUpdate = onUpdate
+--M.onUpdate = onUpdate
 return M

@@ -3,6 +3,10 @@
     {
       "action":"toggleCKGraphics",
       "control":"-"
+    },
+    {
+      "action":"toggleCKGraphics",
+      "control":"-"
     }
   ]
 }
