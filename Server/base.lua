@@ -225,6 +225,7 @@ function OPTIMIZATOR()
 	log("Освобождено памяти: " .. round((c1 - count2), 2) .. " кб", 5)
 end
 
+
 function onInit()
     log("base.lua",2)
 	CoreCommands = import("Core_Commands")--M.command = RegEvent(M.command)
