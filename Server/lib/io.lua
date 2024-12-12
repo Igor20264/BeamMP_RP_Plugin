@@ -203,9 +203,7 @@ function ClassBD:init(namefile)
 		end
 	end
 
-	setmetatable(obj, self)
-	self.__index = self
-	return self
+	return setmetatable(obj, { __index = ClassBD })
 end
 _G.save_database = request_save_database
 M.try_read_config = try_read_config

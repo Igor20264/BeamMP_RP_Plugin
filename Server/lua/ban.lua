@@ -9,7 +9,7 @@ function BanSystem:init()
         privat.Class.join_history = files.ClassBD:init("join_history.ixt") -- name:{{ip="ip",jointime=os.time()},{ip="ip",jointime=os.time()}}
         privat.Class.banlist = files.ClassBD:init("banlist.ixt")
         privat.Class.whitelist = files.ClassBD:init("whitelist.ixt")
-
+        print(privat.Class.whitelist)
         privat.join_history = privat.Class.join_history:load() or {} --
         privat.database = privat.Class.banlist:load() or {}
         privat.whitelist = privat.Class.whitelist:load() or {}
@@ -234,9 +234,7 @@ function BanSystem:init()
     end
 
     --чистая магия!
-    setmetatable(obj, self)
-    self.__index = self
-	return obj
+    return setmetatable(obj, { __index = BanSystem })
 end
 
 
