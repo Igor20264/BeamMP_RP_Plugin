@@ -427,6 +427,10 @@ end
 
 function CarsFix(sender_id,sender_name, message)
     local id = cars:getidbynickname(sender_name,message)
+    if id == nil then
+        SendMessage(sender_id,"Указанный никнейм не найден или указана неверно")
+        return
+    end
     local price = cars.database[sender_name][id].coast
     if CTS[sender_name] == nil then
         SendMessage(sender_id,"Ошибка. Не удалось получить пользователя.")

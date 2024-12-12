@@ -279,6 +279,10 @@ end
 
 function COINFLIP(sender_id, sender_name, message)
     local case = split(message, " ")
+    if case[1] == nil or case[2] == nil then
+        SendMessage(sender_id, "Неверная команда.")
+        return
+    end
     local opponent_name = erors(case[1], 2)
     local bet_amount = tonumber(case[2]) or 0
     local currency = config.currency

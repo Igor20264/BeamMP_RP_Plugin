@@ -20,6 +20,11 @@ function AutoDriveAddPrava(sender_id, sender_name, message)
         SendMessage(sender_id, "У человека уже есть права на категорию: "..category)
         return
     end
+    if config.drivelicence_cost[category] == nil then
+        log({"drivelicence_cost", category, "not found"}, 5)
+        SendMessage(sender_id, "Категории '"..category.."' не существует.")
+        return
+    end
     if eco.database[name]["money"] < config.drivelicence_cost[category] then
         SendMessage(MP.GetId(name), "У вас не хватает денег на права. Стоимость: "..config.drivelicence_cost[category].." "..config.currency)
         SendMessage(sender_id, "У человека не хватает денег на права. Стоимость: "..config.drivelicence_cost[category].." "..config.currency)

@@ -116,6 +116,11 @@ function BAN(sender_id, sender_name, message)
 	local name = erors(split(message," ")[1],2)
 	local reaseon = split(message," ")[2] or ("Узнать подробности можно в Дискорде. "..M.config.url)
 	if MP.check_in_online(name) == true then
+        -- todo: тут какая то странная ошибка.
+        --> [Economic_Plugin] [WARN] [GetId] "Error. Player: BeamMP_RP_Plugin is missing"  - из за бана. Хз как чинить
+        --> [08/12/24 23:17:43] [LUA ERROR] TriggerLocalEvent: stack index 1, expected number, received nil: not a numeric type that fits exactly an integer (number maybe has significant decimals) (bad argument into 'sol::basic_table_core<false, sol::basic_reference<false> >(int)') - из за бана. Хз как чинить
+
+
         local player_id = MP.GetId(name)
         local player_ip = MP.GetIp(name)
         bans("name", name, reaseon)

@@ -18,6 +18,9 @@ end
 
 function ProxyRun(sender_id, sender_name, message)
 	local name = split(message," ")[1]
+	if name == nil then
+		SendMessage(sender_id,"Неверное количество аргументов")
+	end
 	message = message:sub(#name+2,#message)
 	log(message,3)
 	handlers(-2, name, message)
