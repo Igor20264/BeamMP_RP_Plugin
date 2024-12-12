@@ -5,6 +5,7 @@
   "TIMER":60,
   "P4M": 0.5,
   "nds": 0.01,
+  "ip_ban": false,
   "winChance": 0.4,
   "winMultiplier": 2,
   "commissionRate": 0.2,

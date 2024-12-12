@@ -1,73 +1,257 @@
 local M = {}
-local temporaryBanIp = {}
-local last_join = {name={ip="ip",jointime=os.time()}} -- если пользователей с одним ip, несколько (3 и более), то ip отлетает в бан
-local withelist = load_database("whitelist.ixt") or {}
-local ban = load_database("banlist.ixt") or {name={},ip={}}
-config.withelist = true
-local ignore_ip = {"89.250.2.140"}
-local function check_ip_duplication()
-    local ips = {}
-    for name,data in pairs(last_join) do
-        if not ips[data.ip] then
-            ips[data.ip] = 1
-        elseif ips[data.ip] >= 2 then
-            log("ip "..data.ip.." is duplicate NAKRUTKA",5)
-            temporaryBanIp[data.ip] = true
+local BanSystem = {}
+
+function BanSystem:init()
+    local privat = {}  --приватное свойство
+
+        privat.Class = {}
+
+        privat.Class.join_history = files.ClassBD:init("join_history.ixt") -- name:{{ip="ip",jointime=os.time()},{ip="ip",jointime=os.time()}}
+        privat.Class.banlist = files.ClassBD:init("banlist.ixt")
+        privat.Class.whitelist = files.ClassBD:init("whitelist.ixt")
+
+        privat.join_history = privat.Class.join_history:load() or {} --
+        privat.database = privat.Class.banlist:load() or {}
+        privat.whitelist = privat.Class.whitelist:load() or {}
+
+        privat.cache = {}
+        privat.cache.ban = {}
+    local obj= {} --публичное свойство
+
+
+    function obj:check(name,role,is_guest,data)
+        if is_guest == true and config.guest_ban == true then
+            return "[GUEST] Для игры на сервере вам необходимо зарегистрироваться в BeamMP и Discord: "..config.url
+        end
+        obj:add_history(name,data,role)
+        if config.withelist == true then
+            local is_whitelisted = privat:check_whitelist(name)
+            if is_whitelisted ~= true then
+                return is_whitelisted
+            end
+        end
+
+        local is_banned = privat:check_ban(name,role,is_guest,data)
+        if is_banned ~= true then
+            return is_banned
+        end
+
+        if config.ip_ban == true then
+            local is_ip_banned = privat:check_ip(data.ip)
+            if is_ip_banned ~= true then
+                return is_ip_banned
+            end
+        end
+
+        return true
+    end
+
+     function obj:update_cache()
+         privat.cache.ban = {}
+         if config.ip_ban == true then
+             privat:gen_cache_ban()
+         end
+     end
+
+    -- WHITELIST --
+    function privat:check_whitelist(name)
+        if privat.whitelist[name] == true then
+            return true
+        else
+            return privat:message_whitelist(name)
         end
     end
+
+    function obj:is_whitelisted(name)
+        return privat.whitelist[name] or false
+    end
+
+    function obj:add_whitelist(name)
+        if privat.whitelist[name] == true then
+            return false
+        else
+            privat.whitelist[name] = true
+            privat.Class.whitelist:save(privat.whitelist)
+            return true
+        end
+
+    end
+
+    function obj:remove_whitelist(name)
+        if privat.whitelist[name] == nil then
+            return false
+        else
+            privat.whitelist[name] = nil
+            privat.Class.whitelist:save(privat.whitelist)
+            return true
+        end
+    end
+
+    function privat:message_whitelist(name)
+        local msg = "К сожалению, "..name.." нет в белом списке. Для получения доступа авторизируйтесь на сервере: "..config.server_url
+        return msg
+    end
+
+    -- ip --
+    function privat:is_ip_addres(name)
+        local ip
+        ip = privat:to_ip(name)
+        if ip ~= false then
+            return ip
+        else
+            return name
+        end
+    end
+
+    function privat:to_ip(ip)
+        if string.find(ip,".") == nil then
+            return false
+        end
+        local data = string.split(ip,".")
+        if data == nil or #data ~= 4 then
+            return false
+        end
+        return data[1].."."..data[2].."."..data[3]..".X"
+    end
+
+    function privat:ip_eq_ip(ip1,ip2)
+        if string.find(ip1,".") == nil then
+            return false
+        end
+        local data1 = string.split(ip1,".")
+        if data1 == nil or #data1 ~= 4 then
+            return false
+        end
+
+        if string.find(ip2,".") == nil then
+            return false
+        end
+        local data2 = string.split(ip2,".")
+        if data2 == nil or #data2 ~= 4 then
+            return false
+        end
+
+        if data1[1] == data2[1] and data1[2] == data2[2] and data1[3] == data2[3] then
+            return true
+        end
+        return false
+    end
+
+    function privat:check_ip(ip)
+        if privat.cache.ip[ip] ~= nil then
+            return privat:message_ip(ip)
+        else
+            return true
+        end
+    end
+
+    function privat:message_ip(name)
+        name = privat:to_ip(name)
+        local msg = "К сожалению, пул ip: "..name.." заблокирован. Для выяснения подробностей обратитесь к администратору: "..config.server_url
+        return msg
+    end
+
+    function privat:gen_cache_ban()
+        local cache_ip = {}
+        local banned = {}
+        for name, data in pairs(privat.database) do
+            banned[name] = true
+        end
+        -- {name:{{data,data},{data,data}},name:{{data,data},{data,data}}}
+        for name, data in pairs(privat.join_history) do
+            if banned[name] then
+                for i,v in pairs(data) do
+                    if v.ip ~= nil then
+                        cache_ip[v.ip] = name
+                    end
+                end
+            end
+        end
+        privat.cache.ip = cache_ip
+        return cache_ip
+    end
+    -- BANS --
+    function privat:check_ban(name,role,is_guest,identifiers)
+        if privat:is_banned(name) == true then
+            return privat:ban_message(name)
+        end
+        local ip = identifiers.ip
+        if privat.cache.ip[ip] ~= nil then
+            name = privat.cache.ip[ip]
+            if privat:is_banned(name) == true then
+                return privat:ban_message(name)
+            end
+        end
+    end
+
+    function obj:add_ban(name,duration,reason)
+        -- duration - в секундах
+        name = privat:is_ip_addres(name)
+        local time = os.time() + duration
+        privat.database[name] = {endtime = time,reason=reason or "Не указано. Для получения подробностей обратитесь к администратору: "..config.server_url}
+        privat.Class.banlist:save(privat.database)
+    end
+
+    function obj:remove_ban(name)
+        privat.database[name] = nil
+        privat.Class.banlist:save(privat.database)
+    end
+
+    function obj:is_banned(name)
+        if privat.database[name] == nil then
+            return false
+        end
+        if os.time() >= privat.database[name].endtime then
+            privat.database[name] = nil
+            return false
+        end
+        return true
+    end
+
+    function obj:update_bans()
+        for name,data in pairs(privat.database) do
+            if os.time() >= data.endtime then
+                privat.database[name] = nil
+            end
+        end
+        save_database("bans.ixt",privat.database)
+    end
+
+    function privat:ban_message(name)
+        local msg = "Вы были заблокированы. \nПричина: "..privat.database[name].reason.." \nОсталось: "..os.date("%d.%m.%Y %H:%M:%S",privat.database[name].endtime-os.time()).." \nОбжаловать бан можно в Дискорде: "..config.url
+        return msg
+    end
+
+    -- JOIN HISTORY --
+    function obj:get_join_history(name)
+        return privat.join_history[name] or {}
+    end
+
+    function obj:add_history(name,data,role)
+        privat.join_history[name] = privat.join_history[name] or {}
+        privat.join_history[name][#privat.join_history[name]+1] = {data=data,time=os.time(),role = role}
+        privat.Class.join_history:save(privat.join_history)
+    end
+
+    --чистая магия!
+    setmetatable(obj, self)
+    self.__index = self
+	return obj
 end
 
-local function add_whitelist(name)
-    withelist[name] = true
-    save_database("whitelist.ixt",withelist)
-end
-local function remove_whitelist(name)
-    withelist[name] = nil
-    save_database("whitelist.ixt",withelist)
-end
-local function bans(type, data, reason)
-    reason = reason or "Узнать подробности бана можно в Дискорде. " .. config.url
-    ban[type][data] = reason
-    save_database("banlist.ixt",ban)
-end
-local function unban(type, data)
-    ban[type][data] = nil
-    save_database("banlist.ixt",ban)
-end
+
+local banSystem = BanSystem:init()
 
 function onPlayerAuth(name, role, is_guest, identifiers)
-    local ip = identifiers.ip
-    ban.name = ban.name or {}
-    ban.ip = ban.ip or {}
-    last_join[name] = {ip=ip,jointime=os.time()}
-    if temporaryBanIp[ip] == true and ignore_ip[ip] == nil then
-        return "[TIP] Узнать подробности блокировки можно в Дискорде. "..M.config.url
+    local result = banSystem:check(name,role,is_guest,identifiers)
+    if result ~= true then
+        return result
     end
-    if is_guest == true then return "Для игры на этом сервере необходимо иметь аккаунт BeamMP. \nПожалуйста, зарегистрируйтесь." end
-    if config.withelist == true then
-        if withelist[name] == nil then
-            return "Для игры на этом сервере вам необходимо пройти проверку на сервере. " .. config.url
-        end
-    end
-    if type(ban.name[name]) ~= "nil" then
-        return ban.name[name] or "[NA] Узнать подробности бана можно в Дискорде: " .. config.url
-    end
-    if type(ban.ip[ip]) ~= "nil" then
-        return ban["ip"][ip] or "[IP] Узнать подробности бана можно в Дискорде. "..M.config.url
-    end
-    check_ip_duplication()
-end
- 
-function UNBAN(sender_id, sender_name, message)
-	local name = split(message, " ")[1]
-	unban("name", name)
-	SendMessage(sender_id, message)
-	return 1
 end
 
 function WHITELIST_ADD(sender_id, sender_name, message)
-    if withelist[message] == nil then
-        add_whitelist(message)
+    local res = banSystem:add_whitelist(message)
+    if not res then
         SendMessage(sender_id, "Пользователь "..message.." добавлен в белый список.")
     else
         SendMessage(sender_id, "Пользователь "..message.." уже в белом списке.")
@@ -75,36 +259,19 @@ function WHITELIST_ADD(sender_id, sender_name, message)
 end
 
 function WHITELIST_DEL(sender_id, sender_name, message)
-    if withelist[message] ~= nil then
-        remove_whitelist(message)
+    local res = banSystem:remove_whitelist(message)
+    if not res then
         SendMessage(sender_id, "Пользователь "..message.." удален из белого списка.")
     else
         SendMessage(sender_id, "Пользователь "..message.." не в белом списке.")
     end
 end
+--
 
-function CLEARTEMPBANIP(sender_id, sender_name, message)
-    temporaryBanIp = {}
-    return 1
-end
-
-function UBNANIP(sender_id, sender_name, message)
-    local name = split(message, " ")[1]
-    unban("ip", name)
-    if temporaryBanIp[name] ~= nil then
-        temporaryBanIp[name] = nil
-    end
-    SendMessage(sender_id, message)
-    return 1
-end
-
-function GETALLBANIP(sender_id, sender_name, message)
-    local mess = ""
-    for k,v in pairs(ban.ip) do
-        mess = mess..k.."\n"
-    end
-    SendMessage(sender_id, mess)
-    return 1
+function UNBAN(sender_id, sender_name, message)
+    banSystem:remove_ban(message)
+	SendMessage(sender_id, "Пользователь "..message.." разблокирован.")
+	return 1
 end
 
 function KICK(sender_id, sender_name, message)
@@ -113,27 +280,30 @@ function KICK(sender_id, sender_name, message)
 end
 
 function BAN(sender_id, sender_name, message)
-	local name = erors(split(message," ")[1],2)
-	local reaseon = split(message," ")[2] or ("Узнать подробности можно в Дискорде. "..M.config.url)
+    -- todo: !ban <name> <duration> <reason>
+    local case = split(message, " ")
+    if case == nil or #case < 1 then
+        SendMessage(sender_id,"Неверное количество аргументов")
+    end
+    local name = erors(case[1],2)
+    local duration = timeConverter(case[2]) or timeConverter("3d")
+    case[1] = nil
+    case[2] = nil
+    local reason = "Узнать подробности можно в Дискорде. "..M.config.url
+    if case ~= nil and #case >= 1 then
+        reason = table.concat(case, " ")
+    end
+    banSystem:add_ban(name,duration,reason)
+    SendMessage(sender_id,name.." был забанен. Причина: "..reason..". Осталось: "..os.date("%d.%m.%Y %H:%M:%S",banSystem.database[name].endtime-os.time()))
 	if MP.check_in_online(name) == true then
         -- todo: тут какая то странная ошибка.
         --> [Economic_Plugin] [WARN] [GetId] "Error. Player: BeamMP_RP_Plugin is missing"  - из за бана. Хз как чинить
         --> [08/12/24 23:17:43] [LUA ERROR] TriggerLocalEvent: stack index 1, expected number, received nil: not a numeric type that fits exactly an integer (number maybe has significant decimals) (bad argument into 'sol::basic_table_core<false, sol::basic_reference<false> >(int)') - из за бана. Хз как чинить
-
-
-        local player_id = MP.GetId(name)
-        local player_ip = MP.GetIp(name)
-        bans("name", name, reaseon)
-        bans("ip",player_ip, reaseon)
-        temporaryBanIp[player_ip] = true
-        MP.TriggerClientEvent(player_id, "PacketBannedSub" ,"")
-        HeventTimer.Createtask((60),NextBan,sender_id.."UnTeleport",{player_id,reason})
+        HeventTimer.Createtask(20,NextBan,sender_id.."BAN",{player_id,reason})
 		--MP.DropPlayer(player_id,reaseon)
 		local mess = name.." был забанен"
 		SendMessage(-1,mess)
-	else 
-		bans("name", name, reaseon)
-        temporaryBanIp[MP.GetIp(name)] = true
+	else
         SendMessage(sender_id, name.." был забанен")
 	end
 end
@@ -142,25 +312,21 @@ function NextBan(player_id,reason)
     MP.DropPlayer(player_id, reason)
 end
 
+function checkUnban()
+    banSystem:check_unban()
+end
 
 M.config = config
-command = {
+M.command = {
 	{command = "unban", help ="Разбан игрока. ",args="[name]",func ="UNBAN",roles = {"admin"}},
 	{command = "kick", help ="Кик Игрока. ",args="=[name]",func ="KICK",roles = {"moderator","admin"}},
-	{command = "ban", help ="Бан со ссылкой на сервер. ",args="[name] [reason_slovo_slovo_slov]",func ="BAN",roles = {"admin"}},
-    {command = "unip", help ="Разбан IP. ",args="[ip]",func ="UBNANIP",roles = {"admin"}},
-    {command = "getallip", help ="Получить все забаненные IP. ",func ="GETALLBANIP",roles = {"admin"}},
-    {command = "cleartempip", help ="Очистить список забаненных IP. ",func ="CLEARTEMPBANIP",roles = {"admin"}},
+	{command = "ban", help ="Бан со ссылкой на сервер. ",args="[name] <duration> <reason можно не в 1 слово>",func ="BAN",roles = {"admin"}},
     {category = "whitelist",command = "add", help ="Добавить в белый список. ",args="[name]",func ="WHITELIST_ADD",roles = {"admin"}},
     {category = "whitelist",command = "del", help ="Удалить из белого списка. ",args="[name]",func ="WHITELIST_DEL",roles = {"admin"}},
 }
-M.command = command
 function M.load()
+    HeventTimer.addFunc(checkUnban, 60*30) -- 30 мин
 	MP.RegisterEvent("onPlayerAuth","onPlayerAuth")
-end
-
-function M.unload()
-	save_database("banlist.ixt",ban)
 end
 
 -- Ban.ixt

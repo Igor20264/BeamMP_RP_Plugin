@@ -98,8 +98,8 @@ function load_database(namefile)
 		return nil
 	else
 	    local read = file:read("*all")
+		file:close()
 		if read == nil or read == "" then
-			file:close()
 			return nil
 		end
 		local _, data = pcall(Util.JsonDecode,read)
@@ -107,7 +107,6 @@ function load_database(namefile)
             log("failed to decode file: " .. namefile,5)
             return nil
         end
-		file:close()
 		return data
 	end
 end
@@ -147,7 +146,70 @@ function save_config(namefile,data)
 		file:close()
 	end
 end
+
+local ClassBD = {}
+
+function ClassBD:init(namefile)
+	local obj = {}
+
+	local private = {}
+		private.namefile = namefile
+		private.data = nil
+
+	function private:check_err(file,error)
+		if file==nil then
+			log("Couldn't open file: "..error,5)
+			return nil
+		else
+			return file
+		end
+	end
+
+	function obj:forced_save_database(data)
+		log(private.namefile,3)
+		private.data = data
+		local file, err = io.open(M.pluginPath .."/database/"..private.namefile,"w")
+		file = private:check_err(file,err)
+		if file then
+			file:write(Util.JsonEncode(data))
+			file:close()
+			return true
+		end
+	end
+
+	function obj:save(data)
+		if data == nil then log({"Data is nil",private.namefile},5) return end
+		log(private.namefile,3)
+		private.data = data
+    	req_save_database[private.namefile] = {data=private.data,time=gettime()+config.REQUEST_SAVE_DATABASE_TIME_SEC}
+	end
+
+	function obj:load()
+		log(private.namefile,3)
+		local file, err = io.open (M.pluginPath.."/database/"..private.namefile,"r")
+		file = private:check_err(file,err)
+		if file then
+			local read = file:read("*all")
+			file:close()
+			if read == nil or read == "" then
+				return nil
+			end
+			local _, data = pcall(Util.JsonDecode,read)
+			if data == nil then
+				log("failed to decode file: " .. private.namefile,5)
+				return nil
+			end
+			return data
+		end
+	end
+
+	setmetatable(obj, self)
+	self.__index = self
+	return self
+end
+_G.save_database = request_save_database
 M.try_read_config = try_read_config
 M.verify = verify
+M.ClassBD = ClassBD
 
 return M
