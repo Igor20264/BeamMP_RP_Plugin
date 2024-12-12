@@ -10,12 +10,14 @@ end
 
 
 local Working = {}
+Working.__index = Working
 function Working:init()
+	local obj = setmetatable({}, self)
     local privat = {}  --приватное свойство
         privat.working = {}
 		privat.neworking = {}
 		privat.workcars = load_database("work_cars.ixt") or {}
-    local obj= {} --публичное свойство
+
 		obj.workcars = privat.workcars
 
     function obj:all()
@@ -122,8 +124,7 @@ function Working:init()
 	end
 
     --чистая магия!
-    setmetatable(obj, self)
-    self.__index = self
+
 	return obj
 end
 

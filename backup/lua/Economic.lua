@@ -118,6 +118,7 @@ function JOINPLAYER(player_id)
 end
 
 function AddtoList(id)
+    print(eco)
 	eco:join(id)
 end
 

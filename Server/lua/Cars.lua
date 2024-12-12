@@ -82,8 +82,18 @@ end
 Уйти из работы по команде
 Закончить работу если более N минут
 --]]
---Cars:extended(DB)
 extended(Cars, DB)
+
+function Cars:init(path)
+    local db_instance = DB:init(path) -- Инициализация DB
+
+    -- Копируем поля из db_instance в self
+    for key, value in pairs(db_instance) do
+        self[key] = value
+    end
+
+    return self
+end
 
 function Cars:new(owner,sperBuy) --perBuy[sender_name]
     local config = files.try_read_config(sperBuy.path)
@@ -783,7 +793,7 @@ local function add_number_info(number)
 end
 
 function SaveCarEveryXsec()
-    local olddata = table:shallow_copy(posCar)
+    local olddata = deep_copy(posCar)
     for i, name in pairs(MP.GetPlayers()) do
         if lastCar[name] ~= nil and lastCar[name].ret.jbm ~= "unicycle" and lastCar[name].licenss_plate ~= nil then
             local vehicles = MP.GetPlayerVehicles(tonumber(i))
@@ -800,7 +810,9 @@ function SaveCarEveryXsec()
             end
         end
     end
-    if posCar ~= olddata and math.random(1,100) == 10 then
+
+    if not tables_equal(posCar, olddata) and math.random(1,10) == 1 then
+        print("SaveCarEveryXsec",posCar,olddata)
         forced_save_database("position_on_lic_plate.ixt",posCar)
     end
     return true

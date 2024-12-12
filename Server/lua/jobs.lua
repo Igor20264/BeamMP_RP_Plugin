@@ -24,14 +24,13 @@ work_role = {
 ]]
 
 local Working = {}
-
+Working.__index = Working
 function Working:init()
+    local obj = setmetatable({}, self)
     local privat = {}
     privat.working = {} -- Хранит информацию о работающих игроках (почасовая оплата или по времени)
     privat.neworking = {} -- Хранит информацию о работающих игроках (оплата за точку/задание)
     privat.workcars = load_database("work_cars.ixt") or {} -- Загружает данные о рабочих машинах
-
-    local obj = {}
     obj.workcars = privat.workcars
 
     function obj:all()
@@ -163,8 +162,6 @@ function Working:init()
 		return privat.neworking[name]
 	end
 
-    setmetatable(obj, self)
-    self.__index = self
 	return obj
 end
 

@@ -24,6 +24,17 @@ local function sort_by_distancse(not_sorted,sort_offset)
 
 -- Система координат
 local geo = {}
+setmetatable(geo, { __index = DB })
+function geo:init(path)
+    local db_instance = DB:init(path) -- Инициализация DB
+
+    -- Копируем поля из db_instance в self
+    for key, value in pairs(db_instance) do
+        self[key] = value
+    end
+
+    return self
+end
 
 function geo:new_point(nickname,work,x1,y1,z1,x2,y2,z2)-- str,bool,float,float,float,float
     local uuid = Gen.uuid()
@@ -157,8 +168,6 @@ function geo:get_public_points()
     temp = sort_by_distancse(temp)
     return temp
 end
-extended(geo,DB)
---geo:extended(DB)
 --[[
 type_gep = круг, квадрад
 uuid = {nickname= str, type = {work = bool, cam = bool}, geo = {0={x=float,y=float,z=float},2={x=float,y=float,z=float}}}

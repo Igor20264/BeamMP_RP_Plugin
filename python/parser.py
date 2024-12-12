@@ -16,3 +16,13 @@ for line in data:
     print(line)
 print("\n")
 print(*error,sep="\n")
+
+brands = [('as',), ("As",)]
+new_brands = []
+for brand in brands:
+    brand = list(brand)
+    brand[0] = brand[0].lower()
+    new_brands.append(brand[0])
+brands = list(set(new_brands))
+
+brands = [(item,) for item in brands]

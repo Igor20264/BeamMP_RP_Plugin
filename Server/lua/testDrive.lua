@@ -163,7 +163,7 @@ function CheckTestDrive()
         -- Сохраняем данные о тест-драйве
         -- TODO: вынести testDriveCars в отдельный класс!
         save_database("testDriveCars.ixt", testDriveCars)
-        old_testDriveCars = table.shallow_copy(testDriveCars)
+        old_testDriveCars = shallow_copy(testDriveCars)
     end
     return true
 end

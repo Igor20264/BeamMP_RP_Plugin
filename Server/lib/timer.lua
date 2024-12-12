@@ -2,7 +2,7 @@ local M = {}
 function M:init()
 	local privat = {}  --приватное свойство
 	privat.start = os.time()
-	local obj= {} --публичное свойство
+	local obj= setmetatable({},self) --публичное свойство
 
 	function obj:get()
 		return os.time()
@@ -27,10 +27,7 @@ function M:init()
 	function obj:getCooldown(s)
 		return obj:Get()+s
 	end	
-	
-	--чистая магия!
-    setmetatable(obj, self)
-    self.__index = self
+
 	return obj
 end
 

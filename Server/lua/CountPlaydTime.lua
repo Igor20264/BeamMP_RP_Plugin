@@ -1,12 +1,13 @@
 local M = {}
-local PlaydTime = {}
+
 M.info = "Система счетчика времени"
 M.ver = "BETA 0.1"
 
-
+local PlaydTime = {}
+PlaydTime.__index = PlaydTime
 function PlaydTime:init()
+    local public = setmetatable({}, self)
     local private = {}
-    local public = {}
     function public:init_user(username)
         if eco.database[username] ~= nil and eco.database[username]["playdtime"] == nil then
             eco:set(username, "playdtime", 0) -- Каждые 10 минут
@@ -46,9 +47,6 @@ function PlaydTime:init()
         end
     end
 
-    --чистая магия!
-    setmetatable(public, self)
-    self.__index = self
     return public
     end
 -- Посмотреть список игроков которые отыграли более x часов (адм)

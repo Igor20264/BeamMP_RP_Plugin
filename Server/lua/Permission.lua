@@ -7,11 +7,11 @@ local Permissions = {}
 Permissions.__index = Permissions
 function Permissions:init()
     local public = setmetatable({}, self)
-
     local private = {}
     private.cache = {}
     function public:init_user(username)
-        if eco.database[username] ~= nil and eco.database[username]["roles"] == nil then
+        if eco.database[username] ~= nil then
+            --eco.database[username]["roles"] = {"player"}
             eco:set(username, "roles", {"player"})
         end
     end
@@ -23,7 +23,7 @@ function Permissions:init()
             return nil
         end
         if eco.database[username]["roles"] == nil then
-            self:init_user(username)
+            public:init_user(username)
         end
         return eco.database[username]["roles"]
     end
