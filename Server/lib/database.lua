@@ -1,11 +1,11 @@
 local Database = {}
+Database.__index = Database
 
 function Database:init(namedb) -- свойства
 	local private = {}  --приватное свойство
-	    private.database = load_database(namedb) or {}
 	    private.database_name = namedb
-    local obj= {} --публичное свойство
-        obj.database = private.database
+    local obj = setmetatable({},self) --публичное свойство
+        obj.database = load_database(namedb) or {}
     -- метод
 
     -- Метод для генерации шаблона или же всех свойст в базе
@@ -38,7 +38,7 @@ function Database:init(namedb) -- свойства
     end
     --[[
     function private:clear_template(database)
-        database = database or private.database
+        database = database or obj.database
         local data = private:genSchema(database)
         local clear_template = {}
         for key, value in pairs(data) do
@@ -56,8 +56,8 @@ function Database:init(namedb) -- свойства
         end
         -- save file
         --save_config("pattern/"..split(private.database_name,'.')[1], egg)
-    if private.database ~= nil then
-        private:clear_template(private.database)
+    if obj.database ~= nil then
+        private:clear_template(obj.database)
     end
     end--]]
 	function obj:getTable(name)
@@ -68,8 +68,8 @@ function Database:init(namedb) -- свойства
 	end
 
     function obj:delete(name) -- return state delete : bool
-        if private.database[name] ~= nil then
-            private.database[name] = nil
+        if obj.database[name] ~= nil then
+            obj.database[name] = nil
             obj:save()
             return true
         else
@@ -80,7 +80,7 @@ function Database:init(namedb) -- свойства
     function obj:value(name, ...)
         local args = {...}
         local lastArgIndex = #args
-        local currentTable = private.database[name]
+        local currentTable = obj.database[name]
         for i =1, lastArgIndex do
             local key = args[i]
             currentTable[key] = currentTable[key] or {}
@@ -91,26 +91,36 @@ function Database:init(namedb) -- свойства
 
 	function obj:set(name,...)
         local args = {...}
-        local currentTable = private.database[name]
+        local currentTable = obj.database[name]
 
-        for i = 1, #args - 3 do
-            local key = args[i+1]
+         -- Проверяем, существует ли таблица для данного имени
+        if currentTable == nil then
+            currentTable = {} -- Создаем таблицу, если её нет
+            obj.database[name] = currentTable
+        end
+
+        for i = 1, #args - 2 do
+            local key = args[i]
             currentTable[key] = currentTable[key] or {}
             currentTable = currentTable[key]
         end
-
+        -- Устанавливаем последний ключ
         local lastKey = args[#args - 1]
+        local lastValue = args[#args]
 
-        if type(args[#args]) == "table" then
-            currentTable[lastKey] = args[#args]
+        if type(lastValue) == "table" then
+            currentTable[lastKey] = lastValue -- Устанавливаем таблицу
         else
-            if args[#args] == "{}" then
-                currentTable[lastKey] = {fixed_path = 1}
+            if lastValue == "{}" then
+                currentTable[lastKey] = {fixed_path = 1} -- Устанавливаем фиксированный путь
             else
-                 currentTable[lastKey] = tonumber(args[#args]) or args[#args]
+                currentTable[lastKey] = tonumber(lastValue) or lastValue -- Устанавливаем значение
             end
         end
+
         obj:save()
+
+        -- Возвращаем текущее значение
         local ts = {}
         for _,data in pairs(args) do
             ts[#ts+1] = data
@@ -121,7 +131,7 @@ function Database:init(namedb) -- свойства
 
 	function obj:add(name,...)
         local args = {...}
-        local currentTable = private.database[name]
+        local currentTable = obj.database[name]
 
         for i = 1, #args - 3 do
             local key = args[i+1]
@@ -141,12 +151,9 @@ function Database:init(namedb) -- свойства
     end
 
 	function obj:save()
-	    request_save_database(private.database_name,private.database)
+	    request_save_database(private.database_name,obj.database)
 	end
 
-    --чистая магия!
-    setmetatable(obj, self)
-    self.__index = self
 	return obj
 end
 

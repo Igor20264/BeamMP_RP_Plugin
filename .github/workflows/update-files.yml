@@ -26,15 +26,15 @@ jobs:
             cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin
             chmod -R 777 /root/server_dev/server-mods/BeamMP_RP_Plugin
 
-      - name: Pack Mod to zip
-        run: |
-          cd Client
-          zip -r ../Client.zip .
-          cd ..
-          mkdir -p ./tempZip
-          cp -r ./Client.zip ./tempZip
-          cd ./tempZip
-          ls
+      #- name: Pack Mod to zip
+      #  run: |
+      #    cd Client
+      #    zip -r ../Client.zip .
+      #    cd ..
+      #    mkdir -p ./tempZip
+      #    cp -r ./Client.zip ./tempZip
+      #    cd ./tempZip
+      #    ls
 
       - name: SFTP Plugin uploader
         uses: wangyucode/sftp-upload-action@v2.0.2
@@ -53,18 +53,20 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           script: |
+            rm -rf /root/server_dev/client-mods/
+            mkdir /root/server_dev/client-mods
             cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin
 
-      - name: SFTP mod uploader
-        uses: wangyucode/sftp-upload-action@v2.0.2
-        with:
-          host: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          localDir: ./tempZip
-          remoteDir: /root/server_dev/client-mods/
-          forceUpload: false
-          exclude: .git/**,.github/**,.gitignore
+      #- name: SFTP mod uploader
+      #  uses: wangyucode/sftp-upload-action@v2.0.2
+      #  with:
+      #    host: ${{ secrets.FTP_HOST }}
+      #    username: ${{ secrets.FTP_USERNAME }}
+      #    password: ${{ secrets.FTP_PASSWORD }}
+      #    localDir: ./tempZip
+      #    remoteDir: /root/server_dev/client-mods/
+      #    forceUpload: false
+      #    exclude: .git/**,.github/**,.gitignore
 
 
       - name: Update Database

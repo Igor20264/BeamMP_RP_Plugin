@@ -7,7 +7,16 @@ local DB = require("lib.database")
 local Notifications = {}
 --Notifications:extended(DB)
 extended(Notifications, DB)
+function Notifications:init(path)
+    local db_instance = DB:init(path) -- Инициализация DB
 
+    -- Копируем поля из db_instance в self
+    for key, value in pairs(db_instance) do
+        self[key] = value
+    end
+
+    return self
+end
 function Notifications:addNotification(playerName, message)
     self.database[playerName] = self.database[playerName] or {}
     table.insert(self.database[playerName], message)

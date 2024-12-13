@@ -7,7 +7,20 @@ M.ver = "2.0"
 online_player = {}
 
 local Eco = {}
-extended(Eco,DB)
+Eco.__index = Eco
+setmetatable(Eco, { __index = DB }) -- Наследуем методы из DB
+
+function Eco:init(path)
+    local db_instance = DB:init(path) -- Инициализация DB
+
+    -- Копируем поля из db_instance в self
+    for key, value in pairs(db_instance) do
+        self[key] = value
+    end
+
+    return self
+end
+
 function Eco:getOnline()
     local ret = {}
     for i,data in pairs(database_player) do
@@ -20,8 +33,9 @@ end
 
 function Eco:join(id)
     if self.database[MP.GetPlayerName(id)] == nil then
-        self.database[MP.GetPlayerName(id)] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false,time_work = false, time_minute = 0}, drivelicence = table.shallow_copy(config.drivelicence)}
-        eco.database[MP.GetPlayerName(id)]["drivelicence"]["A"] = true
+        self.database[MP.GetPlayerName(id)] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false,time_work = false, time_minute = 0}, drivelicence = shallow_copy(config.drivelicence)}
+        self.database[MP.GetPlayerName(id)]["drivelicence"]["A"] = true
+        print(self.database[MP.GetPlayerName(id)])
         self:save()
     end
 end
@@ -167,7 +181,7 @@ function PAY(sender_id,sender_name, message) -- Перевод от одного
 end
 
 function WIPE(sender_id,sender_name, message)
-    eco.database[message] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false}, drivelicence = table.shallow_copy(config.drivelicence)}
+    eco.database[message] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false}, drivelicence = shallow_copy(config.drivelicence)}
     eco.database[message]["drivelicence"]["A"] = true
     permissions:set_roles(message, {"player"})
     local carss = cars:get_all(sender_name)

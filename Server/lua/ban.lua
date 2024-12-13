@@ -1,7 +1,8 @@
 local M = {}
 local BanSystem = {}
-
+BanSystem.__index = BanSystem
 function BanSystem:init()
+    local obj= setmetatable({},self)
     local privat = {}  --приватное свойство
 
         privat.Class = {}
@@ -9,14 +10,14 @@ function BanSystem:init()
         privat.Class.join_history = files.ClassBD:init("join_history.ixt") -- name:{{ip="ip",jointime=os.time()},{ip="ip",jointime=os.time()}}
         privat.Class.banlist = files.ClassBD:init("banlist.ixt")
         privat.Class.whitelist = files.ClassBD:init("whitelist.ixt")
-        print(privat.Class.whitelist)
+
         privat.join_history = privat.Class.join_history:load() or {} --
         privat.database = privat.Class.banlist:load() or {}
         privat.whitelist = privat.Class.whitelist:load() or {}
 
         privat.cache = {}
         privat.cache.ban = {}
-    local obj= {} --публичное свойство
+
 
 
     function obj:check(name,role,is_guest,data)
@@ -167,18 +168,19 @@ function BanSystem:init()
                 end
             end
         end
+        privat.cache = {}
         privat.cache.ip = cache_ip
         return cache_ip
     end
     -- BANS --
     function privat:check_ban(name,role,is_guest,identifiers)
-        if privat:is_banned(name) == true then
+        if obj:is_banned(name) == true then
             return privat:ban_message(name)
         end
         local ip = identifiers.ip
-        if privat.cache.ip[ip] ~= nil then
+        if ip ~= nil and privat.cache.ip ~= nil and privat.cache.ip[ip] ~= nil then
             name = privat.cache.ip[ip]
-            if privat:is_banned(name) == true then
+            if obj:is_banned(name) == true then
                 return privat:ban_message(name)
             end
         end
@@ -214,7 +216,7 @@ function BanSystem:init()
                 privat.database[name] = nil
             end
         end
-        save_database("bans.ixt",privat.database)
+        privat.Class.banlist:save(privat.database)
     end
 
     function privat:ban_message(name)
@@ -234,7 +236,7 @@ function BanSystem:init()
     end
 
     --чистая магия!
-    return setmetatable(obj, { __index = BanSystem })
+    return obj
 end
 
 
@@ -311,7 +313,7 @@ function NextBan(player_id,reason)
 end
 
 function checkUnban()
-    banSystem:check_unban()
+    banSystem:update_bans()
 end
 
 M.config = config

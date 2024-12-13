@@ -214,6 +214,40 @@ function round(numder,p)
 	return tonumber(string.format("%."..p.."f",numder)) 
 end
 
+function shallow_copy(tables)
+    local t = {}
+    for k,v in pairs(tables) do
+        t[k] = v
+    end
+    return t
+end
+
+function tables_equal(t1, t2)
+    if type(t1) ~= "table" or type(t2) ~= "table" then
+        return t1 == t2
+    end
+    for k, v in pairs(t1) do
+        if not tables_equal(v, t2[k]) then
+            return false
+        end
+    end
+    for k, v in pairs(t2) do
+        if not tables_equal(v, t1[k]) then
+            return false
+        end
+    end
+    return true
+end
+
+function deep_copy(t)
+    if type(t) ~= "table" then return t end
+    local new_table = {}
+    for k, v in pairs(t) do
+        new_table[k] = deep_copy(v)
+    end
+    return new_table
+end
+
 function table.shallow_copy(self)
 		local t = {}
 		for k,v in pairs(self) do

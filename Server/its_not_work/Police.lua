@@ -5,6 +5,16 @@ M.ver = "2.0"
 --
 local Police = {}
 extended(Police,DB)
+function Police:init(path)
+    local db_instance = DB:init(path) -- Инициализация DB
+
+    -- Копируем поля из db_instance в self
+    for key, value in pairs(db_instance) do
+        self[key] = value
+    end
+
+    return self
+end
 --Police:extended(DB)
 --[[
 Система Полиции

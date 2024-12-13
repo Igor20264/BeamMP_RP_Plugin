@@ -127,6 +127,14 @@ local function enableMotd()
         --        guihooks.trigger('ChangeState', {state = 'scenario-start', params = {data = {name=config.motd.title,buttonText="УРА!",description=description,introType=config.motd.type,showDataImmediately=true}}})
     end
 end
+
+local function onWorldReadyState(worldReadyState)
+    print({state = worldReadyState,text = "worldReadyState"})
+    if worldReadyState == 2 then
+        enableMotd()
+    end
+end
+
 local function onScenarioUIReady(state)
     print({state = state,text = "onScenarioUIReady"})
     if state == "start" then
@@ -193,11 +201,11 @@ local function onExtensionUnloaded()
     log("I", config.name,  "version " .. config.version .. " unloaded, goodbye!")
     Lua:requestReload()
 end
-
+--M.onWorldReadyState = onWorldReadyState
 M.onExtensionLoaded = onExtensionLoaded
 M.onExtensionUnloaded = onExtensionUnloaded
 M.onUpdate = onUpdate
-M.onVehicleSelected = onVehicleSelected
-M.onScenarioUIReady = onScenarioUIReady
+--M.onVehicleSelected = onVehicleSelected
+--M.onScenarioUIReady = onScenarioUIReady
 
 return M
