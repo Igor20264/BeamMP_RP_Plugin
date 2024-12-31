@@ -86,6 +86,12 @@ local function try_read_config(path)
 		local read = file:read("*all")
 		file:close()
 		local result = Util.JsonDecode(read)
+		if result == nil then -- fix json json_string = json_string:gsub('"%s*:%s*"', '", "')
+			result = result:gsub('"%s*:%s*"', '", "')
+		end 
+		if result == nil then
+			print("result nil")
+		end
 		return result
 	end
 end

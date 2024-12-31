@@ -61,6 +61,7 @@ M.onShut = {}
 M.command = {}
 
 log(pluginPath,4)
+dkjson = require "lib/dkjson"
 smallfunc = require "lib/other"
 HeventTimer = require("lib/EventTimer")
 files = require "lib/io"
