@@ -89,7 +89,7 @@ function BanSystem:init()
     end
 
     function privat:message_whitelist(name)
-        local msg = "К сожалению, "..name.." нет в белом списке. Для получения доступа авторизируйтесь на сервере: "..config.server_url
+        local msg = "К сожалению, "..name.." нет в белом списке. Для получения доступа авторизируйтесь на сервере: "..config.url
         return msg
     end
 
