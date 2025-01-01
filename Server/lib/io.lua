@@ -85,20 +85,25 @@ local function try_read_config(path)
 	else
 		local read = file:read("*all")
 		file:close()
+	
 		-- Попробуем декодировать JSON
 		local result, json_err = Util.JsonDecode(read)
-		if not result then -- Если декодирование не удалось, пробуем исправить JSON
-			-- Удаляем лишние запятые перед закрывающей фигурной скобкой
-			read = read:gsub(",%s*}", "}")
-			-- Добавляем запятые между значениями, если они разделены пробелами или новой строкой
-			read = read:gsub('"%s*:%s*"', '", "')
-			read = read:gsub('"%s*:%s*%s*', '", "')
-			read = read:gsub('"%s*:%s*%s*\n%s*"', '", "')
+	
+		if not result then -- Если декодирование не удалось, пробуем исправить JSON\
+			-- Добавляем запятую перед закрывающей фигурной скобкой, если она отсутствует
+			read = read:gsub('"%s*:%s*"%s*%S+%s*"%s*%s*[\n\r]', '%0,')
+			-- Удаляем запятую перед закрывающей фигурной скобкой, если она есть
+			read = read:gsub(',%s*}', '}')
 			-- Пытаемся снова декодировать исправленный JSON
 			result, json_err = Util.JsonDecode(read)
+	
 			if not result then
-				print("Ошибка декодирования JSON после исправления: " .. json_err)
-				return nil
+				-- Проверяем, существует ли json_err перед его использованием
+				if json_err then
+					print("Ошибка декодирования JSON после исправления: " .. json_err)
+				else
+					print("Ошибка декодирования JSON после исправления: неизвестная ошибка")
+				end
 			end
 		end
 		return result

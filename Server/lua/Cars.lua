@@ -567,7 +567,7 @@ function CarsSpawn(sender_id, sender_name, message)
                 end
             end
         end
-
+        log(adata)
         if adata.mainPartName == nil and adata.model == nil then
             SendMessage(sender_id,"Car Error: mainPartName and model is missing. Обратитесь к администратору.")
         end
