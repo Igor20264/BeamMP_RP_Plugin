@@ -84,8 +84,9 @@ function Working:init()
 			obj:stop(name)
 			return false,"Вы выполнили недельный план работ. Может начать заново!"
 		end
-		if getonlineplayers() < config.PLAYERMIN then
+		if getonlineplayers() < config.PLAYERMIN and config.checktime == true then
 			if 1 <= get_hour() and get_hour() <= 6 then
+				obj:stop(name)
 				return false,"Слишком мало игроков или время пойти поспать."
 			end
 		end
@@ -93,11 +94,8 @@ function Working:init()
 		local type_work = eco.database[name]["work"]["type"] or true
 
 		-- Генерируем новую точку, пока она не будет на достаточном расстоянии
-		local min_distance = 100 -- Минимальное расстояние в метрах
-		local new_dist, new_uuid
-		repeat
-			new_dist, new_uuid = gps:set_random_path(name, type_work)
-		until new_dist >= min_distance
+		local min_distance = 300 -- Минимальное расстояние в метрах
+		local new_dist, new_uuid = gps:set_random_path(name, type_work,min_distance)
 
 		privat.neworking[name].dist = new_dist
 		privat.neworking[name].uuid = new_uuid
