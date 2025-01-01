@@ -77,6 +77,9 @@ function Working:init()
 		money = round(money,2)*2
 		eco:add(name,"money",money)
 		SendMessage(MP.GetId(name),"Вам выплатили "..money.." "..config.currency)
+		privat.neworking[name].last_work_time = os.time()
+		privat.neworking[name].last_uuid = uuid
+
 		if privat.neworking[name].lens >= 50 then
 			obj:stop(name)
 			return false,"Вы выполнили недельный план работ. Может начать заново!"
@@ -86,15 +89,25 @@ function Working:init()
 				return false,"Слишком мало игроков или время пойти поспать."
 			end
 		end
-		privat.neworking[name].last_work_time = os.time()
-		privat.neworking[name].last_uuid = uuid
 		privat.neworking[name].lens = privat.neworking[name].lens + 1
 		local type_work = eco.database[name]["work"]["type"] or true
-		privat.neworking[name].dist,privat.neworking[name].uuid = gps:set_random_path(name,type_work)
+
+		-- Генерируем новую точку, пока она не будет на достаточном расстоянии
+		local min_distance = 100 -- Минимальное расстояние в метрах
+		local new_dist, new_uuid
+		repeat
+			new_dist, new_uuid = gps:set_random_path(name, type_work)
+		until new_dist >= min_distance
+
+		privat.neworking[name].dist = new_dist
+		privat.neworking[name].uuid = new_uuid
 		privat.neworking[name].alltimemoney = privat.neworking[name].alltimemoney + money
 	end
 
     function obj:stop(name,sender_id)
+		if sender_id == nil then
+			sender_id = MP.GetId(name)
+		end
 		MP.TriggerClientEvent(sender_id, "PacketNotify", Util.JsonEncode({color="yellow", title="Оповещение", text="Вы закончили работу"}));
 		MP.TriggerClientEvent(sender_id, "PacketProfsUpdate", eco.database[name]["work"]["name"]);
 		MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"Начать работу")
