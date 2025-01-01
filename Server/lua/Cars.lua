@@ -812,7 +812,6 @@ function SaveCarEveryXsec()
     end
 
     if not tables_equal(posCar, olddata) and math.random(1,10) == 1 then
-        print("SaveCarEveryXsec",posCar,olddata)
         forced_save_database("position_on_lic_plate.ixt",posCar)
     end
     return true
