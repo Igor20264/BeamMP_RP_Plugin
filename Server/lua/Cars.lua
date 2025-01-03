@@ -40,6 +40,7 @@ end
 local function vehicle_parser(data)
     local jbm = finds(data, "jbm")
     local per_data = data
+    print(data)
     data = string.gsub(data, jbm.."_", '')
     local engine = finds(data, "engine") or "Неизвестный двигатель"
     data = string.gsub(data, engine..'_', "")
@@ -283,7 +284,7 @@ Util.CompareJson = function(original, modified)
     end
     original = Util.JsonDecode(original)
     modified = Util.JsonDecode(modified)
-    if (original.model ~= modified.model and original.mainpartname ~= modified.mainpartname) and (original.model ~= nil or modified.model ~= nil) then
+    if (original.model ~= nil or modified.model ~= nil) and (original.model ~= modified.model and original.mainpartname ~= modified.mainpartname) then
         return false
     end
     if modified.model == "unicycle" and modified.mainpartname == "unicycle" then
@@ -454,7 +455,7 @@ function CarsFix(sender_id,sender_name, message)
     end
     if CTS[sender_name].custom ~= nil and CTS[sender_name].custom.repair ~= nil then
         -- Получаем процент повреждения
-        local damage = CTS[sender_name].custom.repair/config.percent_repair
+        local damage = (CTS[sender_name].custom.repair+1)/config.percent_repair
         local price_damage = damage*price
         price = round(price_damage,1)
     else
@@ -567,11 +568,50 @@ function CarsSpawn(sender_id, sender_name, message)
                 end
             end
         end
-        log(adata)
+        --[[
         if adata.mainPartName == nil and adata.model == nil then
+            -- Определение самого популярного слова в ключах объекта parts
+            if adata.parts then
+                local wordcount = {}
+
+                for key in pairs(adata.parts) do
+                    -- Извлекаем слово перед подчеркиванием
+                    local word = key:match("^(%w+)")
+                    if word then
+                        wordcount[word] = (wordcount[word] or 0) + 1
+                    end
+                end
+
+                -- Находим самое популярное слово
+                local model = nil
+                local max_count = 0
+                local ignore_word = { 'skin', "color" }
+                for word, count in pairs(wordcount) do
+                    if table.contains(ignore_word, word) then
+                        goto continue
+                    end
+                    if count > max_count then
+                        max_count = count
+                        model = word
+                    end
+                    ::continue::
+                end
+
+                -- Устанавливаем значение model
+                if model then
+
+                end
+            end
+        end
+        --]]
+
+
+        if adata.mainPartName == nil and adata.model == nil then
+            adata.model = adata.jbm
+            adata.mainPartName = adata.jbm
             SendMessage(sender_id,"Car Error: mainPartName and model is missing. Обратитесь к администратору.")
         end
-
+        log(adata)
         if adata.model == nil and adata.mainPartName ~= nil then
             adata.model = adata.mainPartName
         end
@@ -625,10 +665,11 @@ function CarsSellGos(sender_id, sender_name, message)
         return
     end
     local pc = math.random(30,40)
-    eco:add(sender_name, "money", price*(pc/100))
+    --eco:add(sender_name, "money", price*(pc/100))
+    eco:add(sender_name, "money", price)
     cars.database[sender_name][id] = nil
     cars:save()
-    SendMessage(sender_id, "Машина продана. Вам заплатили за утилизацию "..pc.."% от стоимости. "..price*(pc/100)..""..config.currency)
+    SendMessage(sender_id, "Машина продана. Вам заплатили за утилизацию "..pc.."% от стоимости. "..price..""..config.currency)
 end
 
 -- Установить стоймость машины
@@ -735,10 +776,14 @@ function CarsCheckCreate(player_id,vehicle_id,data)
     lastCar[name].name = cars_name[ret.jbm] or ret.mainPartName
     lastCar[name].category = cars_category[ret.jbm]
     lastCar[name].licenss_plate = adata.licenseText or adata.licenss_plate or cars_name[ret.jbm] or ret.mainPartName
-    
+
+    if adata.mainPartName == nil and adata.model == nil and ret.jbm ~= nil then
+        adata.model = ret.jbm
+        adata.mainPartName = ret.jbm
+    end
 	local isd = cars:is_doesnt(name,lastCar[name].config)
     if isd==false and price ~= nil and ret.jbm ~= "unicycle" then
-        perBuy[name] = {path = adata.partConfigFilename, price=CarCoast[adata.partConfigFilename],color = adata.paints,vars = adata.vars,model = adata.model or adata.mainPartName}
+        perBuy[name] = {path = adata.partConfigFilename, price=CarCoast[adata.partConfigFilename],color = adata.paints,vars = adata.vars,model = adata.model or ret.jbm or adata.mainPartName}
         SendMessage(player_id,"Стоимость машины в диллерском центре. "..price..""..config.currency)
     end
 

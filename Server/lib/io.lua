@@ -88,17 +88,18 @@ local function try_read_config(path)
 	
 		-- Попробуем декодировать JSON
 		local result, json_err = Util.JsonDecode(read)
-	
-		if not result then -- Если декодирование не удалось, пробуем исправить JSON\
-			-- Добавляем запятую перед закрывающей фигурной скобкой, если она отсутствует
+
+
+		if not result then
+			result = dkjson.decode(read)
+		end
+
+		if result == nil then
 			read = read:gsub('"%s*:%s*"%s*%S+%s*"%s*%s*[\n\r]', '%0,')
-			-- Удаляем запятую перед закрывающей фигурной скобкой, если она есть
 			read = read:gsub(',%s*}', '}')
-			-- Пытаемся снова декодировать исправленный JSON
 			result, json_err = Util.JsonDecode(read)
 	
 			if not result then
-				-- Проверяем, существует ли json_err перед его использованием
 				if json_err then
 					print("Ошибка декодирования JSON после исправления: " .. json_err)
 				else

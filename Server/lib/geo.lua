@@ -89,11 +89,11 @@ local function getPos(id,server_car_id)
     server_car_id = server_car_id or active or 0
     data = MP.GetPositionRaw(id,server_car_id) or nil
     if data == nil then
-        log("User"..id.." | Car "..server_car_id.." | is not active",5)
+        log("User"..id.." | Car "..server_car_id.." | is not data",5)
         return 0,0,0
     end
     if data["pos"] == nil then
-        log("User"..id.." | Car "..server_car_id.." | is not active",5)
+        log("User"..id.." | Car "..server_car_id.." | is not data['pos']",5)
         return 0,0,0
     end
     return data["pos"][1],data["pos"][2],data["pos"][3] -- x,y,z

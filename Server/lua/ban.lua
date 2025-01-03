@@ -148,7 +148,7 @@ function BanSystem:init()
 
     function privat:message_ip(name)
         name = privat:to_ip(name)
-        local msg = "К сожалению, пул ip: "..name.." заблокирован. Для выяснения подробностей обратитесь к администратору: "..config.server_url
+        local msg = "К сожалению, пул ip: "..name.." заблокирован. Для выяснения подробностей обратитесь к администратору: "..config.url
         return msg
     end
 
@@ -190,7 +190,7 @@ function BanSystem:init()
         -- duration - в секундах
         name = privat:is_ip_addres(name)
         local time = os.time() + duration
-        privat.database[name] = {endtime = time,reason=reason or "Не указано. Для получения подробностей обратитесь к администратору: "..config.server_url}
+        privat.database[name] = {endtime = time,reason=reason or "Не указано. Для получения подробностей обратитесь к администратору: "..config.url}
         privat.Class.banlist:save(privat.database)
     end
 
