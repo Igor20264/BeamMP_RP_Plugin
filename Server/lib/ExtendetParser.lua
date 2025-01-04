@@ -1,4 +1,6 @@
 local M = {}
+local CarName = load_config("settings/car_name")
+local CarCategory = load_config("settings/car_category")
 
 local function is_integer(num)
     return num == math.floor(num)
@@ -13,6 +15,14 @@ local function round_color(value)
     else
         return value
     end
+end
+
+local function AdditionalInfo(parsedData)
+    parsedData.coast = load_database("cars_coast.ixt")[parsedData.vcf.partConfigFilename]
+    parsedData.carName = CarName[parsedData.jbm] or parsedData.vcf.mainPartName
+    parsedData.category = CarCategory("settings/car_category")[parsedData.jbm]
+    parsedData.licenss_plate = parsedData.vcf.licenseText or parsedData.vcf.licenss_plate
+    return parsedData
 end
 
 local function TryReadDetail(etk, partName, jsonStr)
@@ -166,6 +176,7 @@ local function updateParts(inputStr)
 end
 
 -- Экспорт функции
+M.AdditionalInfo = AdditionalInfo
 M.updateBaseData = updateBaseData
 M.vehicleParser = basesplit
 M.updateParts = updateParts

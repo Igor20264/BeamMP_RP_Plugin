@@ -12,10 +12,6 @@ local VehicleParser = require "lib.ExtendetParser"
 local Generator = require "lib.Generator"
 M.info = "Система владения машинами"
 M.ver = "0.9 Beta"
-local cars_name = load_config("settings/car_name")
-local cars_category = load_config("settings/car_category")
-local lastCar = {}
-local CarCoast =  CarCoast or load_database("cars_coast.ixt") or {}
 local perBuy = {}
 
 
@@ -24,21 +20,9 @@ local function add_number_info(number)
     return sl
 end
 
-local function AdditionalInfo(parsedData)
-    parsedData.coast = CarCoast[parsedData.vcf.partConfigFilename]
-    parsedData.carName = cars_name[parsedData.jbm] or parsedData.vcf.mainPartName
-    parsedData.category = cars_category[parsedData.jbm]
-    parsedData.licenss_plate = parsedData.vcf.licenseText or parsedData.vcf.licenss_plate
-    return parsedData
-end
 ---@class Car
 local Car = {}
 Car.__index = Car
-
----@param player_id number
----@param carId number
----@param data string
----@return Car
 function Car:init(player_id,carId,data)
     local obj = setmetatable({}, self)
     obj.player_id = player_id
@@ -95,7 +79,7 @@ function Car:check(disableCheck)
     if self.data.jbm == "unicycle" then
         return 0
     end
-    self.data = AdditionalInfo(self.data)
+    self.data = VehicleParser.AdditionalInfo(self.data)
     if disableCheck == true then
         return 0
     end
@@ -141,7 +125,6 @@ end
 ---@class CarsManager
 local CarsManager = {}
 CarsManager.__index = CarsManager
-
 function CarsManager:init()
     local obj = setmetatable({}, self)
         obj.lastCar = {}
@@ -246,7 +229,6 @@ local carsManager = CarsManager:init()
 
 local Cars = {}
 extended(Cars, DB)
-
 function Cars:init(path)
     local db_instance = DB:init(path) -- Инициализация DB
 
@@ -568,8 +550,6 @@ function CarsFix(sender_id,sender_name, message)
     HeventTimer.Createtask(150,UncarFix,sender_id.."Unfreez",sender_id)
 end
 
--- Заспавнить машину
-
 -- Admin
 -- Получить все машины пользователя
 function CarsGetAll(sender_id,sender_name, message)
@@ -706,14 +686,14 @@ function CarsSellGos(sender_id, sender_name, message)
     end
 
     local config_name = cars.database[sender_name][id].data.vcf.partConfigFilename
-    local price = CarCoast[config_name] or cars.database[sender_name][id].coast or nil
+    local price = cars.database[sender_name][id].coast or nil
     if price == nil then
         SendMessage(sender_id, "Не установлена стоимость "..(config_name or "корпус неизвестен"))
         return
     end
 
     local pc = math.random(30,40)
-    --price = price*(pc/100)
+    price = price*(pc/100)
     eco:add(sender_name, "money", price)
     cars.database[sender_name][id] = nil
     cars:save()
@@ -739,6 +719,7 @@ function CarsSetPrice(sender_id, sender_name, message)
     
     -- Устанавливаем цену в CarCoast
     car.coast = coast
+    local CarCoast = load_database("cars_coast.ixt")
     CarCoast[car.data.vcf.partConfigFilename] = coast
     save_database("cars_coast.ixt", CarCoast)
     if name ~= sender_name then
@@ -859,20 +840,3 @@ function M.unload()
 end
 
 return M
-
---[[
-
-
-Cars.ixt
-
---
-
-Cars.hex.ixt
-```
-id = {player,nickname_car,path}
-```
-Cars/{id}.ixt
-
-
-
---]]
