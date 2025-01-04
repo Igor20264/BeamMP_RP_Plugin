@@ -247,18 +247,11 @@ function MYINFO(sender_id,sender_name, message)
     end
     ret = ret.."Работает: "..data.."\n"
     ret = ret.."Текущие права: | "
-    local data
     for category,ovn in pairs(eco.database[sender_name]["drivelicence"]) do
         if ovn then
             ret = ret..category.." | "
         end
 
-    end
-    ret = ret.."\n"
-    if Cars.lastCar[sender_name] then
-        ret = ret.."Текущая машина: "..Cars.lastCar[sender_name].name.."\n"
-    else
-        ret = ret.."Текущая машина: нет\n"
     end
     SendMessage(name,ret)
 end
@@ -278,18 +271,11 @@ function GETINFO(sender_id,sender_name, message)
     end
     ret = ret.."Работает: "..data.."\n"
     ret = ret.."Текущие права: | "
-    local data
     for category,ovn in pairs(eco.database[name]["drivelicence"]) do
         if ovn then
             ret = ret..category.." | "
         end
 
-    end
-    ret = ret.."\n"
-    if Cars.lastCar[name] then
-        ret = ret.."Текущая машина: "..Cars.lastCar[name].name.."\n"
-    else
-        ret = ret.."Текущая машина: нет\n"
     end
     SendMessage(sender_id,ret)
 end

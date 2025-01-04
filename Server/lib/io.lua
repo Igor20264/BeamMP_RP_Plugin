@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 
 local req_save_database = req_save_database or {}
 

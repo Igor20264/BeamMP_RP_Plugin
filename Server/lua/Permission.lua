@@ -164,8 +164,6 @@ local function permission_decorator(allowed_roles)
             return original_function(...)
         end
         local user_roles = permissions:get_roles(user_name)
-        print(user_name)
-        print(allowed_roles)
         --[[
         if cache ~= nil and cache[user_name] and cache[user_name][original_function] then
             return original_function(...)  -- Вызываем оригинальную функцию с измененными аргументами

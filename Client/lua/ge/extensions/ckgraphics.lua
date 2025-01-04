@@ -113,9 +113,9 @@ local function onWorldReadyState(worldReadyState)
 		if type(data) == "nil" then
 			log('D', 'simpletrace', "FileNotFaund")
 			core_vehicles.spawnNewVehicle("unicycle",{pos = vec3(
-			711+(math.random()),
-			-54+(math.random()),
-			53+(math.random())
+			-807+(math.random()),
+			904+(math.random()),
+			76+(math.random())
 			)})
 		elseif type(data) == "table" then
 			log("D", "simpletrace","HomeFindet")
@@ -127,9 +127,9 @@ local function onWorldReadyState(worldReadyState)
 		else
 			log('W', 'simpletrace', "FileNotFaund")
 			core_vehicles.spawnNewVehicle("unicycle",{pos = vec3(
-			711+(math.random()),
-			-54+(math.random()),
-			53+(math.random())
+      -807+(math.random()),
+			904+(math.random()),
+			76+(math.random())
 			)})
 		end
 		core_camera.setByName(be:getPlayerVehicle(0))

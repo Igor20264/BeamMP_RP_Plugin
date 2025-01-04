@@ -186,7 +186,7 @@ local function onExtensionUnloaded()
     log("I", "LightSystem", "unloaded")
 end
 
-M.onExtensionLoaded = onExtensionLoaded
-M.onExtensionUnloaded = onExtensionUnloaded
-M.onUpdate = onUpdate
+--M.onExtensionLoaded = onExtensionLoaded
+--M.onExtensionUnloaded = onExtensionUnloaded
+--M.onUpdate = onUpdate
 return M

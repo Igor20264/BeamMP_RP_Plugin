@@ -104,7 +104,7 @@ function geo:get_random(px,py,min_dist,work_type)
     work_type = work_type or true
     min_dist = min_dist or 10
     local temp = geo:get_table_by_distancse(px,py,min_dist,work_type)
-    local s = Util.RandomIntRange(#temp//2,#temp)
+    local s = math.random(#temp//2,#temp)
     return temp[s].uuid
 end
 

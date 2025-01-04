@@ -122,10 +122,12 @@ end
 local function enableMotd()
     if config.motd.enabled then
         local description = config.motd.description:gsub("{serverTime}", os.date("!%I:%M %p", os.time() + config.timesync.offsetHours * 60 * 60) .. " UTC" .. getSign(config.timesync.offsetHours) .. config.timesync.offsetHours)
-        guihooks.trigger('ScenarioChange', {name = config.motd.title, description = description, introType = config.motd.type})
-
+        --guihooks.trigger('ScenarioChange', {name = config.motd.title, description = description, introType = config.motd.type})
+        extensions.core_gamestate.setGameState("scenario", "BeamMP_RP_Plugin","uj_base")
         --        guihooks.trigger('ChangeState', {state = 'scenario-start', params = {data = {name=config.motd.title,buttonText="УРА!",description=description,introType=config.motd.type,showDataImmediately=true}}})
     end
+
+
 end
 
 local function onWorldReadyState(worldReadyState)
@@ -179,13 +181,7 @@ end
 local function onExtensionLoaded()
     config = require("settings/config")
     log("W", "onExtensionLoaded")
-    if config.motd.enabled then
-        guihooks.trigger("ChangeState", {state = "scenario-start"})
-    end
 
-    if config.restrictMenu then
-        extensions.core_gamestate.setGameState("scenario", "BeamMP_RP_Plugin","uj_base")
-    end
     setInitialTime()
     setInitialWeather()
     replaceResetHook()

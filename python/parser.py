@@ -21,6 +21,8 @@ for line in data:
             continue
         if "Respond failed, dropping client" in line:
             continue
+        if "server_url" in line:
+            continue
         error.append(line)
     print(line)
 print("\n")

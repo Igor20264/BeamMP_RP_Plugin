@@ -15,7 +15,7 @@ local function onRedLightCamTriggered(speedTrapData, playerSpeed)
     speedTrapData.licensePlate = obj:getDynDataFieldbyName("licenseText", 0) or "Illegible"
     speedTrapData.vehicleModel = core_vehicles.getModel(obj.JBeam).model.Name or nil
     speedTrapData.playerSpeed = playerSpeed or nil
-    speedTrapData.overSpeed = overSpeed or nil
+    speedTrapData.overSpeed = nil
     TriggerServerEvent("redLight", jsonEncode( speedTrapData ) )
 end
 

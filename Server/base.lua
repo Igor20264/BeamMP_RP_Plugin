@@ -3,7 +3,30 @@ local M = {logs = true, debugs = true}
 os.setlocale( "C", "ctype" );
 os.execute( "chcp 65001 > nul" )
 
-math.randomseed(os.clock()*os.clock())
+-- Функция для генерации сложного сида
+function generate_complex_seed()
+    -- Получаем текущее время в секундах
+    local time_seconds = os.time()*os.clock()
+
+    -- Получаем текущее время в миллисекундах
+    local time_milliseconds = os.clock() * 1000  -- os.clock() возвращает время в секундах с плавающей точкой
+
+    -- Получаем текущую дату в виде строки
+    local date_string = os.date("%Y-%m-%d %H:%M:%S")
+
+    -- Комбинируем все данные в одну строку
+    local combined_data = tostring(time_seconds) .. tostring(time_milliseconds) .. date_string
+
+    -- Преобразуем строку в числовой сид
+    local seed = 0
+    for i = 1, #combined_data do
+        seed = seed + combined_data:byte(i) * i  -- Используем байтовое значение каждого символа
+    end
+
+    return seed
+end
+
+math.randomseed(generate_complex_seed())
 
 inspect = require "lib/inspect"
 
