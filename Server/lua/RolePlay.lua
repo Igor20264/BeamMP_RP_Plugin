@@ -40,6 +40,10 @@ function NRP_Chat(sender_id, sender_name, message) --НРП Информация
 end
 
 function ME(sender_id, sender_name, message) --действия от 3-го лица
+    SendMessage(-1, sender_name..":^b " .. message)
+end
+
+function DO(sender_id, sender_name, message) --действия от 3-го лица
     SendMessage(-1, sender_name..":^3 " .. message)
 end
 
@@ -48,6 +52,7 @@ M.command = {
     {command = "dm", help = "Отправить сообщение другому игроку.", args = "[ник] [сообщение]", func = "DM"},
     {command = "b", help = "НРП Информация", args = "[сообщение]", func = "NRP_Chat"},
     {command = "me", help = "Действия от 3-го лица", args = "[действие]", func = "ME"},
+    {command = "do", help = "Действия от 3-го лица", args = "[действие]", func = "DO"},
 }
 function M.load()
 end

@@ -71,7 +71,7 @@ local function trigerPost(data_json)
 
 	log('D', 'trigerJobsPost', dump(data))
 	CheckPoint = createObject("BeamNGTrigger")
-	CheckPoint.loadmode = 1;
+	CheckPoint.loadMode = 1;
 	CheckPoint:setField("triggerType", 0, 'Sphere')
 	CheckPoint.debug = true;
 	CheckPoint:registerObject(trigger_name)
@@ -114,7 +114,7 @@ end
 
 local function packetJobsUpdate()
 	log('D', 'packetJobsUpdate', dump(data))
-	TriggerEventSener("packetJobsUpdate")
+	TriggerServerEvent("packetJobsUpdate")
 end
 
 local function CarReplace(data_json)

@@ -111,9 +111,9 @@ end
 function Gen.uuid()
     local seed={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'}
     local tb={}
-    math.randomseed(os.clock()*os.clock())
+    math.randomseed(generate_complex_seed())
     for i=1,32 do
-        table.insert(tb,seed[Util.RandomIntRange(1,16)])
+        table.insert(tb,seed[math.random(1,16)])
     end
     local sid=table.concat(tb)
     return string.format('%s-%s-%s-%s-%s',
@@ -133,7 +133,7 @@ function Gen.generateRandomData(size)
   end
   local res = ''
   for i = 1, size do
-	res = res .. charTable[Util.RandomIntRange(1, #charTable)]
+	res = res .. charTable[math.random(1, #charTable)]
   end
   return res
 end

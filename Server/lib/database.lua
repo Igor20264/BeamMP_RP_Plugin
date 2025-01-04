@@ -90,7 +90,12 @@ function Database:init(namedb) -- свойства
     end
 
 	function obj:set(name,...)
+        -- Check if obj is nil
+        if not obj then
+            error("obj is nil")
+        end
         local args = {...}
+
         local currentTable = obj.database[name]
 
          -- Проверяем, существует ли таблица для данного имени
@@ -101,6 +106,9 @@ function Database:init(namedb) -- свойства
 
         for i = 1, #args - 2 do
             local key = args[i]
+            if type(currentTable) ~= "table" then
+                error("currentTable is not a table at iteration " .. i)
+            end
             currentTable[key] = currentTable[key] or {}
             currentTable = currentTable[key]
         end

@@ -104,14 +104,15 @@ function geo:get_random(px,py,min_dist,work_type)
     work_type = work_type or true
     min_dist = min_dist or 10
     local temp = geo:get_table_by_distancse(px,py,min_dist,work_type)
-    local s = Util.RandomIntRange(#temp//2,#temp)
+    local s = math.random(#temp//2,#temp)
     return temp[s].uuid
 end
 
-function geo:set_random_path(player,work_type)
+function geo:set_random_path(player,work_type, minimal_distance)
+    minimal_distance = minimal_distance or 300
     work_type = work_type or true
-    local x,y,z = GEO.getPos(MP.GetId(player),0)
-    local uuid = geo:get_random(x,y,300,work_type)
+    local x,y,z = GEO.getPos(MP.GetId(player))
+    local uuid = geo:get_random(x,y,minimal_distance,work_type)
     geo:set_active_path(player,uuid)
     local database = self.database or gps.database
     return GEO.Distance(x,y,database[uuid].geo[1].x,database[uuid].geo[1].y)*1.5,uuid

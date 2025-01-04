@@ -157,22 +157,25 @@ onlyPlayer(sag, 1, "CMD", 3)
 local function permission_decorator(allowed_roles)
     return function(original_function,...)
         allowed_roles = allowed_roles or {'player'}
+
         local args = {...}  -- Получаем переданные аргументы
         local user_name = args[3]
         if user_name == "CMD" then
             return original_function(...)
         end
         local user_roles = permissions:get_roles(user_name)
+        --[[
         if cache ~= nil and cache[user_name] and cache[user_name][original_function] then
             return original_function(...)  -- Вызываем оригинальную функцию с измененными аргументами
         end
+        --]]
         -- перенбираем все роли игрока и ищем схожие
         if user_roles ~= nil then
             for _, role in ipairs(user_roles) do
                 for _, allowed_role in ipairs(allowed_roles) do
                     if role == allowed_role then
-                        cache[user_name] = cache[user_name] or {}
-                        cache[user_name][original_function] = true
+                        --cache[user_name] = cache[user_name] or {}
+                        --cache[user_name][original_function] = true
                         return original_function(...)  -- Вызываем оригинальную функцию с измененными аргументами
                     end
                 end

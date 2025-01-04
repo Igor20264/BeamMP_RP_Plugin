@@ -56,7 +56,9 @@ function HELP(sender_id, sender_name, message)
 	if category_target ~= "" then
 		for _,case in ipairs(M.parrent.command) do
 			if case.category == category_target and (case.hide == false or case.hide == nil) then
-				text_message = text_message..(permissions:role_in_roles('admin',case.roles) and "[A]" or "")..config.prefix..""..case.category.." "..case.command.." "..case.args.." |\t "..case.help.."\n"
+				if case.roles == nil or permissions:roles_in_roles(case.roles,sender_name) then
+					text_message = text_message..(permissions:role_in_roles('admin',case.roles) and "[A]" or "")..config.prefix..""..case.category.." "..case.command.." "..case.args.." |\t "..case.help.."\n"
+				end
 			end
 		end
 	else

@@ -81,7 +81,7 @@ function getCheckPointDostavka(profs_pos, use_pos, user_id)
     end
     if DostavkaActive[user_id] == "load" then
         DostavkaActive[user_id] = "unload"
-        randPos = Util.RandomIntRange(1, count)
+        randPos = math.random(1, count)
         data = points[profs_pos..randPos]
 
         pos_name = profs_pos..randPos
@@ -103,7 +103,7 @@ function getCheckPointDostavka(profs_pos, use_pos, user_id)
         MP.TriggerClientEvent(user_id, "PackettrigerPost" ,data_json)
 
         if pay_use == true then
-            randBal = Util.RandomIntRange(150, 800)
+            randBal = math.random(150, 800)
             MP.TriggerClientEvent(user_id, "PacketNotify", json.encode({color="yellow", title="Оповещение", text="Вы получили "..randBal.."$ за работу"}))
             local new_bal = UserData(MP.GetPlayerName(user_id)).bal + randBal
             editUserData(getIdByNick(MP.GetPlayerName(user_id)),"bal", new_bal)

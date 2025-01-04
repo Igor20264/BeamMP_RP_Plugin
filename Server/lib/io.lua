@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 
 local req_save_database = req_save_database or {}
 
@@ -85,7 +85,28 @@ local function try_read_config(path)
 	else
 		local read = file:read("*all")
 		file:close()
-		local result = Util.JsonDecode(read)
+	
+		-- Попробуем декодировать JSON
+		local result, json_err = Util.JsonDecode(read)
+
+
+		if not result then
+			result = dkjson.decode(read)
+		end
+
+		if result == nil then
+			read = read:gsub('"%s*:%s*"%s*%S+%s*"%s*%s*[\n\r]', '%0,')
+			read = read:gsub(',%s*}', '}')
+			result, json_err = Util.JsonDecode(read)
+	
+			if not result then
+				if json_err then
+					print("Ошибка декодирования JSON после исправления: " .. json_err)
+				else
+					print("Ошибка декодирования JSON после исправления: неизвестная ошибка")
+				end
+			end
+		end
 		return result
 	end
 end

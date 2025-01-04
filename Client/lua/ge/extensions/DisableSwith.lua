@@ -1,8 +1,9 @@
 local M = {}
 ToSendServerData = {}
 AddToSendServerData = {}
-
-
+SoldId = {}
+insnowman = false
+-- other func
 local function split(inputstr, sep) 
 	if sep == nil then sep = "%s" end 
 	local t={}
@@ -44,7 +45,7 @@ local function skipPlayers(egg)
 	settings.requestSave()
 end
 
-function skipPlayersAdm(egg)
+local function skipPlayersAdm(egg)
 	settings.setValue("skipOtherPlayersVehicles", false)
 	settings.setValue("nameTagFadeEnabled", egg)
 	settings.setValue("nameTagFadeDistance", 5)
@@ -66,6 +67,23 @@ function AddDataToSendServerData(strlua)
 	AddToSendServerData[tdata[1]] = tdata[2]
 end
 
+local function onVehicleSwitched(oldId, newId, playerId)
+	local currentVehicle = core_vehicles.getCurrentVehicleDetails()
+	local name_car = currentVehicle.model.key
+	if name_car == 'unicycle' then
+		if issnowman ~= true then
+			SoldId = oldId
+			insnowman = true
+		end
+	elseif insnowman == true and name_car ~= 'unicycle' and newId ~= SoldId then
+		local x,y,z = be:getPlayerVehicle(0):getPositionXYZ()
+		TriggerServerEvent("VehicleSwitched", jsonEncode({id = newId,position={x=x,y=y,z=z}}))
+		insnowman = false
+	elseif insnowman == true and name_car ~= 'unicycle' and newId == SoldId then
+		insnowman = false
+	end
+end
+
 local function SendToServerData(name)
 	ToSendServerData = ToSendServerData or {}
 	ToSendServerData.activeVehicle = be:getPlayerVehicle(0):getId()
@@ -80,8 +98,6 @@ local function SendToServerData(name)
 	TriggerServerEvent('GetCTS', name.."$$$"..(jsonEncode(ToSendServerData)))
 	ToSendServerData = {}
 end
-
-
 
 local function SpawnCar(data)
 	log('I', 'spawn', data)
@@ -142,13 +158,20 @@ local function onExtensionLoaded()
 	--core_input_actionFilter.addAction(0, "restrictions",  true)
 end
 
+local function onBeamNGTriggerPoint(trigger, data)
+	data = jsonEncode({trigger=trigger,data=data})
+	TriggerServerEvent("onTriggerPoint", data)
+end
+
+--onJoinTriggerPoint
 local function onExtensionUnloaded()
 	skipPlayers(false)
 	skipPlayersAdm(false)
 	log('I', 'simpletrace', "UNLOAD")
     extensions.core_input_actionFilter.addAction(0, 'restrictions',  false)
 end
-
+M.onBeamNGTriggerPoint = onBeamNGTriggerPoint
+M.onVehicleSwitched = onVehicleSwitched
 M.onExtensionLoaded = onExtensionLoaded
 M.onExtensionUnloaded = onExtensionUnloaded
 --M.onUpdate = onUpdate

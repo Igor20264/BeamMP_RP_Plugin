@@ -72,12 +72,12 @@ function SET(sender_id,sender_name,message)
 	local cur = config.currency
 	local case = split(message," ")
 	local name = erors(case[1],2)
-	case[1] = nil
+    table.remove(case,1)
 	local type = case[3]
 	local value = case[2]
 	--case[3] = tonumber(case[3])
 
-	if value == "name" then
+	if case[1] ~= "work" and value == "name" then
 	    SendMessage(sender_id,"У вас нет прав редактировать этот параметр")
     else
 		log("Установлено значение "..case[#case-1].." игроку "..name.." в размере ".. case[#case])
@@ -160,7 +160,10 @@ function PAY(sender_id,sender_name, message) -- Перевод от одного
     money = round(math.abs(money),1)
     local money_nds = money*(config.nds or 0.05)
 	local currency = config.currency
-
+    if money_nds == 0 then
+        SendMessage(sender_id, "Сумма перевода не может быть равна 0")
+        return
+    end
 	if p2 == "CMD" or MP.check_in_online(p2) == true then
 		if (eco:value(sender_name,"money")-(money+money_nds) >= 0) then
             local p1 = eco:add(sender_name,"money",-(money+money_nds))
@@ -244,18 +247,11 @@ function MYINFO(sender_id,sender_name, message)
     end
     ret = ret.."Работает: "..data.."\n"
     ret = ret.."Текущие права: | "
-    local data
     for category,ovn in pairs(eco.database[sender_name]["drivelicence"]) do
         if ovn then
             ret = ret..category.." | "
         end
 
-    end
-    ret = ret.."\n"
-    if Cars.lastCar[sender_name] then
-        ret = ret.."Текущая машина: "..Cars.lastCar[sender_name].name.."\n"
-    else
-        ret = ret.."Текущая машина: нет\n"
     end
     SendMessage(name,ret)
 end
@@ -275,18 +271,11 @@ function GETINFO(sender_id,sender_name, message)
     end
     ret = ret.."Работает: "..data.."\n"
     ret = ret.."Текущие права: | "
-    local data
     for category,ovn in pairs(eco.database[name]["drivelicence"]) do
         if ovn then
             ret = ret..category.." | "
         end
 
-    end
-    ret = ret.."\n"
-    if Cars.lastCar[name] then
-        ret = ret.."Текущая машина: "..Cars.lastCar[name].name.."\n"
-    else
-        ret = ret.."Текущая машина: нет\n"
     end
     SendMessage(sender_id,ret)
 end
