@@ -108,7 +108,6 @@ function Car:check(disableCheck)
 end
 
 function Car:update(data, disableCheck)
-    print(data)
     data = VehicleParser.updateParts(data)
     if self.data.jbm == "unicycle" then
         return 0
@@ -116,7 +115,7 @@ function Car:update(data, disableCheck)
         if disableCheck == true then
             return 0
         end
-        return not self:is_doesnt(data)
+        return 0
     else
         return 1
     end

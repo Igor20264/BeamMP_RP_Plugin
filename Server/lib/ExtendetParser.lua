@@ -20,7 +20,7 @@ end
 local function AdditionalInfo(parsedData)
     parsedData.coast = load_database("cars_coast.ixt")[parsedData.vcf.partConfigFilename]
     parsedData.carName = CarName[parsedData.jbm] or parsedData.vcf.mainPartName
-    parsedData.category = CarCategory("settings/car_category")[parsedData.jbm]
+    parsedData.category = CarCategory[parsedData.jbm]
     parsedData.licenss_plate = parsedData.vcf.licenseText or parsedData.vcf.licenss_plate
     return parsedData
 end

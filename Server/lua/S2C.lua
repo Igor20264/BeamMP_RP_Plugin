@@ -128,7 +128,7 @@ local data = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehic
 'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
 'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
 'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
-'toggle_play', 'reset_physics'}
+'toggle_play', 'reset_physics','switch_next_vehicle'}
 
 for i,case in ipairs(data) do
 	M.data = M.data.." "..case
@@ -190,13 +190,6 @@ _damageRate = (DAMAGE_RATE_MAX > _damageRate) and _damageRate or DAMAGE_RATE_MAX
 return _damageRate
 ]]
 
-local function split(s, delimiter)
-    result = {};
-    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
-        table.insert(result, match)
-    end
-    return result
-end
 --
 function crash(sender_id,sender_name, message)  -- username
     local user = error(message)
