@@ -113,9 +113,15 @@ function Car:update(data, disableCheck)
         return 0
     elseif data.jbm == self.data.jbm then
         if disableCheck == true then
+            self.data = data
             return 0
         end
-        return 0
+        if self:is_doesnt(data) == true then
+            self.data = data
+            return 0
+        else
+            return 1
+        end
     else
         return 1
     end
@@ -168,9 +174,6 @@ function CarsManager:update(player_id,carId,data)
     self.lastCarId[username] = strCarId
     local cars = self.lastCar[username][strCarId]
     local status = cars:update(data,block_ignore[username])
-    if block_ignore[username] == true then
-        block_ignore[username] = false
-    end
     -- если 1 то изменения откатываются
     return status
 end
@@ -221,6 +224,7 @@ end
 ---@param username string
 ---@return Car
 function CarsManager:get_car(username)
+    print(self.lastCarId[username],self.lastCar[username][self.lastCarId[username]])
     return self.lastCar[username][self.lastCarId[username]]
 end
 
@@ -575,17 +579,37 @@ end
 function CarsUpdate(sender_id,sender_name, message)
     local case = split(message," ")
     local name = erors(case[1],2)
-    local id = cars:getidbynickname(name,case[2])
-    local car = CarsManager:get_car(name)
+    if name == nil then
+        SendMessage(sender_id,"Укажите никнейм")
+        return
+    end
     local money = tonumber(case[3])
-
-    cars.database[name][id].data.vcfStr = car.vcfStr
-    cars.database[name][id].data.vcf = car.vcf
+    if money == nil then
+        SendMessage(sender_id,"Укажите сумму")
+        return
+    end
+    local id = cars:getidbynickname(name,case[2])
+    if id == nil then
+        SendMessage(sender_id,"Машина не найдена")
+        return
+    end
+    local car = carsManager:get_car(name)
+    print(car.data.vcfStr)
+    if eco:value(name, "money") < money then
+        local curMoney = eco:value(sender_name, "money")
+        SendMessage(MP.GetId(name), "У вас не хватает: "..money-curMoney.." "..config.currency.." для обновления машины")
+        SendMessage(sender_name, "У Игрока не хватает: "..money-curMoney.." "..config.currency.." для обновления машины")
+    end
+    cars.database[name][id].data.vcfStr = car.data.vcfStr
+    cars.database[name][id].data.vcf = car.data.vcf
     cars.database[name][id].data.coast = round(cars.database[name][id].coast + (money/4),2)
-    cars.database[name][id].data.base = car.base
+    cars.database[name][id].data.base = car.data.base
     cars:save()
+    eco:add(name, "money", -math.abs(money))
     SendMessage(MP.GetId(name),"Вы заплатили "..money.." "..config.currency.." за обновление машины")
-    SendMessage(sender_id,"Машина обновлена | Вам заплатили за обновление машины "..money.." "..config.currency)
+    eco:add(sender_name, "money", math.abs((money/100)*5))
+    SendMessage(sender_id,"Машина обновлена | Вам заплатили за обновление машины "..math.abs((money/100)*5).." "..config.currency)
+
 end
 
 function CarsChekEdit(sender_id,sender_name, message)
@@ -593,7 +617,7 @@ function CarsChekEdit(sender_id,sender_name, message)
     local name = erors(case[1],2)
     local id = cars:getidbynickname(name,case[2])
     local text = "Изменения:\n"
-    local car = CarsManager:get_car(name)
+    local car = carsManager:get_car(name)
     local carg = cars.database[name][id]
     if carg == nil then
         SendMessage(sender_id,"Машина не найдена")

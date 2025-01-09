@@ -128,7 +128,7 @@ local data = {'recover_to_last_road', 'editorSaveLevel', 'funExtinguish', 'vehic
 'debugmode_meshvis_incr', 'toggleTrackBuilder', 'debugmode_meshvis_decr', 'nodegrabberStrength', 'objectEditorToggle', 'cycleTimeOfDay',
 'funBreak', 'debugmode_toggle_coltris', 'vehicleTeleporting', 'cefdev_reload_ui', 'editorSafeModeToggle', 'flexmeshDebugSelectionToggle',
 'editorSaveLevelAs', 'funHinges', 'recover_vehicle', 'slower_motion', 'reload_all_vehicles', 'editorToggleFreeCamera', 'nodegrabberAction',
-'toggle_play', 'reset_physics','switch_next_vehicle'}
+'toggle_play', 'reset_physics'}
 
 for i,case in ipairs(data) do
 	M.data = M.data.." "..case
