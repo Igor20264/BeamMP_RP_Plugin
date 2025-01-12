@@ -1,0 +1,17 @@
+{
+    "domElement": "<roleplaybal></roleplaybal>",
+    "name": "RolePlay Balance",
+    "types": [
+      "ui.apps.categories.roleplaybal"
+    ],
+    "css": {
+        "left": "50%",
+        "top": "40px",
+        "width": "200px",
+        "height": "49px"
+    },
+    "description": "Интерфейс для баланса",
+    "author": "BeamMP_RP_Plugin",
+    "version": "0.1",
+    "directive": "roleplaybal"
+}

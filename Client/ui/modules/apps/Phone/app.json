@@ -1,0 +1,17 @@
+{
+    "domElement": "<roleplayphone></roleplayphone>",
+    "name": "RolePlay Phone",
+    "types": [
+      "ui.apps.categories.roleplayphone"
+    ],
+    "css": {
+        "left": "50%",
+        "top": "40px",
+        "width": "382px",
+        "height": "778px"
+    },
+    "description": "Интерфейс телефона",
+    "author": "BeamMP_RP_Plugin",
+    "version": "0.1",
+    "directive": "roleplayphone"
+  }

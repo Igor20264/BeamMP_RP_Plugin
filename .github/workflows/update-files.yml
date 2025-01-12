@@ -3,33 +3,72 @@ name: Deploy to FTP
 on:
   push:
     branches:
-      - dev
+      - "main"
 
 jobs:
   update-files:
+    if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Clear Old Code
+
+      - name: Clear Old Code and update database
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           script: |
+            docker stop server_dev_beammp-server_1
             rm -rf /root/server_dev/server-mods/BeamMP_RP_Plugin
             mkdir /root/server_dev/server-mods/BeamMP_RP_Plugin
+            cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin
+            chmod -R 777 /root/server_dev/server-mods/BeamMP_RP_Plugin
 
-      - name: SFTP uploader
+      #- name: Pack Mod to zip
+      #  run: |
+      #    cd Client
+      #    zip -r ../Client.zip .
+      #    cd ..
+      #    mkdir -p ./tempZip
+      #    cp -r ./Client.zip ./tempZip
+      #    cd ./tempZip
+      #    ls
+
+      - name: SFTP Plugin uploader
         uses: wangyucode/sftp-upload-action@v2.0.2
         with:
           host: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localDir: ./
+          localDir: ./Server/
           remoteDir: /root/server_dev/server-mods/BeamMP_RP_Plugin
-          exclude: .git/**,.github/**,.gitignore,database/**,its_not_work/**,pattern/**
+          exclude: its_not_work/**,pattern/**,docs/**
+
+      - name: Clear Old Code and update database
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: |
+            rm -rf /root/server_dev/client-mods/
+            mkdir /root/server_dev/client-mods
+            cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin
+
+      #- name: SFTP mod uploader
+      #  uses: wangyucode/sftp-upload-action@v2.0.2
+      #  with:
+      #    host: ${{ secrets.FTP_HOST }}
+      #    username: ${{ secrets.FTP_USERNAME }}
+      #    password: ${{ secrets.FTP_PASSWORD }}
+      #    localDir: ./tempZip
+      #    remoteDir: /root/server_dev/client-mods/
+      #    forceUpload: false
+      #    exclude: .git/**,.github/**,.gitignore
+
+
       - name: Update Database
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -37,6 +76,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           script: |
-            cp -r /root/server/server-mods/economic/database /root/server_dev/server-mods/BeamMP_RP_Plugin/database
-            docker restart server_beammp-server_dev1
-
+            docker start server_dev_beammp-server_1
