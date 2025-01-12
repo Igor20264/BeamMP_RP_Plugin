@@ -31,6 +31,14 @@ function Eco:getOnline()
     return ret
 end
 
+function Eco:player_in_game(name)
+    if self.database[name] == nil then
+        return false
+    else
+        return true
+    end
+end
+
 function Eco:join(id)
     if self.database[MP.GetPlayerName(id)] == nil then
         self.database[MP.GetPlayerName(id)] = {money = config.startmoney, work = {name = config.starworkname,money = config.startworkmoney,metr = config.P4M,on_works = false,time_work = false, time_minute = 0}, drivelicence = shallow_copy(config.drivelicence)}

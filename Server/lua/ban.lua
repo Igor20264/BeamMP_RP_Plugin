@@ -219,6 +219,13 @@ function BanSystem:init()
         privat.Class.banlist:save(privat.database)
     end
 
+    function obj:get_endtime(name)
+        if privat.database[name] == nil then
+            return false
+        end
+        return privat.database[name].endtime
+    end
+
     function privat:ban_message(name)
         local msg = "Вы были заблокированы. \nПричина: "..privat.database[name].reason.." \nОсталось: "..os.date("%d.%m.%Y %H:%M:%S",privat.database[name].endtime-os.time()).." \nОбжаловать бан можно в Дискорде: "..config.url
         return msg
@@ -285,21 +292,25 @@ function BAN(sender_id, sender_name, message)
     if case == nil or #case < 1 then
         SendMessage(sender_id,"Неверное количество аргументов")
     end
-    local name = erors(case[1],2)
+    local name = erors2(case[1],1)
+    if name == false then
+        SendMessage("Игрок "..case[1].." не найден.")
+        return
+    end
     local duration = timeConverter(case[2]) or timeConverter("3d")
-    case[1] = nil
-    case[2] = nil
+    table.remove(case, 1)
+    table.remove(case, 1)
     local reason = "Узнать подробности можно в Дискорде. "..M.config.url
     if case ~= nil and #case >= 1 then
         reason = table.concat(case, " ")
     end
     banSystem:add_ban(name,duration,reason)
-    SendMessage(sender_id,name.." был забанен. Причина: "..reason..". Осталось: "..os.date("%d.%m.%Y %H:%M:%S",banSystem.database[name].endtime-os.time()))
+    SendMessage(sender_id,name.." был забанен. Причина: "..reason..". Осталось: "..os.date("%d.%m.%Y %H:%M:%S",banSystem:get_endtime(name)-os.time()))
 	if MP.check_in_online(name) == true then
         -- todo: тут какая то странная ошибка.
         --> [Economic_Plugin] [WARN] [GetId] "Error. Player: BeamMP_RP_Plugin is missing"  - из за бана. Хз как чинить
         --> [08/12/24 23:17:43] [LUA ERROR] TriggerLocalEvent: stack index 1, expected number, received nil: not a numeric type that fits exactly an integer (number maybe has significant decimals) (bad argument into 'sol::basic_table_core<false, sol::basic_reference<false> >(int)') - из за бана. Хз как чинить
-        HeventTimer.Createtask(20,NextBan,sender_id.."BAN",{player_id,reason})
+        HeventTimer.Createtask(15,NextBan,sender_id.."BAN",{player_id,reason})
 		--MP.DropPlayer(player_id,reaseon)
 		local mess = name.." был забанен"
 		SendMessage(-1,mess)

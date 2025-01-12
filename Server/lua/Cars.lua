@@ -486,7 +486,7 @@ function CarsGive(sender_id,sender_name, message)
     local case = split(message," ")
     local name = erors(case[1],2)
     local id = cars:getidbynickname(sender_name,case[2])
-    if cars.database[name][id] ~= nil then
+    if cars.database[name] ~= nil and cars.database[name][id] ~= nil then
         SendMessage(sender_id,"Вы не можете передать машину игроку. Внутренний конфликт UUID")
         SendMessage(MP.GetId(name),"Вам не могут передать машину. Внутренний конфликт UUID")
         return
