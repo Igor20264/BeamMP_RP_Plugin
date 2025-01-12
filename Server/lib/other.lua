@@ -177,6 +177,16 @@ function erors(name,levenhtein)
 	return name
 end
 
+function erors2(name,levenhtein)
+	for name_inDB,_ in pairs(eco.database) do
+		if lev_iter(name,name_inDB) <= levenhtein then
+			return name_inDB
+		end
+	end
+	return false
+end
+
+
 function concat(...)
     local result = {}
         for i, tbl in ipairs({...}) do
