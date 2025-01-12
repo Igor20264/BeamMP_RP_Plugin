@@ -69,7 +69,13 @@ end
 
 local function onVehicleSwitched(oldId, newId, playerId)
 	local currentVehicle = core_vehicles.getCurrentVehicleDetails()
-	local name_car = currentVehicle.model.key
+	local name_car
+	if currentVehicle.model == nil then
+		name_car = "unicycle"
+	else
+		name_car = currentVehicle.model.key
+	end
+
 	if name_car == 'unicycle' then
 		if issnowman ~= true then
 			SoldId = oldId
