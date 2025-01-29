@@ -537,7 +537,7 @@ function CarsFix(sender_id,sender_name, message)
     if CTS[sender_name].custom ~= nil and CTS[sender_name].custom.repair ~= nil then
         -- Получаем процент повреждения
         local damage = (CTS[sender_name].custom.repair+1)/config.percent_repair
-        local price_damage = damage*price
+        local price_damage = (damage/2)*price
         price = round(price_damage,1)
     else
         SendMessage(sender_id,"Ошибка. Не удалось получить стоймость ремонта машины.")
@@ -602,7 +602,7 @@ function CarsUpdate(sender_id,sender_name, message)
     end
     cars.database[name][id].data.vcfStr = car.data.vcfStr
     cars.database[name][id].data.vcf = car.data.vcf
-    cars.database[name][id].data.coast = round(cars.database[name][id].coast + (money/4),2)
+    cars.database[name][id].coast = round(cars.database[name][id].coast + (money/4),2)
     cars.database[name][id].data.base = car.data.base
     cars:save()
     eco:add(name, "money", -math.abs(money))
@@ -746,9 +746,9 @@ function CarsSetPrice(sender_id, sender_name, message)
     CarCoast[car.data.vcf.partConfigFilename] = coast
     save_database("cars_coast.ixt", CarCoast)
     if name ~= sender_name then
-        SendMessage(MP.GetId(name), "Администратор установил стоимость, теперь машина стоит " .. price .. " " .. config.currency)
+        SendMessage(MP.GetId(name), "Администратор установил стоимость, теперь машина стоит " .. coast .. " " .. config.currency)
     end
-    SendMessage(sender_id, "Вы установили стоимость " .. price .. " " .. config.currency)
+    SendMessage(sender_id, "Вы установили стоимость " .. coast .. " " .. config.currency)
 end
 
 function BuyCar(sender_id, sender_name, message)
@@ -767,7 +767,6 @@ function BuyCar(sender_id, sender_name, message)
         SendMessage(sender_id, "Ошибка: Данная модель машины не существует. Свяжитесь с администратором. Код ошибки: '"..car.vcf.partConfigFilename.." is nil'")
         return
     end
-    print(car)
     if not perBuy[sender_name].view then
         local send_message = "Модель машины: "..car.carName .."\nСтоймость машины: "..car.coast.." "..config.currency.."\nКонфигурация: "..car.vcf.partConfigFilename
         send_message = send_message.."\n\nДля покупки введите команду !car buy еще раз"

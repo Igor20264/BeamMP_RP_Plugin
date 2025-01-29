@@ -73,7 +73,7 @@ function Working:init()
 			return true
 		end
 		gps:remove_active_path(name)
-		local money = (privat.neworking[name].dist*config.P4M)+(privat.neworking[name].lens*config.BonusOnCunt)
+		local money = (privat.neworking[name].dist*eco.database[name]["work"]["metr"])+(privat.neworking[name].lens*config.BonusOnCunt)
 		money = round(money,2)*2
 		eco:add(name,"money",money)
 		SendMessage(MP.GetId(name),"Вам выплатили "..money.." "..config.currency)
@@ -242,6 +242,16 @@ function CheckWayPoint()
 	end
 end
 
+function CheckTimeWork()
+    for name, data in pairs(work:all()) do
+        if type(data) ~= "number" and data.end_time <= timer:get() then
+            STOP_WORK(MP.GetId(name), name, "")
+        end
+    end
+end
+
+-- TODO: Реализовать функцию спавна рабочей машины
+
 function SpawnWorkCar(name, workname)
 	if work.workcars[workname] == nil then
 		return
@@ -272,9 +282,10 @@ M.command = {
 
 
 function M.load()
-	MP.RegisterEvent("EventJobsButton", "PressButton")
-	HeventTimer.addFunc(CheckWayPoint, 1)
-	HeventTimer.addFunc(CheckWorkW, 10)
+    MP.RegisterEvent("EventJobsButton", "PressButton")
+    HeventTimer.addFunc(CheckWayPoint, 1)
+    HeventTimer.addFunc(CheckWorkW, 10)
+    --HeventTimer.addFunc(CheckTimeWork, 1) -- Проверка работы по времени
 end
 
 function M.unload()

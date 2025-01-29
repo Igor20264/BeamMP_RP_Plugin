@@ -273,7 +273,7 @@ M.command = {
 	{ category = "testdrive", command = "req", help = "Предложить тест-драйв машины.", args = "[игрок] [nickname_car] (7d or 1d or 1m or 1h default: 2h)", func = "CarsTestDrive"},
     { category = "testdrive", command = "acc", help = "Принять запрос на тест-драйв.", func = "CarsTestDriveAccept"},
     { category = "testdrive", command = "dec", help = "Отклонить запрос на тест-драйв.", func = "CarsTestDriveDecline"},
-    { category = "carrent", command = "offer", help = "Предложить аренду машины.", args = "[игрок] [nickname_car] [цена]", func = "CarsRentOffer"},
+    { category = "carrent", command = "offer", help = "Предложить аренду машины.", args = "[игрок] [nickname_car] [цена] [2d or 1d or 1m or 1h]", func = "CarsRentOffer"},
     { category = "carrent", command = "acc", help = "Принять предложение о аренде.", func = "CarsRentAccept"},
     { category = "carrent", command = "dec", help = "Отклонить предложение о аренде.", func = "CarsRentDecline"},
     { category = "carrent", command = "show", help = "Показать все предложения о аренде.", func = "CarsRentShow"},

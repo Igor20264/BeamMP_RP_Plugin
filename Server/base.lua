@@ -172,7 +172,7 @@ function run(case,sender_id,sender_name,message)
 	message = message or ""
 	log(case.command.." "..case.func.." "..message.." "..sender_name,2)
 	if sender_name ~= "CMD" then
-		local permms = permission.decorator(case.roles)
+		local permms = permissionClass.decorator(case.roles)
 		permms(MP.TriggerLocalEvent,case.reg,sender_id,sender_name,message)
 	else
 		MP.TriggerLocalEvent(case.reg,sender_id,sender_name,message)
@@ -254,23 +254,23 @@ function onInit()
     log("base.lua",2)
 	CoreCommands = import("Core_Commands")--M.command = RegEvent(M.command)
 	Economic = import("Economic")
-	permission = import "Permission"
+	permissionClass = import("Permission")
 	TimeCounter = import("CountPlaydTime")
 	Gps = import("Geo")
 	Work = import("Works")
 	Cars = import("Cars")
-	--testDrive = import("TestDrive")
+	testDrive = import("testDrive")
 	ban = import("ban")
 	--Promos = import("PromoCode")
 	D2S = import("D2S")
 	AutoPrava = import("AutoDrive")
 	Sblocker = import("S2C",true,true)  --Назввание файла, Добавлять ли команды в хелп, Оповестить о импорте
 	RolePlay = import("RolePlay")
-    EnvSync = import("EnvSync")
+    --EnvSync = import("EnvSync")
 	--TEST = import("Test")
 	--CheakCheaters = import("CheckCheater")
 	HeventTimer.addFunc(check_request_save_database, 5) -- 10 секунд иногда слишком долго
-	HeventTimer.addFunc(OPTIMIZATOR,60*60) -- раз в 10 минут
+	--HeventTimer.addFunc(OPTIMIZATOR,60*60) -- раз в 10 минут
 	HeventTimer.addFunc(SaveCarEveryXsec, 1) --, MP.CallStrategy.Precise
 
 	MP.RegisterEvent("onChatMessage", "MyChatMessageHandler")

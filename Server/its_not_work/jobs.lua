@@ -4,24 +4,10 @@ local DB = require "lib.database"
 M.info = "Система работ"
 M.ver = "1.2"
 
-
 local function getonlineplayers()
 	return MP.GetPlayerCount()
 end
 
---[[
-work_role = {
-    id = {
-        money = 1000,
-        ptype = "metr\time\check-point",
-        name = "Работа грузчика",
-        cars= {"car1", "car2"} or nil,
-        posledovat = {} or false
-    }
-
-}
-
-]]
 
 local Working = {}
 Working.__index = Working
@@ -162,6 +148,8 @@ function Working:init()
 		return privat.neworking[name]
 	end
 
+    --чистая магия!
+
 	return obj
 end
 
@@ -173,6 +161,7 @@ function PressButton(id,data)
 	else
 		STOP_WORK(id,name,data)
 	end
+
 end
 
 function START_WORK(sender_id,sender_name, message)
@@ -214,7 +203,7 @@ function ASTOP_WORK(sender_id,sender_name, message)
 	end
 end
 
-function STAT_WORK(sender_id, sender_name, message)
+function STAT_WORK(sender_id,sender_name, message)
     local stats = work:stats(sender_name)
     local nestats = work:nestats(sender_name)
 
@@ -305,7 +294,6 @@ function UpdateWorkButton(id,data)
 end
 
 work = Working:init()
-
 M.command = {
     {category = "work",command = "start", help = "💼 Начать работу.",func = "START_WORK"},
     {category = "work",command = "stop", help = "💼 Закончить работу.",func = "STOP_WORK"},
@@ -314,11 +302,12 @@ M.command = {
 	{category = "work",command = "astop", help = "💼 Принудительно закончить работу игрока.", args = "[name] ",func = "ASTOP_WORK", roles = {"moderator","admin"}},
 }
 
+
 function M.load()
     MP.RegisterEvent("EventJobsButton", "PressButton")
     HeventTimer.addFunc(CheckWayPoint, 1)
     HeventTimer.addFunc(CheckWorkW, 10)
-    HeventTimer.addFunc(CheckTimeWork, 1) -- Проверка работы по времени
+    --HeventTimer.addFunc(CheckTimeWork, 1) -- Проверка работы по времени
 end
 
 function M.unload()

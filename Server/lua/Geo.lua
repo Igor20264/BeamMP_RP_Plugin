@@ -111,7 +111,11 @@ end
 function geo:set_random_path(player,work_type, minimal_distance)
     minimal_distance = minimal_distance or 300
     work_type = work_type or true
-    local x,y,z = GEO.getPos(MP.GetId(player))
+    local x,y,z = CTS[player].pos.x,CTS[player].pos.y,CTS[player].pos.z
+    if x == nil or y == nil then
+        x,y,z = 0,0,0
+    end
+    --local x,y,z = GEO.getPos(MP.GetId(player))
     local uuid = geo:get_random(x,y,minimal_distance,work_type)
     geo:set_active_path(player,uuid)
     local database = self.database or gps.database
@@ -145,15 +149,27 @@ end
 function geo:get_user_in_point()
     local ret = {}
     for id,name in pairs(MP.GetPlayers()) do
-        local caruser = GEO.getActiveVehicle(id)
-        if caruser ~= nil then
-            local x,y,z = GEO.getPos(id,caruser)
+        if CTS[name] ~= nil then
+            local x,y = CTS[name].pos.x,CTS[name].pos.y
             for uuid,data in pairs((self.database or gps.database)) do
                 if GEO.Rectangle(data.geo[1].x,data.geo[1].y,data.geo[2].x,data.geo[2].y,x,y) then
                     ret[name] = uuid
                 end
             end
         end
+
+        --[[
+        local caruser = GEO.getActiveVehicle(id)
+        if caruser ~= nil then
+          --  local x,y,z = GEO.getPos(id,caruser) CTS[name].pos
+            local x,y,z = CTS[name].pos
+            for uuid,data in pairs((self.database or gps.database)) do
+                if GEO.Rectangle(data.geo[1].x,data.geo[1].y,data.geo[2].x,data.geo[2].y,x,y) then
+                    ret[name] = uuid
+                end
+            end
+        end
+        --]]
     end
     return ret
 end
@@ -187,15 +203,14 @@ M.gps = gps
 function GPS_GET_POS(sender_id,sender_name, message)
     local x,y,z = 0,0,0
     if sender_id ~= -2 then
-        local vehicle = GEO.getActiveVehicle(sender_id)
-        if vehicle == nil then
+        x,y,z = CTS[sender_name].pos.x,CTS[sender_name].pos.y,CTS[sender_name].pos.z
+        if x == nil or y == nil then
             x,y,z = 0,0,0
-        else
-            x,y,z = GEO.getPos(sender_id,vehicle)
         end
-        x,y,z = GEO.getPos(sender_name,vehicle)
+    else
+        log("Warning GPS_GET_POS get by Console",4)
     end
-    SendMessage(sender_id, "Текущая позиция: x = "..round(x,2).." | y = "..round(y,2).." | z = "..round(z,2))
+    SendMessage(sender_id, "Текущая позиция: x = "..round(x).." | y = "..round(y).." | z = "..round(z))
 end
 
 function GEO_GET_ALL(sender_id, sender_name, message)
@@ -207,13 +222,10 @@ function GEO_GET_ALL(sender_id, sender_name, message)
     local ret = "Точки отсортированы по дистанции: \n"
     local x,y,z = 0,0,0
     if sender_id ~= -2 then
-        local vehicle = GEO.getActiveVehicle(sender_id)
-        if vehicle == nil then
-            x,y,z = 0,0,0
-        else
-            x,y,z = GEO.getPos(player,vehicle)
-        end
-
+        x,y,z = CTS[sender_name].pos.x,CTS[sender_name].pos.y,CTS[sender_name].pos.z
+    end
+    if x == nil or y == nil then
+        x,y,z = 0,0,0
     end
     local list = gps:get_table_by_distancse(x,y,0,true)
     for i,data in pairs(list) do
@@ -260,7 +272,7 @@ end
 function GEO_GET_INFO(sender_id, sender_name, message) -- name
     local name = message
     local uuid = gps:get_uuid_by_nickname(name)
-    if data == nil then
+    if uuid == nil then
         SendMessage(sender_id, "Точка не найдена")
         return
     end
@@ -277,7 +289,7 @@ end
 function GEO_DELETE_POINT(sender_id, sender_name, message) -- name
     local name = message
     local uuid = gps:get_uuid_by_nickname(name)
-    if data == nil then
+    if uuid == nil then
         SendMessage(sender_id, "Точка не найдена")
         return
     end
@@ -289,7 +301,7 @@ function GEO_SET_POINT(sender_id, sender_name, message) -- point_name type true/
     local case = split(message," ")
     local name = case[1]
     local uuid = gps:get_uuid_by_nickname(name)
-    if data == nil then
+    if uuid == nil then
         SendMessage(sender_id, "Точка не найдена")
         return
     end

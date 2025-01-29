@@ -205,10 +205,10 @@ end
 function try_exept(func,...)
     local status, result = pcall(func,...)
     if not status then
-        --local s = split(debug.getinfo(func).source,"\\")
-        --log({"file: "..s[#s].." "..result},4)
-        log({"file: "..result},4)
-        return falselu
+        local s = split(debug.getinfo(func).source,"\\")
+        log({"file: "..s[#s].." "..result},4)
+        --log({"file: "..result},4)
+        return false
     end
     return result
 end

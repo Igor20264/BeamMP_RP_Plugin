@@ -20,7 +20,7 @@ end
 function GetRequestCTS(id,data)
     data = split(data,"$$$")
     --log(data,2)
-    CTS[data[1]] = Util.JsonDecode(data[2])
+    CTS[MP.GetPlayerName(id)] = Util.JsonDecode(data[2])
 end
 
 function RemoutRun(player, data)
