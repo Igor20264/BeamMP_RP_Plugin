@@ -83,7 +83,7 @@ function eventtimerAll()
         M.times = 0
     end
 end
-
+-- Core of Task Manager
 function kernel_thread()
     if #tasker == 0 then return end
     for i,tasks in ipairs(tasker) do

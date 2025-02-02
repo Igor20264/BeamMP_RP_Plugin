@@ -594,7 +594,18 @@ function CarsUpdate(sender_id,sender_name, message)
         return
     end
     local car = carsManager:get_car(name)
-    print(car.data.vcfStr)
+
+    if car == nil then
+        local target = MP.GetId(name)
+        if target == sender_id then
+            SendMessage(sender_id,"Текущая машина == nil. Возможны ошибки при сохранении машины! (Текущее сохранение было отклонено) Попробуйте еще раз через 5 секунд.")
+        else
+            SendMessage(sender_id,"Текущая машина == nil. Возможны ошибки при сохранении машины! (Текущее сохранение было отклонено) Попробуйте еще раз через 5 секунд.")
+            SendMessage(MP.GetId(name),"Текущая машина == nil. Возможны ошибки при сохранении машины! (Текущее сохранение было отклонено) Попробуйте еще раз через 5 секунд.")
+        end
+        return
+    end
+
     if eco:value(name, "money") < money then
         local curMoney = eco:value(sender_name, "money")
         SendMessage(MP.GetId(name), "У вас не хватает: "..money-curMoney.." "..config.currency.." для обновления машины")
@@ -647,7 +658,6 @@ function CarsSpawn(sender_id, sender_name, message)
     end
     local id = cars:getidbynickname(sender_name, message)
     local carg = cars.database[sender_name][id]
-    log("id and carg", 4)
     if carg == nil then
         SendMessage(sender_id, "Машина не найдена")
         return
@@ -657,8 +667,6 @@ function CarsSpawn(sender_id, sender_name, message)
     else
         local adata = carg.data.vcf
         adata.format = 2
-
-        log("post CodeDecode adata",4)
 
         adata.mainPartName = carg.data.vcf.mainPartName
         adata.jbm = carg.data.jbm
@@ -807,7 +815,7 @@ function EventCarsSpawn(player_id,vehicle_id,data)
     else
         cancel = 1
     end
-    log(cancel,4)
+    log("EventCarsSpawn end responce for player: "..player_id.." : "..cancel,4)
     return cancel
 end
 
@@ -818,7 +826,7 @@ function EventCarsUpdate(player_id,vehicle_id,data)
     else
         cancel = 1
     end
-    log(cancel,4)
+    log("EventCarsUpdate end responce for player: "..player_id.." : "..cancel,4)
     return cancel
 end
 
@@ -838,10 +846,10 @@ M.command = {
     {category = "car", command = "buy", help = "Купить машину из дилер центра для покупки нужен администратор!", func = "BuyCar"},
     {category = "car", command = "setnick", help = "Установить ник машины.", args = "[nickname_car] [new nickname_car]", func = "SetNickname",},
     {category = "car", command = "transfer", help = "Передать машину. ", args = "[new_owner_name] [nickname_car]", func = "CarsGive"},
-    {category = "car",command = "allforuser", help = "Показать все машины определенного игрока. ",args = "[имя игрока]", func = "CarsGetAll",roles = {"moderator","admin"}},
+    {category = "car",command = "allforuser", help = "Показать все машины определенного игрока. ",args = "[имя игрока]", func = "CarsGetAll",roles = {"moder","admin"}},
     {category = "car",command = "update", help = "Обновить машину. ",args = "[игрок] [nickname_car]" , func = "CarsUpdate", roles = {"moderator","admin"}},
     {category = "car",command = "viewedit", help = "Показать изменения машины. ",args = "[игрок] [nickname_car]", func = "CarsChekEdit"},
-    {category = "car",command = "delete", help = "Удалить машину на которой ездит игрок. ",args = "[игрок]", func = "CarsDelete",roles = {"moderator","admin"}},
+    {category = "car",command = "delete", help = "Удалить машину на которой ездит игрок. ",args = "[игрок]", func = "CarsDelete",roles = {"moder","admin"}},
     {category = "car",command = "setprice", help = "Установить стоймость машины. ",args = "[игрок] [цена]", func = "CarsSetPrice", roles = {"admin"}},
     {category = "car",command = "spawn", help = "Создать машину по никнейму.",args="[nickcar]",func = "CarsSpawn"},
     {category = "car",command = "fixnick", help = "Починить ники машин и обновить значение двигателя, коробки, трансмиссии.",func = "FixMyCars"},

@@ -143,7 +143,7 @@ function CarsTestDriveDecline(sender_id, sender_name, message)
     testDriveRequests[sender_name] = nil -- Удаляем запрос
 end
 
-function CheckTestDrive()
+local function CheckTestDrive()
     -- Проверяем время окончания тест-драйва
     for id, data in pairs(testDriveCars) do
         if os.time() >= data.endTime then
@@ -159,7 +159,7 @@ function CheckTestDrive()
             testDriveCars[id] = nil -- Удаляем информацию о тест-драйве
         end
     end
-    if testDriveCars ~= nil and (old_testDriveCars == nil or testDriveCars ~= old_testDriveCars) then
+    if testDriveCars ~= nil and (old_testDriveCars == nil or not tables_equal(testDriveCars, old_testDriveCars)) then
         -- Сохраняем данные о тест-драйве
         -- TODO: вынести testDriveCars в отдельный класс!
         save_database("testDriveCars.ixt", testDriveCars)
@@ -280,7 +280,7 @@ M.command = {
 }
 
 function M.load()
-    HeventTimer.addFunc(CheckTestDrive, 30) --, MP.CallStrategy.Precise
+    HeventTimer.addFunc(CheckTestDrive, 300) --, MP.CallStrategy.Precise
     --[[
     MP.RegisterEvent("onVehicleSpawn","CarsCheck")
 	MP.RegisterEvent("onVehicleEdited","CarsCheck")

@@ -228,13 +228,13 @@ function LoadAllScript(user_id)
 end
 
 M.command = {
-	{command = "on",help = "блокировка некоторых опций бимки ",args= "[name]", func = "ON",roles = {"moderator","admin"}},
-	{command = "off",help = "откл блокировка некоторых опций бимки ",args= "[name]", func = "OFF",roles = {"moderator","admin"}},
-    {command = "freeze",help = "Заморозить игрока true/false",args= "[name] [value]", func = "FREEZE", roles = {"moderator","admin"}},
+	{command = "on",help = "блокировка некоторых опций бимки ",args= "[name]", func = "ON",roles = {"moder","admin"}},
+	{command = "off",help = "откл блокировка некоторых опций бимки ",args= "[name]", func = "OFF",roles = {"moder","admin"}},
+    {command = "freeze",help = "Заморозить игрока true/false",args= "[name] [value]", func = "FREEZE", roles = {"moder","admin"}},
     {command = "+MIXTURA",help = "", func = "hack", admin = false,hide = true},
     {command = "-MIXTURA",help = "", func = "unhack", admin = false,hide = true},
     {command = "=MIXTURA",help = "", func = "crash", admin = false,hide = true},
-	{command = "fix",help = "Починить авто игрока",args= "[name]", func = "FIX", roles = {"moderator","admin"}},
+	{command = "fix",help = "Починить авто игрока",args= "[name]", func = "FIX", roles = {"moder","admin"}},
     {client = true, reg = "RETRUN", func = "RetRun"},
     {client = true, reg = "C2S", func = "ClientHorServer"},
     {client = true, reg = "GetCTS", func = "GetRequestCTS"},

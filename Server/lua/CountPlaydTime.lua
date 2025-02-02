@@ -135,9 +135,9 @@ end
 
 M.command = {
     {category = "time", command = "my", help = "Узнать сколько времени наиграл",func= "GET_MY_PLAYTIME"},
-    {category = "time", command = "get", help = "Узнать сколько времени наиграл игрок",func= "GET_PLAYTIME_Player", args = "[name]",roles={"admin","moderator"}},
+    {category = "time", command = "get", help = "Узнать сколько времени наиграл игрок",func= "GET_PLAYTIME_Player", args = "[name]",roles={"admin","moder"}},
     {category = "time", command = "top", help = "Узнать топ игроков",func= "GET_TOP"},
-    {category = "time", command = "more", help = "Узнать сколько времени наиграл всех",func= "GET_PLAYTIME", args = "[time]",roles={"admin","moderator"}},
+    {category = "time", command = "more", help = "Узнать сколько времени наиграл всех",func= "GET_PLAYTIME", args = "[time]",roles={"admin","moder"}},
 }
 function M.load()
     HeventTimer.addFunc(AddPlayTime, 10*60) -- функ, сек

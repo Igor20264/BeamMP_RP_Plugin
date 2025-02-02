@@ -181,7 +181,7 @@ function envSyncTick()
 end
 
 M.command = {
-    {category = "env",command = "set", help ="Установить время суток.",args="[08:00]",func ="ENVSETIME",roles = {"moderator","admin"}}
+    {category = "env",command = "set", help ="Установить время суток.",args="[08:00]",func ="ENVSETIME",roles = {"moder","admin"}}
 }
 
 function M.load()

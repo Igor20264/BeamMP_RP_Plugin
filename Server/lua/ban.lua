@@ -330,7 +330,7 @@ end
 M.config = config
 M.command = {
 	{command = "unban", help ="Разбан игрока. ",args="[name]",func ="UNBAN",roles = {"admin"}},
-	{command = "kick", help ="Кик Игрока. ",args="=[name]",func ="KICK",roles = {"moderator","admin"}},
+	{command = "kick", help ="Кик Игрока. ",args="=[name]",func ="KICK",roles = {"moderator","admin","moder"}},
 	{command = "ban", help ="Бан со ссылкой на сервер. ",args="[name] <duration> <reason можно не в 1 слово>",func ="BAN",roles = {"admin"}},
     {category = "whitelist",command = "add", help ="Добавить в белый список. ",args="[name]",func ="WHITELIST_ADD",roles = {"admin"}},
     {category = "whitelist",command = "del", help ="Удалить из белого списка. ",args="[name]",func ="WHITELIST_DEL",roles = {"admin"}},

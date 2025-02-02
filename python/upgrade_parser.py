@@ -50,7 +50,7 @@ def parse_logs(log_data):
 # Example usage:
 if __name__ == "__main__":
     # Assuming 'log_data' is the string containing all the log entries
-    with open("11f9d3fb58b32fae5b3cc0149150c99c3fc713d5d7c1924afd7e85e624c34493-json.log","r",encoding="utf-8") as f:
+    with open("332c8e310e97a12929b923379005b47c4060b99560caed8a984854e58e859456-json.log","r",encoding="utf-8") as f:
         log_data = f.read()
     parsed_logs = parse_logs(log_data)
 

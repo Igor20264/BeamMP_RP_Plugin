@@ -22,9 +22,7 @@ end
 function DM(sender_id, sender_name, message) --Личное сообщение
     local target_name = erors(split(message," ")[1],2)
     local message2 = message:sub(#target_name+1,#message)
-    log(target_name, 3)
     local target_id = MP.GetId(target_name)
-    log(target_id, 3)
     if target_id ~= -1 then
         if sender_id ~= target_id then
             MP.SendChatMessage(sender_id,"^5Для -> ^r" .. target_name .. " : " .. message2)
@@ -44,7 +42,7 @@ function ME(sender_id, sender_name, message) --действия от 3-го ли
 end
 
 function DO(sender_id, sender_name, message) --действия от 3-го лица
-    SendMessage(-1, sender_name..":^3 " .. message)
+    SendMessage(-1, "^3" .. message .. " ("..sender_name..")")
 end
 
 M.command = {

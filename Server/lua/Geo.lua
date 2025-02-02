@@ -343,11 +343,11 @@ end
 -- LOAD PEREMENNI
 
 M.command = {
-    {category = "gps", command = "get", help = "Получить текущую позицию",args = "",roles = {"admin"},func = "GPS_GET_POS"},
-    {category = "gps", command = "list", help = "Получить список точке для построения маршрута",args = "",roles = {"tester"},func = "GPS_GET_ALL"},
+    {category = "gps", command = "get", help = "Получить текущую позицию",args = "",roles = {"admin","moder"},func = "GPS_GET_POS"},
+    {category = "gps", command = "list", help = "Получить список точке для построения маршрута",args = "",roles = {"admin"},func = "GPS_GET_ALL"},
 
-    {category = "geo", command = "list",help = "Получить список всех точек | дальность от пользователя", args = "[list 1/2/3/4/...]",roles = {"admin"},func = "GEO_GET_ALL"},
-    {category = "geo", command = "info",help = "Получить информаци о точке", args = "[geo_nick]",roles = {"admin"},func = "GEO_GET_INFO"},
+    {category = "geo", command = "list",help = "Получить список всех точек | дальность от пользователя", args = "[list 1/2/3/4/...]",roles = {"admin","moder"},func = "GEO_GET_ALL"},
+    {category = "geo", command = "info",help = "Получить информаци о точке", args = "[geo_nick]",roles = {"admin","moder"},func = "GEO_GET_INFO"},
     {category = "geo", command = "add_work", help = "Создать область работы !! Предпологаемый цент области должен быть пуст !!", args = "[named] [x1] [y1] [z1] [x2] [y2] [z2]",roles = {"admin"},func = "GEO_ADD_WORK"},
     {category = "geo", command = "del", help = "Удалить точку", args = "[geo_nick]",roles = {"admin"},func = "GEO_DELETE_POINT"},
     {category = "geo", command = "set", help = "Изменить данные о точке", args = "[geo_nick_type] [data]",roles = {"admin"},func = "GEO_SET_POINT"},

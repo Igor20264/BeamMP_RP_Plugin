@@ -238,7 +238,7 @@ M.command = {
     {category = "roles",command = "add", help = "Давабивть роль",args = "[имя] [роль]",func = "ROLESADD",roles = {"admin"}},
     {category = "roles",command = "remove", help = "Удалить роль",args = "[имя] [роль]",func = "ROLESREMOVE",roles = {"admin"}},
     --{category = "roles",command = "set", help = "Установить список ролей",args = "[имя] {'роль','роль'}!!БЕЗ ПРОБЕЛОВ!!",func = "ROLESSET",roles = {"admin"}},
-    {category = "roles",command = "list", help = "Список ролей",args = "[имя]",func = "ROLESLIST",roles = {"admin"}},
+    {category = "roles",command = "list", help = "Список ролей",args = "[имя]",func = "ROLESLIST",roles = {"admin","moder"}},
 }
 
 function M.load()

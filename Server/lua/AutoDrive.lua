@@ -49,8 +49,8 @@ end
 
 
 M.command = {
-    { category = "prava", command = "add", help = "Добавить категорию. (У игрока должны быть деньги)", args = "[name] [category]", func = "AutoDriveAddPrava", roles = {"police","moderator","admin"}},
-    { category = "prava", command = "remove", help = "Забрать категорию.", args = "[name] [category] ", func = "AutoDriveRemovePrava", roles = {"police","admin"}},
+    { category = "prava", command = "add", help = "Добавить категорию. (У игрока должны быть деньги)", args = "[name] [category]", func = "AutoDriveAddPrava", roles = {"police","moder","admin"}},
+    { category = "prava", command = "remove", help = "Забрать категорию.", args = "[name] [category] ", func = "AutoDriveRemovePrava", roles = {"police","admin","moder"}},
     { category = "prava", command = "all", help = "Показать все категории.", func = "AutoDriveAllPrava"},
 }
 

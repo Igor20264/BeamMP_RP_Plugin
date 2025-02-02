@@ -72,8 +72,13 @@ function Working:init()
 			print(os.time()-privat.neworking[name].last_work_time,"overspeed",name)
 			return true
 		end
-		gps:remove_active_path(name)
 		local money = (privat.neworking[name].dist*eco.database[name]["work"]["metr"])+(privat.neworking[name].lens*config.BonusOnCunt)
+		if (privat.neworking[name].dist > 4096*1.5) then
+			SendMessage(MP.GetId(name), "Читер...")
+			money = -money
+		end
+		gps:remove_active_path(name)
+
 		money = round(money,2)*2
 		eco:add(name,"money",money)
 		SendMessage(MP.GetId(name),"Вам выплатили "..money.." "..config.currency)
@@ -277,7 +282,7 @@ M.command = {
     {category = "work",command = "stop", help = "💼 Закончить работу.",func = "STOP_WORK"},
 	{category = "work",command = "info", help = "💼 Сколько я работал?",func = "STAT_WORK"},
 	{category = "work",command = "why", help = "💼 Кто работает.",func = "WHY_WORK"},
-	{category = "work",command = "astop", help = "💼 Принудительно закончить работу игрока.", args = "[name] ",func = "ASTOP_WORK", roles = {"moderator","admin"}},
+	{category = "work",command = "astop", help = "💼 Принудительно закончить работу игрока.", args = "[name] ",func = "ASTOP_WORK", roles = {"moder","admin"}},
 }
 
 
