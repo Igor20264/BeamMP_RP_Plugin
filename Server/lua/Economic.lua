@@ -235,8 +235,9 @@ function ROLL(sender_id, sender_name, message)
         SendMessage(sender_id, "Вы выиграли " .. win .. " денег. После вычета комиссии " .. commission .. " денег, ваш выигрыш составляет " .. netWin .. " денег.")
     else
         -- Проигрыш
+        local loss = money
         eco:add(sender_name,"money",-money)
-        SendMessage(sender_id, "Вы проиграли " .. loss .. " денег. После добавления комиссии " .. commission .. " денег, ваш проигрыш составляет " .. netLoss .. " денег.")
+        SendMessage(sender_id, "Вы проиграли " .. loss .. " "..config.currency )
     end
 end
 
