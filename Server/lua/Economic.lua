@@ -123,7 +123,7 @@ function CHEK(sender_id,sender_name, message)
 	local case = split(message," ")
 	local name = erors(case[1],2)
 	local type = case[2]
-	SendMessage(sender_id,eco:value(name,type))
+	SendMessage(sender_id,inspect(eco:value(name,type)))
 end
 
 -- System Commands [[

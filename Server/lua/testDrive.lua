@@ -106,10 +106,10 @@ function CarsTestDrive(sender_id, sender_name, message)
         timed = timed
     }
     testDriveRequests[name] = requestData
-    local totime = sectotime(timed)
-    SendMessage(MP.GetId(name), "Вам предлагают тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м.")
+    local days, hours, minutes, seconds_ret = sectotime(timed)
+    SendMessage(MP.GetId(name), "Вам предлагают тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " на " .. days.."д." .. hours.. "ч."..minutes.."м.")
     SendMessage(MP.GetId(name), "Чтобы принять тест-драйв, введите команду /testdrive accept. Для отказа введите /testdrive decline.")
-    SendMessage(sender_id, "Вы отправили запрос на тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " игроку " .. name .. ". Сроком на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м. ")
+    SendMessage(sender_id, "Вы отправили запрос на тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " игроку " .. name .. ". Сроком на " .. days.."д." .. hours.. "ч."..minutes.."м.")
 end
 
 -- Функция для обработки запроса на тест-драйв
@@ -217,10 +217,10 @@ function CarsRentOffer(sender_id,sender_name,message)
         cost = cost
     }
     rentalRequests[name] = requestData
-    local totime = sectotime(timed)
-    SendMessage(MP.GetId(name), "Вам предлагают тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м. | За " .. cost .. " "..config.currency .. ".")
+    local days, hours, minutes, seconds_ret = sectotime(timed)
+    SendMessage(MP.GetId(name), "Вам предлагают тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " на " .. days.."д." .. hours.. "ч. "..minutes.."м. | За " .. cost .. " "..config.currency .. ".")
     SendMessage(MP.GetId(name), "Чтобы принять тест-драйв, введите команду /carrent acc. Для отказа введите /carrent dec.")
-    SendMessage(sender_id, "Вы отправили запрос на тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " игроку " .. name .. ". Сроком на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м. | За " .. cost .. " "..config.currency .. ".")
+    SendMessage(sender_id, "Вы отправили запрос на тест-драйв машины " .. cars:value(sender_name, id, "nickname") .. " игроку " .. name .. ". Сроком на " .. days.."д." .. hours.. "ч. "..minutes.."м. | За " .. cost .. " "..config.currency .. ".")
 end
 
 -- Принять предложение о аренде машины
