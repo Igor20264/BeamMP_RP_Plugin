@@ -1,0 +1,63 @@
+/* achievement.css */
+.achievement-container {
+    position: fixed;
+    bottom: 20px;
+    right: -400px;
+    z-index: 9999;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+}
+
+.achievement-container.visible {
+    right: 20px;
+    opacity: 1;
+}
+
+.achievement-card {
+    background: linear-gradient(135deg, #2b2b2b 0%, #1b1b1b 100%);
+    border-radius: 4px;
+    padding: 15px;
+    width: 350px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    border-left: 4px solid #f5b83d;
+}
+
+.achievement-icon {
+    width: 64px;
+    height: 64px;
+    margin-right: 15px;
+}
+
+.achievement-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.achievement-content {
+    flex: 1;
+    color: #fff;
+}
+
+.achievement-title {
+    font-family: 'Arial', sans-serif;
+    font-size: 12px;
+    color: #f5b83d;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.achievement-name {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.achievement-desc {
+    font-family: 'Arial', sans-serif;
+    font-size: 12px;
+    color: #999;
+}

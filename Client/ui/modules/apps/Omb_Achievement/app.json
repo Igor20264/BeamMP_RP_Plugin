@@ -1,0 +1,17 @@
+{
+    "domElement": "<steam-achievement></steam-achievement>",
+    "name": "Steam Achievement",
+    "types": [
+      "ui.apps.categories.achievement"
+    ],
+    "css": {
+        "right": "20px",
+        "bottom": "20px",
+        "width": "350px",
+        "height": "94px"
+    },
+    "description": "Steam-style achievement notification",
+    "author": "Your Name",
+    "version": "1.0",
+    "directive": "steamAchievement"
+}

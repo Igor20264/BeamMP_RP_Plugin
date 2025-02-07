@@ -93,8 +93,8 @@ function CarsTestDrive(sender_id, sender_name, message)
     end
 
     -- Проверяем, доступна ли машина для тест-драйва
-    if testDriveCars[id] ~= nil then
-        SendMessage(sender_id, "Эта машина уже на тест-драйве.")
+    if testDriveCars[name] ~= nil then
+        SendMessage(sender_id, "У вас уже активен тест-драйв. Попробуйте позже.")
         return
     end
 
@@ -148,7 +148,7 @@ local function CheckTestDrive()
     for id, data in pairs(testDriveCars) do
         if os.time() >= data.endTime then
             -- Возвращаем машину владельцу
-            cars:transfer(data.tester, data.owner, id)
+            cars:transfer(data.tester, data.owner, data.carId)
             if MP.check_in_online(data.owner) then
                 SendMessage(MP.GetId(data.owner), "Машина " .. cars:value(data.owner, id, "nickname") .. " вернулась с тест-драйва.")
 
@@ -156,7 +156,7 @@ local function CheckTestDrive()
             if MP.check_in_online(data.tester) then
                 SendMessage(MP.GetId(data.tester), "Время тест-драйва машины " .. cars:value(data.tester, id, "nickname") .. " истекло.")
             end
-            testDriveCars[id] = nil -- Удаляем информацию о тест-драйве
+            testDriveCars[data.tester] = nil -- Удаляем информацию о тест-драйве
         end
     end
     if testDriveCars ~= nil and (old_testDriveCars == nil or not tables_equal(testDriveCars, old_testDriveCars)) then
@@ -202,9 +202,9 @@ function CarsRentOffer(sender_id,sender_name,message)
         return
     end
 
-    -- Проверяем, доступна ли машина для тест-драйва
-    if testDriveCars[id] ~= nil then
-        SendMessage(sender_id, "Эта машина уже на тест-драйве.")
+     -- Проверяем, доступна ли машина для тест-драйва
+    if testDriveCars[name] ~= nil then
+        SendMessage(sender_id, "У вас уже активен тест-драйв. Попробуйте позже.")
         return
     end
 

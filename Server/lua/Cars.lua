@@ -723,6 +723,11 @@ function CarsSellGos(sender_id, sender_name, message)
         return
     end
 
+    if testDriveCars and testDriveCars[sender_name] then
+        SendMessage(sender_id, "Вы не можете продать машину в режиме тест-драйва")
+        return
+    end
+
     local pc = math.random(30,40)
     price = price*(pc/100)
     eco:add(sender_name, "money", price)
