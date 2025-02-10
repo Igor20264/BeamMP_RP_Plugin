@@ -146,7 +146,7 @@ function BAL(sender_id,sender_name, message)
 	local ret1 = eco:value(sender_name,"work","money")
     local old_work = true
     if ret1 == 0 then
-        old_work = true
+        old_work = false
         ret1 = eco:value(sender_name,"work","metr") or 0
     end
 	local ret2 = eco:value(sender_name,"work","name")

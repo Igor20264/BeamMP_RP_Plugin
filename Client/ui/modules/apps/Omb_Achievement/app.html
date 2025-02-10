@@ -1,13 +1,12 @@
-<!-- achievement.html -->
 <div ng-controller="AchievementCtrl" class="achievement-container">
     <div class="achievement-card">
         <div class="achievement-icon">
-            <img ng-src="{{achievementImage}}" alt="Achievement Icon">
+            <img ng-src="{{achievementImage}}" alt="Achievement Icon" onerror="this.src='/ui/modules/apps/Omb_Achievement/images/default_icon.png';">
         </div>
         <div class="achievement-content">
             <div class="achievement-title">Достижение разблокировано!</div>
-            <div class="achievement-name">{{achievementTitle}}</div>
-            <div class="achievement-desc">{{achievementDescription}}</div>
+            <div class="achievement-name">{{achievementTitle || "Без названия"}}</div>
+            <div class="achievement-desc">{{achievementDescription || "Описание недоступно"}}</div>
         </div>
     </div>
 </div>

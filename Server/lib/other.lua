@@ -169,6 +169,7 @@ function levi(name,list,len_iter)
 end
 
 function erors(name,levenhtein)
+    levenhtein = levenhtein or 2
 	for i,case in pairs(MP.GetPlayers()) do
 		if lev_iter(name,case) <= levenhtein then 
 			return case 

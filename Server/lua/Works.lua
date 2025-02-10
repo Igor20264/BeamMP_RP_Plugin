@@ -33,7 +33,7 @@ function Working:init()
 		MP.TriggerClientEvent(sender_id, "PacketProfsUpdate", eco.database[name]["work"]["name"]);
 		MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"Закончить работу")
 		if eco.database[name]["work"]["money"] ~= 0 then
-			privat.working[name] = timer:get()
+			privat.working[name] = {start = timer:get()}
 			eco.database[name]["work"]["is_working"] = true
 			local work = eco.database[name]["work"]["name"]
 			--SpawnWorkCar(name, work)
@@ -73,13 +73,16 @@ function Working:init()
 			return true
 		end
 		local money = (privat.neworking[name].dist*eco.database[name]["work"]["metr"])+(privat.neworking[name].lens*config.BonusOnCunt)
-		if (privat.neworking[name].dist > 4096*1.5) then
+		if (privat.neworking[name].dist > 8096*1.4142) then
 			SendMessage(MP.GetId(name), "Читер...")
 			money = -money
 		end
 		gps:remove_active_path(name)
-
-		money = round(money,2)*2
+		local boost = 1
+		if privat.neworking[name].end_temp and timer:get() < privat.neworking[name].end_temp then
+			boost = privat.neworking[name].temp_boost
+		end
+		money = round(money*boost,2)*2
 		eco:add(name,"money",money)
 		SendMessage(MP.GetId(name),"Вам выплатили "..money.." "..config.currency)
 		privat.neworking[name].last_work_time = os.time()
@@ -115,7 +118,26 @@ function Working:init()
 		MP.TriggerClientEvent(sender_id, "PacketProfsUpdate", eco.database[name]["work"]["name"]);
 		MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"Начать работу")
 		if privat.working[name] ~= nil then
-			local EGG = timer:get()-privat.working[name] or (timer:get()-60)
+			local EGG = 0
+			if privat.working[name].start_temp ~= nil then
+				local befor_temp = privat.working[name].start_temp-privat.working[name].start
+				local temp = 0
+				if privat.working[name].end_temp < timer:get() then
+					temp = privat.working[name].end_temp-privat.working[name].start
+				else
+					temp = timer:get()-privat.working[name].start
+				end
+				local post_temp = 0
+				if privat.working[name].end_temp < timer:get() then
+					post_temp = timer:get()-privat.working[name].end_temp
+				else
+					post_temp = 0
+				end
+				EGG = (befor_temp + (temp*privat.working[name].temp_boost) + post_temp)
+			else
+				EGG = timer:get()-privat.working[name].start or (timer:get()-60)
+			end
+
 			local pay = eco:value(name,"work","money")*round(EGG/3600) or 0
 			eco:add(name,"money",pay)
 			eco.database[name]["work"]["is_working"] = false
@@ -198,7 +220,7 @@ function STAT_WORK(sender_id,sender_name, message)
     local stats = work:stats(sender_name)
 	local nestats = work:nestats(sender_name)
 	if stats then
-		local EGG = timer:get()-stats
+		local EGG = timer:get()-stats.start
 		if EGG/60 > 2 then --Если минуты
 			SendMessage(sender_id,"💼 Вы работали: "..tostring(round(EGG/60,0)).." мин. | Заработанно: "..round(eco:value(sender_name,"work","money")*(EGG/3600),0).." "..config.currency)
 		else
@@ -213,7 +235,7 @@ end
 
 function WHY_WORK(sender_id,sender_name, message)
 	for name,time in pairs(work:all()) do
-		local EGG = timer:get()-work:stats(name)
+		local EGG = timer:get()-work:stats(name).start
 		if EGG/60 > 2 then --Если минуты
 			SendMessage(sender_id,name.."| "..eco:value(name,"work","name").." | "..tostring(round(EGG/60,0)).." мин.")
 		else
@@ -276,8 +298,71 @@ function UpdateWorkButton(id,data)
 	MP.TriggerClientEvent(id, "PacketProfsButtonUpdate" ,"Начать работу");
 end
 
+function BoostWork(sender_id, sender_name, message)
+    local args = string.split(message, " ")
+    if #args < 2 then
+        SendMessage(sender_id, "Использование: !work boostwork [игрок] [время в минутах] [multiplier=2]")
+        return
+    end
+
+    local target_name = args[1]
+    local duration = timeConverter(args[2]) or timeConverter("1h") -- Seconds
+    if not duration or duration <= 0 then
+        SendMessage(sender_id, "Неверное время. Укажите время в минутах.")
+        return
+    end
+    local target_id = MP.GetId(target_name) or nil
+    if not target_id then
+        SendMessage(sender_id, "Игрок " .. target_name .. " не найден.")
+        return
+    end
+
+    local boost_multiplier = tonumber(args[3]) or 2 -- Умножитель опыта
+    local end_time = timer:get() + duration
+
+    if work:stats(target_name) then
+        work:stats(target_name).temp_boost = boost_multiplier
+        work:stats(target_name).end_temp = end_time
+		work:stats(target_name).start_temp = timer:get()
+        SendMessage(target_id, "Вам назначен умножитель опыта x" .. boost_multiplier .. " на " .. duration/60 .. " минут.")
+        SendMessage(sender_id, "Вы назначили умножитель опыта x" .. boost_multiplier .. " игроку " .. target_name .. " на " .. duration/60 .. " минут.")
+    elseif work:nestats(target_name) then
+        work:nestats(target_name).temp_boost = boost_multiplier
+        work:nestats(target_name).end_temp = end_time
+        SendMessage(target_id, "Вам назначен умножитель опыта x" .. boost_multiplier .. " на " .. duration/60 .. " минут.")
+        SendMessage(sender_id, "Вы назначили умножитель опыта x" .. boost_multiplier .. " игроку " .. target_name .. " на " .. duration/60 .. " минут.")
+    else
+        SendMessage(sender_id, "Игрок " .. target_name .. " не работает.")
+    end
+end
+--[[
+function OFFBOOST(sender_id,sender_name, message)
+	local name = erors(message)
+	if work:stats(name) then
+		work:stats(name).temp_boost = nil
+		work:stats(name).start_temp = nil
+		work:stats(name).end_temp = nil
+		SendMessage(sender_id, "Вы отменили умножитель опыта.")
+	elseif work:nestats(name) then
+		work:nestats(name).temp_boost = nil
+		work:nestats(name).end_temp = nil
+		SendMessage(sender_id, "Вы отменили умножитель опыта.")
+	else
+		SendMessage(sender_id, "Игрок " .. sender_name .. " не работает.")
+	end
+end--]]
+
+function WorkOFFGEt(sender_id,sender_name, message)
+	block_ignore[sender_name] = true
+	--RemoutRun(MP.GetId(p2), data_unblock)
+	SendMessage(-1,"Игрок "..sender_name.." получил off для создания рабочей машины.")
+	return 0
+end
+
 work = Working:init()
 M.command = {
+	{category = "work",command = "boostwork", help = "💼 Умножитель опыта.", args = "[игрок] [1s or 1m or 1h or 1d]",func = "BoostWork"},
+	{category = "work",command = "getCar", help = "💼 Получить off для получения рабочей машины.",func = "WorkOFFGEt"},
     {category = "work",command = "start", help = "💼 Начать работу.",func = "START_WORK"},
     {category = "work",command = "stop", help = "💼 Закончить работу.",func = "STOP_WORK"},
 	{category = "work",command = "info", help = "💼 Сколько я работал?",func = "STAT_WORK"},

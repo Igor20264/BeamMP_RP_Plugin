@@ -1,0 +1,17 @@
+<div class="achievement-block", ng-controller="ombAchiInit as ctrl" >
+    <link type="text/css" rel="stylesheet" href="/ui/modules/apps/ombAchi/style.css">
+    <div class="achievement animate-show-hide" 
+            ng-repeat="achievement in achievements" 
+            ng-class="{'show': achievement.visible}" 
+            role="alert" 
+            aria-live="assertive">
+        <div class="achievement-icon">
+            <img src="{{achievement.image}}" alt="Achievement Icon">
+        </div>
+        <div class="achievement-content">
+            <div class="achievement-title">Достижение разблокировано!</div>
+            <div class="achievement-name">{{achievement.title}}</div>
+            <div class="achievement-desc">{{achievement.desc}}</div>
+        </div>
+    </div>
+</div>

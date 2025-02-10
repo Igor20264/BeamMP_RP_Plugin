@@ -1,8 +1,8 @@
 {
-    "domElement": "<steam-achievement></steam-achievement>",
-    "name": "Steam Achievement",
+    "domElement": "<steamAchievement></steamAchievement>",
+    "name": "RP achievement",
     "types": [
-      "ui.apps.categories.achievement"
+      "ui.apps.categories.steamAchievement"
     ],
     "css": {
         "right": "20px",
@@ -11,7 +11,7 @@
         "height": "94px"
     },
     "description": "Steam-style achievement notification",
-    "author": "Your Name",
+    "author": "Hlebushek (github.com/Igor20264)",
     "version": "1.0",
     "directive": "steamAchievement"
 }
