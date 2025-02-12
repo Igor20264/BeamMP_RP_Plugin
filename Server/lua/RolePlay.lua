@@ -7,14 +7,18 @@ function TRY(sender_id, sender_name, message) --Проверка действи�
     if message == nil then
         if random == math.random(0,1) then
             SendMessage(-1,"^7"..sender_name.." ^lУспешно ^r^7сделал некое действие")
+            statistic:addInfo(sender_name,"tryTrue",1)
         else
             SendMessage(-1,"^7"..sender_name.." ^lНеудачно ^r^7сделал некое действие")
+            statistic:addInfo(sender_name,"tryFalse",1)
         end
     else
         if random == math.random(0,1) then
             SendMessage(-1,"^7"..sender_name.." ^lУспешно ^r^7 " .. message)
+            statistic:addInfo(sender_name,"tryTrue",1)
         else
             SendMessage(-1,"^7"..sender_name.." ^lНеудачно ^r^7 " .. message)
+            statistic:addInfo(sender_name,"tryFalse",1)
         end
     end
 end

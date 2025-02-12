@@ -133,6 +133,7 @@ end
 
 function JOINPLAYER(player_id)
     eco:joinOnServer(player_id)
+    statistic:addInfo(MP.GetPlayerName(player_id),"JoinServer",1)
 end
 
 function AddtoList(id)
@@ -155,6 +156,7 @@ function BAL(sender_id,sender_name, message)
     else
         SendMessage(sender_id, "Ваш Баланс💵: "..ret.." "..cur.." | Плата за километр 💸: "..(ret1*1000).." "..cur.." за работу💼 "..ret2)
     end
+    statistic:addInfo(sender_name,"checkBal",1)
 	return 1
 end
 
@@ -177,11 +179,14 @@ function PAY(sender_id,sender_name, message) -- Перевод от одного
             local p1 = eco:add(sender_name,"money",-(money+money_nds))
             if p2 == "CMD" then
                 SendMessage(-1,"Игрок "..sender_name.." перевел деньги в CMD в размере "..money.." "..currency)
+                statistic:addInfo(sender_name,"payCMD",money)
             else
                 local pm2 = eco:add(p2,"money",money)
                 SendMessage(MP.GetId(p2), "Игрок " .. sender_name .." перевёл вам деньги 💵 в размере " .. money .. " "..currency)
+                statistic:addInfo(p2,"payToMe",money)
             end
             SendMessage(sender_id, "Вы перевели деньги игроку "..p2.." в размере "..money.." "..currency.." Комиссия: "..(money_nds).." "..currency)
+            statistic:addInfo(sender_name,"payToOther",money)
 		else
 			SendMessage(sender_id, "У вас не хватает денег 💵")
 		end
@@ -232,10 +237,15 @@ function ROLL(sender_id, sender_name, message)
         local commission = win * config.commissionRate
         local netWin = win - commission
         eco:add(sender_name,"money",netWin)
+        statistic:addInfo(sender_name,"rollWin",win)
+        statistic:addInfo(sender_name,"roll",1)
+
         SendMessage(sender_id, "Вы выиграли " .. win .. " денег. После вычета комиссии " .. commission .. " денег, ваш выигрыш составляет " .. netWin .. " денег.")
     else
         -- Проигрыш
         local loss = money
+        statistic:addInfo(sender_name,"rollLoss",money)
+        statistic:addInfo(sender_name,"roll",1)
         eco:add(sender_name,"money",-money)
         SendMessage(sender_id, "Вы проиграли " .. loss .. " "..config.currency )
     end
@@ -354,7 +364,10 @@ function ACCEPT_COINFLIP(sender_id, sender_name, message)
     -- Transfer the bet amount from the loser to the winner
     eco:add(winner_name, "money", bet_amount-commission)
     eco:add(loser_name, "money", -bet_amount)
-
+    statistic:addInfo(winner_name,"coinflipWin",bet_amount)
+    statistic:addInfo(loser_name,"coinflipLoss",bet_amount)
+    statistic:addInfo(winner_name,"coinflipPlay",1)
+    statistic:addInfo(loser_name,"coinflipPlay",1)
     local currency = config.currency
     SendMessage(-1, "Игрок " .. winner_name .. " выиграл бросок монетки у игрока " .. loser_name .. " и получил " .. bet_amount-commission .. " " .. currency .. ".")
 

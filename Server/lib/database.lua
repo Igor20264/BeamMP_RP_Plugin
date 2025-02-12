@@ -162,6 +162,10 @@ function Database:init(namedb) -- свойства
 	    request_save_database(private.database_name,obj.database)
 	end
 
+    function obj:unstable_save()
+        forced_save_database(private.database_name,obj.database)
+    end
+
 	return obj
 end
 

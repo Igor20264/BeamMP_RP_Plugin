@@ -14,6 +14,7 @@ function uptime(sender_id, sender_name, message)
     else
         SendMessage(sender_id,"Время работы сервера: "..tostring(EGG).." сек.")
     end
+	statistic:addInfo(sender_name,"UseCommandUptime",1)
 end
 
 function ProxyRun(sender_id, sender_name, message)
@@ -140,6 +141,7 @@ function HELP(sender_id, sender_name, message)
 		text_message = "НИКОМУ НЕ РАССКАЗЫВАЙ ;)"
 	end
 	SendMessage(sender_id,text_message)
+	statistic:addInfo(sender_name,"UseCommandHelp",1)
 	return "pass"
 end
 

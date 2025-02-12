@@ -1,0 +1,172 @@
+{
+  "first_join": {
+    "title": "Ого, где я?",
+    "desc": "Вы зашли на сервер в первый раз",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "JoinServer",
+      "value": 1
+    }
+  },
+  "earn_10k": {
+    "title": "Первый капитал",
+    "desc": "Заработайте 10,000$ на сервере",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "workAddMoney",
+      "value": 10000
+    }
+  },
+  "roll_15k": {
+    "title": "Удача или провал",
+    "desc": "Поиграйте в !roll на сумму 15,000$",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "roll",
+      "value": 15000
+    }
+  },
+  "play_50_hours": {
+    "title": "Настоящий игрок",
+    "desc": "Наиграйте 50 часов на сервере",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "playdtime",
+      "value": 50
+    }
+  },
+  "buy_first_car": {
+    "title": "Первая ласточка",
+    "desc": "Купите свою первую машину",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "BuyCar",
+      "value": 1
+    }
+  },
+  "get_all_licenses": {
+    "title": "Все права у меня!",
+    "desc": "Получите все категории водительских прав",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "AllDrivelicence",
+      "value": 1
+    }
+  },
+  "get_first_job": {
+    "title": "Трудоустройство",
+    "desc": "Получите свою первую работу",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "startWork",
+      "value": 1
+    }
+  },
+  "buy_10_cars": {
+    "title": "Автопарк",
+    "desc": "Купите 10 машин",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "BuyCar",
+      "value": 10
+    }
+  },
+  "earn_100k": {
+    "title": "Богатей",
+    "desc": "Заработайте 100,000$ на сервере",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "payCMD",
+      "value": 100000
+    }
+  },
+  "lose_coinflip": {
+    "title": "Не повезло...",
+    "desc": "Проиграйте в монетке с другим игроком",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "coinflipLoss",
+      "value": 1
+    }
+  },
+  "win_coinflip": {
+    "title": "Удача на вашей стороне",
+    "desc": "Выиграйте в монетке с другим игроком",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "coinflipWin",
+      "value": 1
+    }
+  },
+  "sell_test_drive": {
+    "title": "Машина для теста",
+    "desc": "Сдайте свою машину на тест-драйв",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "TestDriveAcceptToOther",
+      "value": 1
+    }
+  },
+  "take_test_drive": {
+    "title": "Пробный заезд",
+    "desc": "Возьмите чужую машину на тест-драйв",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "TestDriveAcceptToMe",
+      "value": 1
+    }
+  },
+  "get_first_ticket": {
+    "title": "Первый штраф",
+    "desc": "Получите свой первый штраф",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "ERROR_NOT_FOUND_first_ticket",
+      "value": 1
+    }
+  },
+  "play_100_hours": {
+    "title": "Профессиональный игрок",
+    "desc": "Наиграйте 100 часов на сервере",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "playdtime",
+      "value": 100
+    }
+  },
+  "scrap_car": {
+    "title": "В утиль!",
+    "desc": "Сдайте машину в государственный утиль",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "SellGosCar",
+      "value": 1
+    }
+  },
+  "sell_car_to_player": {
+    "title": "Деловой человек",
+    "desc": "Продайте свою машину другому игроку",
+    "image": null,
+    "audio": null,
+    "req": {
+      "key": "SellCarToOther",
+      "value": 1
+    }
+  }
+}

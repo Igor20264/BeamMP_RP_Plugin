@@ -1,8 +1,8 @@
 {
     "domElement": "<omb-achi></omb-achi>",
-    "name": "RolePlay Notify",
+    "name": "RolePlay Achievements",
     "types": [
-      "ui.apps.categories.roleplaynot"
+      "ui.apps.categories.achievements"
     ],
     "css": {
         "left": "50%",
@@ -10,7 +10,7 @@
         "width": "420px",
         "height": "90px"
     },
-    "description": "Интерфейс для оповещений",
+    "description": "Интерфейс для достижений.",
     "author": "BeamMP_RP_Plugin",
     "version": "0.1",
     "directive": "ombAchi"

@@ -32,6 +32,14 @@ function AutoDriveAddPrava(sender_id, sender_name, message)
     end
     eco.database[name]["drivelicence"][category] = true
     eco:add(name, 'money', -math.abs(config.drivelicence_cost[category]))
+    statistic:addInfo(name,"AddDrivelicence"..category,1)
+    local l = 0
+    for k,v in pairs(eco.database[name]["drivelicence"]) do
+        l = l + 1
+    end
+    if l == #config.drivelicence then
+        statistic:setInfo(name,"AllDrivelicence",1)
+    end
     SendMessage(MP.GetId(name), "Вам выдали права на категорию: "..category.."\nС вашего счёта снята сумма: "..config.drivelicence_cost[category].." "..config.currency)
     eco:save()
 end
@@ -42,6 +50,7 @@ function AutoDriveRemovePrava(sender_id, sender_name, message)
     local category = string.upper(case[2])
     eco.database[name]["drivelicence"][category] = false
     SendMessage(MP.GetId(name), "У вас отобрали права на категорию: "..category)
+    statistic:addInfo(name,"DelDrivelicence"..category,1)
     eco:save()
 end
 

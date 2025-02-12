@@ -129,6 +129,7 @@ function AddPlayTime()
                 ret = tonumber(ret)
             end
             RemoutRun(-1, "setPlayerNickPrefix('"..player.."', '"..(round(eco:value(player, "playdtime")/(60*60),0)).."h')")
+            statistic:setInfo(player,"playdtime",round(eco:value(player, "playdtime")/(60*60),0))
         end
     end
 end

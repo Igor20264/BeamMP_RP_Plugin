@@ -44,6 +44,8 @@ function CarsSellAccept(sender_id,sender_name, message)
             SendMessage(MP.GetId(carSellQuore[sender_name].owner),"Предложение о продаже машины принято. Вам заплатили "..carSellQuore[sender_name].coast.." "..config.currency)
             eco:add(sender_name,"money",-math.abs(carSellQuore[sender_name].coast))
             eco:add(carSellQuore[sender_name].owner,"money",math.abs(carSellQuore[sender_name].coast))
+            statistic:addInfo(sender_name,"SellCarToMe",1)
+            statistic:addInfo(carSellQuore[sender_name].owner,"SellCarToOther",1)
             carSellQuore[sender_name] = nil
         end
     end
@@ -126,6 +128,9 @@ function CarsTestDriveAccept(sender_id, sender_name, message)
         testDriveCars[requestData.tester] = requestData.shallow_copy()
         SendMessage(MP.GetId(requestData.owner), "Игрок " .. requestData.tester .. " принял запрос на тест-драйв. Машина " .. cars:value(requestData.owner, requestData.carId, "nickname") .. " передана на " .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м.")
         SendMessage(sender_id, "Вы приняли тест-драйв машины " .. cars:value(requestData.owner, requestData.carId, "nickname") .. " на" .. totime[1].."д." .. totime[2].. "ч."..totime[3].."м.")
+        statistic:addInfo(sender_name,"TestDriveAcceptToMe",1)
+        statistic:addInfo(requestData.owner,"TestDriveAcceptToOther",1)
+
         testDriveRequests[sender_name] = nil -- Удаляем запрос
     else
         SendMessage(sender_id, "Ошибка при передаче машины на тест-драйв.")
@@ -235,6 +240,8 @@ function CarsRentAccept(sender_id, sender_name, message)
             eco:add(rentalRequests[sender_name].owner, "money", math.abs(rentalRequests[sender_name].cost))
             cars:transfer(owner, sender_name, id, true) -- Передаем машину в аренду
             testDriveCars[sender_name] = rentalRequests[sender_name].shallow_copy()
+            statistic:addInfo(sender_name,"CarRentToMe",1)
+            statistic:addInfo(rentalRequests[sender_name].owner,"CarRentToOther",1)
             rentalRequests[sender_name] = nil
         else
             SendMessage(sender_id, "У вас недостаточно денег для аренды.")

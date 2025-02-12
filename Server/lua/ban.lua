@@ -283,6 +283,7 @@ end
 
 function KICK(sender_id, sender_name, message)
 	MP.DropPlayer(MP.GetId(message))
+    statistic:addInfo(message,"KICK",1)
 	SendMessage(sender_id,message.." был кикнут.")
 end
 
@@ -314,6 +315,7 @@ function BAN(sender_id, sender_name, message)
 		--MP.DropPlayer(player_id,reaseon)
 		local mess = name.." был забанен"
 		SendMessage(-1,mess)
+        statistic:addInfo(name,"BANNED",1)
 	else
         SendMessage(sender_id, name.." был забанен")
 	end

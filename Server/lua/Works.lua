@@ -84,6 +84,7 @@ function Working:init()
 		end
 		money = round(money*boost,2)*2
 		eco:add(name,"money",money)
+		statistic:addInfo(name,"workAddMoney",money)
 		SendMessage(MP.GetId(name),"Вам выплатили "..money.." "..config.currency)
 		privat.neworking[name].last_work_time = os.time()
 		privat.neworking[name].last_uuid = uuid
@@ -119,6 +120,7 @@ function Working:init()
 		MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"Начать работу")
 		if privat.working[name] ~= nil then
 			local EGG = 0
+			local istEGG = 0
 			if privat.working[name].start_temp ~= nil then
 				local befor_temp = privat.working[name].start_temp-privat.working[name].start
 				local temp = 0
@@ -134,12 +136,16 @@ function Working:init()
 					post_temp = 0
 				end
 				EGG = (befor_temp + (temp*privat.working[name].temp_boost) + post_temp)
+				istEGG = timer:get()-privat.working[name].start or 360
 			else
 				EGG = timer:get()-privat.working[name].start or (timer:get()-60)
+				istEGG = EGG
 			end
-
+			istEGG = round(istEGG/3600)
 			local pay = eco:value(name,"work","money")*round(EGG/3600) or 0
 			eco:add(name,"money",pay)
+			statistic:addInfo(name,"workTimeHour",istEGG)
+			statistic:addInfo(name,"workAddMoney",pay)
 			eco.database[name]["work"]["is_working"] = false
 			privat.working[name] = nil
 			block_ignore[name] = false
@@ -187,6 +193,7 @@ function START_WORK(sender_id,sender_name, message)
 			else
 				SendMessage(sender_id,"💼 Вы начали работать. Ваша работа: "..works.." | Зп "..zp..""..config.currency)
 			end
+			statistic:addInfo(sender_name,"startWork",1)
 		else
 			SendMessage(sender_id,"Для работы на сервере нужно ещё "..config.PLAYERMIN-getonlineplayers().." игрока.")
 		end

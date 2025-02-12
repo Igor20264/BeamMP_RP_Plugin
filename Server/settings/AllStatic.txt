@@ -1,0 +1,55 @@
+-- License system --
+AddDrivelicenceA
+AddDrivelicenceB
+AddDrivelicenceC
+AddDrivelicenceD
+DelDrivelicenceA
+DelDrivelicenceB
+DelDrivelicenceC
+DelDrivelicenceD
+AllDrivelicence
+-- BAN SYSTEM --
+BANNED
+KICK
+-- CAR --
+ChangeNicknameCar
+TransferCarToOther
+TransferCarToMe
+FixCarSam
+UpdateMyCar
+UpdateOtherCar
+SpawnMyCar - через !car spawn
+SellGosCar
+BuyCar
+-- Core Commands --
+UseCommandUptime
+UseCommandHelp
+-- CountPlaydTime --
+playdtime
+-- Money --
+coinflipWin
+coinflipLoss
+coinflipPlay - Количество игр
+rollWin
+roll
+rollLoss
+payCMD - Количество денег
+payToOther
+payToMe
+checkBal - кол во раз проверки баланса через !bal
+JoinServer - Заходов на сервер
+-- RolePlay --
+tryTrue - Повезло
+tryFalse - Не повезло
+-- testDrive --
+SellCarToOther - Продать машину другому игроку
+SellCarToMe - Купить машину у другого игрока
+TestDriveAcceptToMe - Принять тест драйв
+TestDriveAcceptToOther - Предложить тест драйв который приняли
+CarRentToMe - Арендовать машину
+CarRentToOther - Арендовать машину другому игроку
+-- work --
+startWork - сколько раз начал работать
+workTimeHour - количество часов
+workAddMoney - количество денег заработанных
+

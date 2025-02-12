@@ -479,6 +479,7 @@ function SetNickname(sender_id,sender_name, message)
     end
     cars:setnick(sender_name,id,nickname)
     SendMessage(sender_id, "Никнейм изменен, теперь никнейм: " .. cars.database[sender_name][id].nickname)
+    statistic:addInfo(sender_name,"ChangeNicknameCar",1)
 end
 
 -- Передать машину
@@ -496,6 +497,8 @@ function CarsGive(sender_id,sender_name, message)
     if data then
         SendMessage(sender_id,"Вы передали машину "..name)
         SendMessage(MP.GetId(name),"Вам передал машину "..case[2].." | "..cars.database[name][id].nickname.." | от: "..sender_name)
+        statistic:addInfo(sender_name,"TransferCarToOther",1)
+        statistic:addInfo(name,"TransferCarToMe",1)
     else
         SendMessage(sender_id,"Не удалось передать машину.")
     end
@@ -515,6 +518,7 @@ end
 function UncarFix(user_id)
     RemoutRun(user_id, "be:getPlayerVehicle(0):queueLuaCommand('recovery.startRecovering() recovery.stopRecovering()')")
     RemoutRun(user_id,"extensions.core_input_actionFilter.addAction(0, 'FREEZ', false)") -- unfreez
+    statistic:addInfo(MP.GetPlayerName(user_id),"FixCarSam",1)
 end
 
 function CarsFix(sender_id,sender_name, message)
@@ -620,7 +624,8 @@ function CarsUpdate(sender_id,sender_name, message)
     SendMessage(MP.GetId(name),"Вы заплатили "..money.." "..config.currency.." за обновление машины")
     eco:add(sender_name, "money", math.abs((money/100)*5))
     SendMessage(sender_id,"Машина обновлена | Вам заплатили за обновление машины "..math.abs((money/100)*5).." "..config.currency)
-
+    statistic:addInfo(name,"UpdateMyCar",1)
+    statistic:addInfo(sender_name,"UpdateOtherCar",1)
 end
 
 function CarsChekEdit(sender_id,sender_name, message)
@@ -700,6 +705,7 @@ function CarsSpawn(sender_id, sender_name, message)
         end
 
         MP.TriggerClientEventJson(sender_id, "SPAWNCAR", send_data)
+        statistic:addInfo(sender_name,"SpawnMyCar",1)
     end
 end
 
@@ -734,6 +740,8 @@ function CarsSellGos(sender_id, sender_name, message)
     cars.database[sender_name][id] = nil
     cars:save()
     SendMessage(sender_id, "Машина продана. Вам заплатили за утилизацию "..pc.."% от стоимости. "..price..""..config.currency)
+    RemoutRun(MP.GetId(sender_name),"be:getPlayerVehicle(0):delete()")
+    statistic:addInfo(sender_name,"SellGosCar",1)
 end
 
 -- Установить стоймость машины
@@ -792,6 +800,7 @@ function BuyCar(sender_id, sender_name, message)
             eco:add(sender_name, "money", -coast)
             local num = cars:new(sender_name, perBuy[sender_name])
             SendMessage(sender_id, "Вы купили машину "..car.carName.." за "..coast .. " "..config.currency)
+            statistic:addInfo(sender_name,"BuyCar",1)
         else
             SendMessage(sender_id, "У вас недостаточно денег")
             return

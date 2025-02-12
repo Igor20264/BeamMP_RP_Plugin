@@ -252,6 +252,7 @@ end
 
 function onInit()
     log("base.lua",2)
+	import("Achivment")
 	CoreCommands = import("Core_Commands")--M.command = RegEvent(M.command)
 	Economic = import("Economic")
 	permissionClass = import("Permission")
