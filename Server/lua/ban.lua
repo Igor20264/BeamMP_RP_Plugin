@@ -246,6 +246,7 @@ function BanSystem:init()
     return obj
 end
 
+MutedPlayers = MutedPlayers or {} -- {name:endtime}
 
 local banSystem = BanSystem:init()
 
@@ -287,6 +288,52 @@ function KICK(sender_id, sender_name, message)
 	SendMessage(sender_id,message.." был кикнут.")
 end
 
+local function NextBan(player_id,reason)
+    MP.DropPlayer(player_id, reason)
+end
+
+
+function MUTEPLAYER(sender_id, sender_name, message)
+    -- todo: !mute <name> <duration> <reason>
+    local case = split(message, " ")
+    if case == nil or #case < 1 then
+        SendMessage(sender_id,"Неверное количество аргументов")
+    end
+    local name = erors2(case[1],1)
+    if name == false then
+        SendMessage("Игрок "..case[1].." не найден.")
+        return
+    end
+    if MutedPlayers[name] ~= nil then
+        SendMessage(sender_id,"Игрок "..name.." уже замьючен. Длительность: "..os.date("%d.%m.%Y %H:%M:%S",MutedPlayers[name]-os.time()))
+        return
+    end
+    local duration = timeConverter(case[2]) or timeConverter("3h")
+    table.remove(case, 1)
+    table.remove(case, 1)
+    local reason = "Узнать подробности можно в Дискорде. "..M.config.url
+    if case ~= nil and #case >= 1 then
+        reason = table.concat(case, " ")
+    end
+    MutedPlayers[name] = os.time()+duration
+    SendMessage(sender_id,"Игрок "..name.." замьючен. Длительность: "..os.date("%d.%m.%Y %H:%M:%S",duration))
+    SendMessage(MP.GetId(name),name.." - Вам выдана блокировка. Причина: "..reason)
+end
+
+function UNMUTEPLAYER(sender_id, sender_name, message)
+    local name = erors2(message,1)
+    if name == false then
+        SendMessage("Игрок "..message.." не найден.")
+        return
+    end
+    if MutedPlayers[name] == nil then
+        SendMessage(sender_id,"Игрок "..name.." не замьючен.")
+        return
+    end
+    MutedPlayers[name] = nil
+    SendMessage(sender_id,"Игрок "..name.." размьючен.")
+end
+
 function BAN(sender_id, sender_name, message)
     -- todo: !ban <name> <duration> <reason>
     local case = split(message, " ")
@@ -321,10 +368,6 @@ function BAN(sender_id, sender_name, message)
 	end
 end
 
-function NextBan(player_id,reason)
-    MP.DropPlayer(player_id, reason)
-end
-
 function checkUnban()
     banSystem:update_bans()
 end
@@ -332,6 +375,8 @@ end
 M.config = config
 M.command = {
 	{command = "unban", help ="Разбан игрока. ",args="[name]",func ="UNBAN",roles = {"admin"}},
+    {command = "unmute", help ="Размьют игрока. ",args="[name]",func ="UNMUTEPLAYER",roles = {"moderator","admin","moder"}},
+    {command = "mute", help ="Заткнуть игрока. ",args="[name] <duration> <reason можно не в 1 слово>",func ="MUTEPLAYER",roles = {"moderator","admin","moder"}},
 	{command = "kick", help ="Кик Игрока. ",args="=[name]",func ="KICK",roles = {"moderator","admin","moder"}},
 	{command = "ban", help ="Бан со ссылкой на сервер. ",args="[name] <duration> <reason можно не в 1 слово>",func ="BAN",roles = {"admin"}},
     {category = "whitelist",command = "add", help ="Добавить в белый список. ",args="[name]",func ="WHITELIST_ADD",roles = {"admin"}},

@@ -1,8 +1,9 @@
 local M = {}
 M.info = "Команды связанные с РП"
 M.ver = "BETA 0.4"
-
+MutedPlayers = MutedPlayers or {}
 function TRY(sender_id, sender_name, message) --Проверка действия
+    if MutedPlayers[sender_name]>os.time() then return 1 end
 	local random = math.random(0,1)
     if message == nil then
         if random == math.random(0,1) then
@@ -24,6 +25,7 @@ function TRY(sender_id, sender_name, message) --Проверка действи�
 end
 
 function DM(sender_id, sender_name, message) --Личное сообщение
+    if MutedPlayers[sender_name]>os.time() then return 1 end
     local target_name = erors(split(message," ")[1],2)
     local message2 = message:sub(#target_name+1,#message)
     local target_id = MP.GetId(target_name)
@@ -38,14 +40,17 @@ function DM(sender_id, sender_name, message) --Личное сообщение
 end
 
 function NRP_Chat(sender_id, sender_name, message) --НРП Информация
+    if MutedPlayers[sender_name]>os.time() then return 1 end
     SendMessage(-1, sender_name..":^7(( " .. message .. " ))")
 end
 
 function ME(sender_id, sender_name, message) --действия от 3-го лица
+    if MutedPlayers[sender_name]>os.time() then return 1 end
     SendMessage(-1, sender_name..":^b " .. message)
 end
 
 function DO(sender_id, sender_name, message) --действия от 3-го лица
+    if MutedPlayers[sender_name]>os.time() then return 1 end
     SendMessage(-1, "^3" .. message .. " ("..sender_name..")")
 end
 
@@ -53,7 +58,7 @@ M.command = {
     {command = "try", help = "Проверка действия", args = "[Что сделал?]", func = "TRY"},
     {command = "dm", help = "Отправить сообщение другому игроку.", args = "[ник] [сообщение]", func = "DM"},
     {command = "b", help = "НРП Информация", args = "[сообщение]", func = "NRP_Chat"},
-    {command = "me", help = "Действия от 3-го лица", args = "[действие]", func = "ME"},
+    {command = "me", help = "Действия от 1-го лица", args = "[действие]", func = "ME"},
     {command = "do", help = "Действия от 3-го лица", args = "[действие]", func = "DO"},
 }
 function M.load()

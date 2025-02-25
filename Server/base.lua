@@ -93,7 +93,7 @@ notify = require "lib/notify"
 timer = require "lib/timer"
 config = load_config("settings/base")
 log("Время сервера с учётом коррекции: "..get_hour().." ч. | Коррекция: "..config.corrector.." ч.",4)
-
+MutedPlayers = MutedPlayers or {}
 -- Чат + Консолька
 
 function MyChatMessageHandler(sender_id, sender_name, message)
@@ -184,7 +184,10 @@ function run(case,sender_id,sender_name,message)
 end
 
 function handlers(sender_id, sender_name, message)
-	if message:sub(1,1) ~= "!" then return 0 end -- если сообщение не начинается с "!", возвращаем 0
+	if message:sub(1,1) ~= "!" then
+		if MutedPlayers[sender_name]>os.time() then return 1 end
+		return 0
+	end -- если сообщение не начинается с "!", возвращаем 0
 	local cmd, args = message:match("!([^%s]+)%s*(.*)") -- ищем команду и аргументы в сообщении
 	if not cmd then return 0 end -- если команда не найдена, возвращаем 0
 	cmd = "!"..cmd -- bal -> !bal
@@ -208,7 +211,7 @@ function handlers(sender_id, sender_name, message)
             end
 	    end
 	end
-
+	if MutedPlayers[sender_name]>os.time() then return 1 end
 	return 0 -- если команда не найдена, возвращаем 0
 end
 
