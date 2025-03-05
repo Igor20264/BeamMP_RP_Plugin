@@ -110,6 +110,7 @@ local function SpawnCar(data)
 	if type(data) ~= "table" then
 		data = json.decode(data)
 	end
+	core_gamestate.setGameState("multiplayer", "BeamMP_RP_Plugin", "multiplayer")
 	local vih = core_vehicles.spawnNewVehicle(data["model"], data.data)
 	vih:queueLuaCommand(data.run_queue)
 	load("local ids = "..(vih:getId())..";"..data["cmd"])()

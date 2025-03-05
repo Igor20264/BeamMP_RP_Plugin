@@ -314,6 +314,7 @@ function timeConverter(time)
     local time = time:gsub("m", "")
     local time = time:gsub("h", "")
     local time = time:gsub("d", "")
+    local time = time:gsub("y", "")
     local time = tonumber(time)
     if time == nil then
         return nil
@@ -326,6 +327,8 @@ function timeConverter(time)
         return time * 60 * 60
     elseif oldtime:lower():find("d") then
         return time * 60 * 60 * 24
+    elseif oldtime:lower():find("y") then
+        return time * 60 * 60 * 24 * 365
     else
         return nil
     end
@@ -337,6 +340,11 @@ function sectotime(seconds)
     local minutes = math.floor((seconds - (days * 86400) - (hours * 3600)) / 60)
     local seconds_ret = seconds - (days * 86400) - (hours * 3600) - (minutes * 60)
     return days, hours, minutes, seconds_ret
+end
+
+-- Пример использования функции sectotime в сообщениях
+function format_time(days, hours, minutes, seconds)
+    return string.format("%d дней %02d:%02d:%02d", days, hours, minutes, seconds)
 end
 
 function MP.GetBeamId(name)

@@ -227,7 +227,11 @@ function BanSystem:init()
     end
 
     function privat:ban_message(name)
-        local msg = "Вы были заблокированы. \nПричина: "..privat.database[name].reason.." \nОсталось: "..os.date("%d.%m.%Y %H:%M:%S",privat.database[name].endtime-os.time()).." \nОбжаловать бан можно в Дискорде: "..config.url
+        local ban_days, ban_hours, ban_minutes, ban_seconds = sectotime(privat.database[name].endtime - os.time())
+        local msg = "Вы были заблокированы.\n"..
+                    "Причина: "..privat.database[name].reason.."\n"..
+                    "Осталось: "..format_time(ban_days, ban_hours, ban_minutes, ban_seconds).."\n"..
+                    "Обжаловать бан можно в Дискорде: "..config.url
         return msg
     end
 
@@ -305,10 +309,15 @@ function MUTEPLAYER(sender_id, sender_name, message)
         return
     end
     if MutedPlayers[name] ~= nil then
-        SendMessage(sender_id,"Игрок "..name.." уже замьючен. Длительность: "..os.date("%d.%m.%Y %H:%M:%S",MutedPlayers[name]-os.time()))
+        local days, hours, minutes, seconds = sectotime(MutedPlayers[name] - os.time())
+        SendMessage(sender_id, "Игрок "..name.." уже замьючен. Длительность: "..format_time(days, hours, minutes, seconds))
         return
     end
-    local duration = timeConverter(case[2]) or timeConverter("3h")
+    local duration = timeConverter("3h")
+    if case[2] ~= nil then
+        duration = timeConverter(case[2])
+        print(duration)
+    end
     table.remove(case, 1)
     table.remove(case, 1)
     local reason = "Узнать подробности можно в Дискорде. "..M.config.url
@@ -316,8 +325,12 @@ function MUTEPLAYER(sender_id, sender_name, message)
         reason = table.concat(case, " ")
     end
     MutedPlayers[name] = os.time()+duration
-    SendMessage(sender_id,"Игрок "..name.." замьючен. Длительность: "..os.date("%d.%m.%Y %H:%M:%S",duration))
-    SendMessage(MP.GetId(name),name.." - Вам выдана блокировка. Причина: "..reason)
+    -- Сообщение, если игрока замьючили
+    local duration_days, duration_hours, duration_minutes, duration_seconds = sectotime(duration)
+    SendMessage(sender_id, "Игрок "..name.." замьючен. Длительность: "..format_time(duration_days, duration_hours, duration_minutes, duration_seconds))
+    if MP.GetId(name) ~= nil then
+        SendMessage(MP.GetId(name),name.." - Вам выдана блокировка. Причина: "..reason)
+    end
 end
 
 function UNMUTEPLAYER(sender_id, sender_name, message)
@@ -353,7 +366,9 @@ function BAN(sender_id, sender_name, message)
         reason = table.concat(case, " ")
     end
     banSystem:add_ban(name,duration,reason)
-    SendMessage(sender_id,name.." был забанен. Причина: "..reason..". Осталось: "..os.date("%d.%m.%Y %H:%M:%S",banSystem:get_endtime(name)-os.time()))
+    local ban_endtime = banSystem:get_endtime(name) - os.time()
+    local ban_remaining_days, ban_remaining_hours, ban_remaining_minutes, ban_remaining_seconds = sectotime(ban_endtime)
+    SendMessage(sender_id, name.." был забанен. Причина: "..reason..". Осталось: "..format_time(ban_remaining_days, ban_remaining_hours, ban_remaining_minutes, ban_remaining_seconds))
 	if MP.check_in_online(name) == true then
         -- todo: тут какая то странная ошибка.
         --> [Economic_Plugin] [WARN] [GetId] "Error. Player: BeamMP_RP_Plugin is missing"  - из за бана. Хз как чинить
