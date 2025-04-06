@@ -35,5 +35,6 @@
       "C" : 150000,
       "D" : 150000
   },
-  "corrector": 3
+  "corrector": 3,
+  "work_time_limit":7200
 }

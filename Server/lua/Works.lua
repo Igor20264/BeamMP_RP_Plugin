@@ -33,7 +33,10 @@ function Working:init()
 		MP.TriggerClientEvent(sender_id, "PacketProfsUpdate", eco.database[name]["work"]["name"]);
 		MP.TriggerClientEvent(sender_id, "PacketProfsButtonUpdate" ,"Закончить работу")
 		if eco.database[name]["work"]["money"] ~= 0 then
-			privat.working[name] = {start = timer:get()}
+			privat.working[name] = {
+				start = timer:get(),
+            	work_start_time = os.time()
+			}
 			eco.database[name]["work"]["is_working"] = true
 			local work = eco.database[name]["work"]["name"]
 			--SpawnWorkCar(name, work)
@@ -42,7 +45,14 @@ function Working:init()
 		else
 			local type_work = eco.database[name]["work"]["type"] or true
 			local dist,uuid = gps:set_random_path(name,type_work)
-			privat.neworking[name] = {lens=0,dist=dist,uuid=uuid,alltimemoney=0,last_uuid="RANDOM",last_work_time = os.time()}
+			privat.neworking[name] = {
+				lens=0,
+				dist=dist,
+				uuid=uuid,
+				alltimemoney=0,
+				last_uuid="RANDOM",
+				last_work_time = os.time(),
+				work_start_time = os.time()}
 			if eco.database[name]["work"]["metr"] == nil then
 				eco.database[name]["work"]["metr"] = config.P4M
 			end
@@ -184,6 +194,9 @@ function PressButton(id,data)
 end
 
 function START_WORK(sender_id,sender_name, message)
+	if config.work_time_limit ~= 0 then
+		SendMessage(sender_id,"⚠️ Лимит рабочего времени: "..(config.work_time_limit/3600).." часов")
+	end
 	if work:stats(sender_name) == nil and work:nestats(sender_name) == nil then
 		if config.PLAYERMIN <= getonlineplayers() then
 			local works,zp,isnew = work:start(sender_name,sender_id)
@@ -205,9 +218,9 @@ end
 function STOP_WORK(sender_id,sender_name, message)
 	local pay,isnew = work:stop(sender_name,sender_id)
 	if isnew then
-		SendMessage(sender_id,"Вы закончили работать. За время работы вам выплатили: "..pay.." "..config.currency)
+		SendMessage(sender_id,"🏁 Работа завершена. За время работы вам выплатили: "..pay.." "..config.currency)
 	else
-		SendMessage(sender_id,"Вы закончили работать. Вам заплатили: "..(pay or 0).." "..config.currency)
+		SendMessage(sender_id,"🏁 Работа завершена. Заработано: "..(pay or 0).." "..config.currency)
 	end
 end
 
@@ -255,7 +268,29 @@ function WHY_WORK(sender_id,sender_name, message)
 end
 
 function CheckWorkW()
-	if getonlineplayers() < config.PLAYERMIN then
+    -- Проверка лимита времени работы
+    if config.work_time_limit then
+        local current_time = os.time()
+
+        -- Для обычных работ
+        for name, time in pairs(work:all()) do
+            if (current_time - time.work_start_time) >= config.work_time_limit then
+                STOP_WORK(MP.GetId(name), name, "")
+                SendMessage(MP.GetId(name), "⏳ Лимит работы достигнут ("..(config.work_time_limit/3600).." ч.)")
+            end
+        end
+
+        -- Для работы с доставками
+        for name, time in pairs(work:neall()) do
+            if (current_time - time.work_start_time) >= config.work_time_limit then
+                STOP_WORK(MP.GetId(name), name, "")
+                SendMessage(MP.GetId(name), "⏳ Лимит работы достигнут ("..(config.work_time_limit/3600).." ч.)")
+            end
+        end
+    end
+
+    -- Существующие проверки
+    if getonlineplayers() < config.PLAYERMIN then
 		if 1 <= get_hour() and get_hour() <= 6 then
 			for name, time in pairs(work:all()) do
 				STOP_WORK(MP.GetId(name),name,"")
