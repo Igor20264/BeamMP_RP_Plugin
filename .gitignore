@@ -46,3 +46,12 @@ luac.out
 # pycharm
 *.idea
 
+# editor
+.vscode/
+
+# logs
+*.log
+*logs*.txt
+
+do_not_portable/
+
