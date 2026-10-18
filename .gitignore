@@ -53,5 +53,10 @@ luac.out
 *.log
 *logs*.txt
 
+# archives
+*.7z
+*.rar
+*.7zip
+
 do_not_portable/
 
